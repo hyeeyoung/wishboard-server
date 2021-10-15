@@ -22,10 +22,12 @@ jobs:
         env: 
           cache-name: cache-node-modules
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          path: ~./npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-modules-
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       # 직업폴더를 설정 한 수 의존 파일을 설치한다.
       - name: Install Dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
