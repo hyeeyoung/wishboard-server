@@ -11,7 +11,7 @@ require("dotenv").config({ path: "/home/ubuntu/.env" });
 var conn;
 const pool = mysql.createPool({
   host: process.env.HOST,
-  user: process.env.USER,
+  user: process.env.DB_USER,
   password: process.env.PASSWORD,
   port: process.env.PORT,
   database: process.env.DATABASE_NAME,
