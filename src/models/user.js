@@ -4,19 +4,19 @@ const bcrypt = require("bcrypt");
 module.exports = {
   signUp: async function (req) {
     var email = req.body.email;
-    var before_pw = req.body.password;
-    var option_notification = req.body.option_notification;
+    var beforePw = req.body.password;
+    var optionNotification = req.body.option_notification;
 
     //DB에 저장되는 비밀번호를 암호화
-    const password = bcrypt.hashSync(before_pw, 10);
+    const password = bcrypt.hashSync(beforePw, 10);
 
-    var sql_insert =
+    var sqlInsert =
       "INSERT INTO users (email, password, option_notification) VALUES (?, ?, ?)";
-    var params = [email, password, option_notification];
+    var params = [email, password, optionNotification];
 
-    console.log(sql_insert);
+    console.log(sqlInsert);
 
-    const [rows] = await conn.get().query(sql_insert, params);
+    const [rows] = await conn.get().query(sqlInsert, params);
     conn.releaseConn();
     return rows;
   },
@@ -24,12 +24,12 @@ module.exports = {
   signIn: async function (req) {
     var email = req.body.email;
 
-    var sql_select =
+    var sqlSelect =
       "SELECT user_id, email, password FROM users WHERE email = ?";
 
-    console.log("sqlSelect : " + sql_select);
+    console.log("sqlSelect : " + sqlSelect);
 
-    const [rows] = await conn.get().query(sql_select, email);
+    const [rows] = await conn.get().query(sqlSelect, email);
     conn.releaseConn();
     return rows;
   },

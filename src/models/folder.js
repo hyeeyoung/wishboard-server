@@ -2,88 +2,88 @@ const conn = require("../config/db");
 
 module.exports = {
   selectFolder: async function (req) {
-    var user_id = Number(req.params.user_id);
+    var userId = Number(req.params.user_id);
 
-    var sql_select = `SELECT f.user_id, f.folder_name, f.folder_image, f.folder_id, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i 
+    var sqlSelect = `SELECT f.user_id, f.folder_name, f.folder_image, f.folder_id, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i 
   ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
-    console.log(sql_select, user_id);
+    console.log(sqlSelect, userId);
 
-    const [rows] = await conn.get().query(sql_select, user_id);
+    const [rows] = await conn.get().query(sqlSelect, userId);
     conn.releaseConn();
     return rows;
   },
   selectFolderList: async function (req) {
-    var user_id = Number(req.params.user_id);
+    var userId = Number(req.params.user_id);
 
-    var sql_select = `SELECT f.folder_id, f.folder_name, f.folder_image, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
-    console.log(sql_select);
+    var sqlSelect = `SELECT f.folder_id, f.folder_name, f.folder_image, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
+    console.log(sqlSelect);
 
-    const [rows] = await conn.get().query(sql_select, user_id);
+    const [rows] = await conn.get().query(sqlSelect, userId);
     conn.releaseConn();
     return rows;
   },
   selectFolderItems: async function (req) {
-    var user_id = Number(req.params.user_id);
-    var folder_id = Number(req.params.folder_id);
+    var userId = Number(req.params.user_id);
+    var folderId = Number(req.params.folder_id);
 
-    var sql_select = `SELECT i.item_id, i.user_id, i.item_image, i.item_name,
+    var sqlSelect = `SELECT i.item_id, i.user_id, i.item_image, i.item_name,
     i.item_price, i.item_url, i.item_memo, b.item_id cart_item_id
     FROM items i left outer join basket b ON i.item_id = b.item_id
     WHERE i.user_id = ? AND i.folder_id = ?
     ORDER BY i.create_at DESC`;
-    var parmas = [user_id, folder_id];
-    console.log(sql_select);
+    var parmas = [userId, folderId];
+    console.log(sqlSelect);
 
-    const [rows] = await conn.get().query(sql_select, parmas);
+    const [rows] = await conn.get().query(sqlSelect, parmas);
     conn.releaseConn();
     return rows;
   },
   insertFolder: async function (req) {
-    var folder_name = req.body.folder_name;
-    var folder_image = req.body.folder_image;
-    var user_id = Number(req.body.user_id);
+    var folderName = req.body.folder_name;
+    var folderImage = req.body.folder_image;
+    var userId = Number(req.body.user_id);
 
-    var sql_insert = `INSERt INTO folders(folder_name, folder_image, user_id) VALUES (?, ?, ?)`;
-    var params = [folder_name, folder_image, user_id];
-    console.log(sql_insert);
+    var sqInsert = `INSERt INTO folders(folder_name, folder_image, user_id) VALUES (?, ?, ?)`;
+    var params = [folderName, folderImage, userId];
+    console.log(sqInsert);
 
-    const [rows] = await conn.get().query(sql_insert, params);
+    const [rows] = await conn.get().query(sqInsert, params);
     conn.releaseConn();
     return rows;
   },
   updateFolder: async function (req) {
-    var user_id = Number(req.body.user_id);
-    var folder_name = req.body.folder_name;
-    var folder_image = req.body.folder_image;
-    var folder_id = Number(req.body.folder_id);
+    var userId = Number(req.body.user_id);
+    var folderName = req.body.folder_name;
+    var folderImage = req.body.folder_image;
+    var folderId = Number(req.body.folder_id);
 
-    var sql_update = `UPDATE folders SET folder_name = ?, folder_image = ? WHERE folder_id = ? and user_id = ?`;
-    var params = [folder_name, folder_image, folder_id, user_id];
-    console.log(sql_update);
+    var sqlUpdate = `UPDATE folders SET folder_name = ?, folder_image = ? WHERE folder_id = ? and user_id = ?`;
+    var params = [folderName, folderImage, folderId, userId];
+    console.log(sqlUpdate);
 
-    const [rows] = await conn.get().query(sql_update, params);
+    const [rows] = await conn.get().query(sqlUpdate, params);
     conn.releaseConn();
     return rows;
   },
   updateFolderImage: async function (req) {
-    var folder_id = Number(req.body.folder_id);
-    var folder_image = req.body.folder_image; //@TODO : varchar니까 그대로. 수정?
+    var folderId = Number(req.body.folder_id);
+    var folderImage = req.body.folder_image; //@TODO : varchar니까 그대로. 수정?
 
-    var sql_update = `UPDATE folders SET folder_image = ? WHERE folder_id = ?`;
-    var params = [folder_image, folder_id];
-    console.log(update_sql);
+    var sqlUpdate = `UPDATE folders SET folder_image = ? WHERE folder_id = ?`;
+    var params = [folderImage, folderId];
+    console.log(sqlUpdate);
 
-    const [rows] = await conn.get().query(sql_update, params);
+    const [rows] = await conn.get().query(sqlUpdate, params);
     conn.releaseConn();
     return rows;
   },
   deleteFolder: async function (req) {
-    var folder_id = Number(req.body.folder_id);
+    var folderId = Number(req.body.folder_id);
 
-    var sql_delete = `DELETE FROM folders WHERE folder_id = ?`;
-    console.log("delete_sql : " + sql_delete);
+    var sqlDelete = `DELETE FROM folders WHERE folder_id = ?`;
+    console.log("sqlDelete : " + sqlDelete);
 
-    const [rows] = await conn.get().query(sql_delete, folder_id);
+    const [rows] = await conn.get().query(sqlDelete, folderId);
     conn.releaseConn();
     return rows;
   },

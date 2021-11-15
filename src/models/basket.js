@@ -2,28 +2,30 @@ const conn = require("../config/db");
 
 module.exports = {
   selectBasket: async function (req) {
-    var user_id = Number(req.params.user_id);
+    var userId = Number(req.params.user_id);
 
-    var sql_select =
+    var sqlSelect =
       "SELECT a.item_id, a.item_image, a.item_name, a.item_price, b.item_count FROM items a JOIN basket b ON a.item_id = b.item_id WHERE b.user_id = ? ORDER BY a.item_id DESC";
 
-    console.log("sql_select : " + sql_select);
+    console.log("sqlSelect : " + sqlSelect);
 
-    const [rows] = await conn.get().query(sql_select, user_id);
+    const [rows] = await conn.get().query(sqlSelect, userId);
     conn.releaseConn();
     return rows;
   },
   insertBasket: async function (req) {
-    var user_id = Number(req.body.user_id);
-    var item_id = Number(req.body.item_id);
+    var userId = Number(req.body.user_id);
+    var itemId = Number(req.body.item_id);
 
-    var sql_insert =
+    var sqlInsert =
       "INSERT INTO basket (user_id, item_id, item_count) VALUES (?, ?, 1)";
-    var params = [user_id, item_id];
+    var params = [userId, itemId];
 
-    console.log("sql_insert : " + sql_insert);
+    console.log("sqlInsert : " + sqlInsert);
 
-    const [rows] = await conn.get().query(sql_insert, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn.get().query(sqlInsert, params);
+    await (await conn.get().getConnection()).commit();
     conn.releaseConn();
     return rows;
   },
@@ -38,37 +40,37 @@ module.exports = {
           " "
       );
     }
-    var user_id = req.body[0].user_id; // @prams: user_id는 한 명이므로
-    var sql_update = "UPDATE basket SET item_count = CASE ";
+    var userId = req.body[0].user_id; // @prams: user_id는 한 명이므로
+    var sqlUpdate = "UPDATE basket SET item_count = CASE ";
     var params = [];
 
     for (var i = 0; i < req.body.length; i++) {
-      sql_update += "WHEN item_id = ? then ? ";
+      sqlUpdate += "WHEN item_id = ? then ? ";
       params.push(req.body[i].item_id);
       params.push(req.body[i].item_count);
       if (i == req.body.length - 1) {
         //마지막 원소라면
-        sql_update += "ELSE item_count END WHERE user_id = ?";
-        params.push(user_id);
+        sqlUpdate += "ELSE item_count END WHERE user_id = ?";
+        params.push(userId);
       }
     }
 
-    console.log("sql_update : " + sql_update + "\nparams : " + params);
+    console.log("sqlUpdate : " + sqlUpdate + "\nparams : " + params);
 
-    const [rows] = await conn.get().query(sql_update, params);
+    const [rows] = await conn.get().query(sqlUpdate, params);
     conn.releaseConn();
     return rows;
   },
   deleteBasket: async function (req) {
-    var user_id = Number(req.body.user_id);
-    var item_id = Number(req.body.item_id);
+    var userId = Number(req.body.user_id);
+    var itemId = Number(req.body.item_id);
 
-    var sql_delete = "DELETE FROM basket WHERE user_id = ? AND item_id = ?";
-    var params = [user_id, item_id];
+    var sqlDelete = "DELETE FROM basket WHERE user_id = ? AND item_id = ?";
+    var params = [userId, itemId];
 
-    console.log("sql_delete : " + sql_delete + "\nparams : " + params);
+    console.log("sqlDelete : " + sqlDelete + "\nparams : " + params);
 
-    const [rows] = await conn.get().query(sql_delete, params);
+    const [rows] = await conn.get().query(sqlDelete, params);
     conn.releaseConn();
     return rows;
   },
