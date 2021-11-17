@@ -16,7 +16,12 @@ module.exports = {
 
     console.log(sqlInsert);
 
-    const [rows] = await conn.get().query(sqlInsert, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlInsert, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },

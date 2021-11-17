@@ -7,6 +7,6 @@ router.post("/", itemController.insertItemInfo);
 router.get("/home/:user_id", itemController.selectHomeItemInfo); //기존 : /item/home/:user_id
 router.get("/detail/:item_id", itemController.selectItemDetailInfo); //기존 : /item/detail/:user_id
 router.put("/detail/:item_id", itemController.updateItemDetailInfo); //기존 : /item/detail/:user_id
-router.delete("/detail/:item_id", itemController.deleteItemDetailInfo); //기존 : /item/detail/:user_id
+router.delete("/detail", itemController.deleteItemDetailInfo); //기존 : /item/detail/:user_id
 
 module.exports = router;

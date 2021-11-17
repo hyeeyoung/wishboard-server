@@ -47,7 +47,12 @@ module.exports = {
     var params = [folderName, folderImage, userId];
     console.log(sqInsert);
 
-    const [rows] = await conn.get().query(sqInsert, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqInsert, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },
@@ -61,7 +66,12 @@ module.exports = {
     var params = [folderName, folderImage, folderId, userId];
     console.log(sqlUpdate);
 
-    const [rows] = await conn.get().query(sqlUpdate, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlUpdate, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },
@@ -73,7 +83,12 @@ module.exports = {
     var params = [folderImage, folderId];
     console.log(sqlUpdate);
 
-    const [rows] = await conn.get().query(sqlUpdate, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlUpdate, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },
@@ -83,7 +98,12 @@ module.exports = {
     var sqlDelete = `DELETE FROM folders WHERE folder_id = ?`;
     console.log("sqlDelete : " + sqlDelete);
 
-    const [rows] = await conn.get().query(sqlDelete, folderId);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlDelete, folderId)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },

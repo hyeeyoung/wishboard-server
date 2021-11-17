@@ -23,9 +23,13 @@ module.exports = {
 
     console.log("sqlInsert : " + sqlInsert);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn.get().query(sqlInsert, params);
-    await (await conn.get().getConnection()).commit();
+    await conn.get().getConnection().beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlInsert, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
+    await conn.get().getConnection().commit();
     conn.releaseConn();
     return rows;
   },
@@ -57,7 +61,12 @@ module.exports = {
 
     console.log("sqlUpdate : " + sqlUpdate + "\nparams : " + params);
 
-    const [rows] = await conn.get().query(sqlUpdate, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlUpdate, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },
@@ -70,7 +79,12 @@ module.exports = {
 
     console.log("sqlDelete : " + sqlDelete + "\nparams : " + params);
 
-    const [rows] = await conn.get().query(sqlDelete, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlDelete, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },

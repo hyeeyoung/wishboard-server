@@ -29,7 +29,12 @@ module.exports = {
 
     console.log("sqlInsert : " + sqlInsert);
 
-    const [rows] = await conn.get().query(sqlInsert, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlInsert, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },
@@ -79,17 +84,27 @@ module.exports = {
     ];
     console.log("sqlUpdate : " + sqlUpdate + "\nitem_id : " + itemId);
 
-    const [rows] = await conn.get().query(sqlUpdate, params);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlUpdate, params)
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },
   deleteItems: async function (req) {
-    var itemId = Number(req.params.item_id);
+    var itemId = Number(req.body.item_id);
     var sqlDelete = "DELETE FROM items WHERE item_id = ?";
 
     console.log("sql_delete : " + sqlDelete + "itemId : " + itemId);
 
-    const [rows] = await conn.get().query(sqlDelete, [itemId]);
+    await (await conn.get().getConnection()).beginTransaction();
+    const [rows] = await conn
+      .get()
+      .query(sqlDelete, [itemId])
+      .then((await conn.get().getConnection()).commit())
+      .catch((await conn.get().getConnection()).rollback());
     conn.releaseConn();
     return rows;
   },
