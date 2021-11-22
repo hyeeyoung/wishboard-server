@@ -15,19 +15,19 @@ jobs:
         uses: actions/checkout@v2
       - name: Check Node v
         run: node -v
-#       # 캐쉬 작업 추가(이전에 dependency를 설치했다면 캐시를 이용하도록
-#       - name: Cache node modules
-#         id: node-cache
-#         uses: actions/cache@v2
-#         env: 
-#           cache-name: cache-node-modules
-#         with:
-#           path: ~./npm
-#           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-#           restore-keys: |
-#             ${{ runner.os }}-build-${{ env.cache-name }}-
-#             ${{ runner.os }}-build-
-#             ${{ runner.os }}-
+      # 캐시 작업 추가(이전에 dependency를 설치했다면 캐시를 이용하도록
+      - name: Cache node modules
+        id: node-cache
+        uses: actions/cache@v2
+        env: 
+          cache-name: cache-node-modules
+        with:
+          path: ~./npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       # 직업폴더를 설정 한 수 의존 파일을 설치한다.
       - name: Install Dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
@@ -40,31 +40,20 @@ jobs:
         run: yarn run build
         
       #CD
-      # S3에 올리기 전에 zip으로 압축한다.
-#       - name: zip create
-#         working-directory: ./dist
-#         run: zip -qq -r ./build.js .
-#         shell: bash
-    #  # AWS 사용자 정보를 입력한다.
-    #   - name: Configure AWS credentials
-    #     uses: aws-actions/configure-aws-credentials@v1
-    #     with:
-    #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #       aws-region: ${{ secrets.AWS_REGION }}
-    #   # S3에 올린다.
-    #   - name: Upload to S3 # Upload build file to S3
-    #     working-directory: ./dist
-    #     env:
-    #       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #   # aws s3 cp --region ap-northeast-2 **./server.zip** s3://**S3버킷이름/S3에서-업로드하고자-하는-폴더**/**build.zip** 원하는 이름대로 수정한다.
-    #     run: |
-    #       aws s3 cp --region ap-northeast-2 ./server.zip s3://mapclone-server/server/server.zip
-    #   - name: Deploy # Deploy to EC2
-    #     working-directory: ./dist
-    #     run: aws deploy create-deployment
-    #       --application-name wishboard_cicd
-    #       --deployment-config-name CodeDeployDefault.AllAtOnce
-    #       --deployment-group-name wishboard_deploy
-    #       --s3-location bucket=aws-codedeploy-ap-northeast-2,key=server/server.zip,bundleType=zip
+      # build 파일을 ec2에 올리기
+#       - name: build file upload to ec2 
+#         uses: garygrossgarten/github-action-scp@release
+#         with:
+#             local: ./dist
+#             remote: /home/hyeeyoung/wishboard-server/dist/
+#             host: ${{ secrets.HOST }}
+#             username: ${{ secrets.SSH_USER }}
+#             privateKey: ${{ secrets.SSH_KEY }}
+#             recursive: true
+#       - name: ec2 update
+#         uses: appleboy/ssh-action@master
+#         with:
+#            host: ${{ secrets.HOST }}
+#            username: ${{ secrets.SSH_USER }}
+#            key: ${{ secrets.SSH_KEY }}
+#            script: pm2 restart 0 --update-env
