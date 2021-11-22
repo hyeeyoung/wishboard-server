@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "webpack --config ./webpack.config.js --mode development",
     "build": "webpack --config ./webpack.config.js --mode production",
-    "app": "echo \"Error: no test specified\" && exit 1"
+    "app": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/build.js"
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,7 @@
   "homepage": "https://github.com/hyejungg/cicd_test#readme",
   "dependencies": {
     "@mapbox/node-pre-gyp": "^1.0.7",
-    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cardinal": "^2.1.1",
     "cors": "^2.8.5",
@@ -33,9 +34,7 @@
     "webpack-cli": "^4.9.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.0",
-    "@babel/preset-env": "^7.16.4",
-    "babel-loader": "^8.2.3",
+    "clean-webpack-plugin": "^4.0.0",
     "webpack": "^5.64.2"
   }
 }

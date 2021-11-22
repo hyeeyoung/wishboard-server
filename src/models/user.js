@@ -1,5 +1,5 @@
 const conn = require("../config/db");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 module.exports = {
   signUp: async function (req) {
