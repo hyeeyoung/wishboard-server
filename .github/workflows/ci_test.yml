@@ -41,20 +41,20 @@ jobs:
         
       #CD
       # build 파일을 ec2에 올리기
-      - name: build file upload to ec2 
-        uses: garygrossgarten/github-action-scp@release
-        with:
-            local: ./dist
-            remote: /home/ubuntu/server-wishboard/dist/
-            host: ${{ secrets.REMOTE_IP }}
-            username: ${{ secrets.REMOTE_SSH_ID }}
-            privateKey: ${{ secrets.REMOTE_SSH_PK }}
-            port: ${{ secrets.REMOTE_SSH_PORT }}
-            recursive: true
-      - name: ec2 update
-        uses: appleboy/ssh-action@master
-        with:
-           host: ${{ secrets.REMOTE_IP }}
-           username: ${{ secrets.REMOTE_SSH_ID }}
-           key: ${{ secrets.REMOTE_SSH_PK }}
-           script: pm2 restart 0 --update-env
+#       - name: build file upload to ec2 
+#         uses: garygrossgarten/github-action-scp@release
+#         with:
+#             local: ./dist
+#             remote: /home/ubuntu/server-wishboard/dist/
+#             host: ${{ secrets.REMOTE_IP }}
+#             username: ${{ secrets.REMOTE_SSH_ID }}
+#             privateKey: ${{ secrets.REMOTE_SSH_PK }}
+#             port: ${{ secrets.REMOTE_SSH_PORT }}
+#             recursive: true
+#       - name: ec2 update
+#         uses: appleboy/ssh-action@master
+#         with:
+#            host: ${{ secrets.REMOTE_IP }}
+#            username: ${{ secrets.REMOTE_SSH_ID }}
+#            key: ${{ secrets.REMOTE_SSH_PK }}
+#            script: pm2 restart 0 --update-env
