@@ -1,5 +1,4 @@
 const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const webpack = require("webpack");
 const dotenv = require("dotenv");
 
@@ -15,7 +14,6 @@ module.exports = {
     filename: "build.js",
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
       "process.env.HOST": JSON.stringify(process.env.HOST),
       "process.env.DB_USER": JSON.stringify(process.env.DB_USER),
