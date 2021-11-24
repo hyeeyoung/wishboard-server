@@ -15,7 +15,9 @@ module.exports = {
     filename: "build.js",
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanAfterEveryBuildPatterns: ["dist"],
+    }),
     new webpack.DefinePlugin({
       "process.env.HOST": JSON.stringify(process.env.HOST),
       "process.env.DB_USER": JSON.stringify(process.env.DB_USER),
