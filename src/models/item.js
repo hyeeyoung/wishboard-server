@@ -1,4 +1,4 @@
-const conn = require("../config/db");
+const pool = require("../config/db");
 
 module.exports = {
   insertItem: async function (req) {
@@ -29,24 +29,25 @@ module.exports = {
 
     console.log("sqlInsert : " + sqlInsert);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn
-      .get()
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
       .query(sqlInsert, params)
-      .then((await conn.get().getConnection()).commit())
-      .catch((await conn.get().getConnection()).rollback());
-    conn.releaseConn();
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
     return rows;
   },
   selectItems: async function (req) {
     var userId = Number(req.params.user_id);
     var sqlSelect =
-      "SELECT i.item_id, i.user_id, i.folder_id, i.item_image, i.item_name, i.item_price, i.item_url, i.item_memo, b.item_id cart_item_id FROM items i left outer join basket b on i.item_id = b.item_id WHERE i.user_id = ? ORDER BY i.create_at DESC";
+      "SELECT i.item_id, i.user_id, i.folder_id, i.item_image, i.item_name, i.item_price, i.item_url, i.item_memo, b.item_id cart_item_id FROM items i left outer join cart b on i.item_id = b.item_id WHERE i.user_id = ? ORDER BY i.create_at DESC";
 
     console.log("sqlSelect : " + sqlSelect + "\nuser_id : " + userId);
 
-    const [rows] = await conn.get().query(sqlSelect, [userId]);
-    conn.releaseConn();
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, [userId]);
+    connection.release();
     return rows;
   },
   selectItemsDetail: async function (req) {
@@ -58,8 +59,9 @@ module.exports = {
     //var temp_sql_select = "SELECT i.folder_id, i.item_image, i.item_name, i.item_price, i.item_url, i.item_memo, CAST(i.create_at AS CHAR(10)) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date FROM items i LEFT OUTER JOIN notification n ON i.item_id = n.item_id WHERE i.item_id = ?";
     console.log("sqlSelect : " + sqlSelect + "itemId : " + itemId);
 
-    const [rows] = await conn.get().query(sqlSelect, [itemId]);
-    conn.releaseConn();
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, [itemId]);
+    connection.release();
     return rows;
   },
   updateItemsDetail: async function (req) {
@@ -84,13 +86,13 @@ module.exports = {
     ];
     console.log("sqlUpdate : " + sqlUpdate + "\nitem_id : " + itemId);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn
-      .get()
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
       .query(sqlUpdate, params)
-      .then((await conn.get().getConnection()).commit())
-      .catch((await conn.get().getConnection()).rollback());
-    conn.releaseConn();
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
     return rows;
   },
   deleteItems: async function (req) {
@@ -99,13 +101,13 @@ module.exports = {
 
     console.log("sql_delete : " + sqlDelete + "itemId : " + itemId);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn
-      .get()
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
       .query(sqlDelete, [itemId])
-      .then((await conn.get().getConnection()).commit())
-      .catch((await conn.get().getConnection()).rollback());
-    conn.releaseConn();
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
     return rows;
   },
 };

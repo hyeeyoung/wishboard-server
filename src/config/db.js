@@ -17,13 +17,12 @@ const pool = mysql.createPool({
 
 console.log(process.env.HOST);
 console.log(pool);
+console.log("success create pool!!");
 
-let conn;
-exports.connect = async function () {
+exports.connection = async function () {
   let connection = await pool.getConnection(async (conn) => conn);
   try {
     console.log("DB connection Pool Success!");
-    conn = connection;
     return connection;
   } catch (err) {
     switch (err.code) {
@@ -38,12 +37,4 @@ exports.connect = async function () {
         break;
     }
   }
-};
-
-exports.releaseConn = function () {
-  conn.release();
-};
-
-exports.get = function () {
-  return pool;
 };
