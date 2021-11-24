@@ -5,7 +5,7 @@ module.exports = {
     if (!req.body.item_image) {
       return res.status(400).json({
         success: false,
-        message: "정보가 없습니다",
+        message: "이미지 정보가 없습니다",
       });
     }
 
