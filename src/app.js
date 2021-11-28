@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser"); // @brief bodyParse : 요청의 본문에 있는 데이터를 해석해서 req.body 객체로 만들어주는 미들웨어
-const db = require("./config/db"); // @brief : db pool 사용하기
 const path = require("path");
 const port = 3000;
 
@@ -24,22 +23,14 @@ app.use(express.static(path.join(__dirname, "public")));
 //router 설정
 const userRouter = require("./routes/userRoutes");
 const itemRouter = require("./routes/itemRoutes");
-const basketRouter = require("./routes/basketRoutes");
+const cartRouter = require("./routes/cartRoutes");
 const folderRouter = require("./routes/folderRoutes");
 const notiRouter = require("./routes/notiRoutes");
 app.use("/user", userRouter);
 app.use("/item", itemRouter);
-app.use("/basket", basketRouter);
+app.use("/cart", cartRouter);
 app.use("/folder", folderRouter);
 app.use("/noti", notiRouter);
-
-//db 설정
-db.connect(function (err) {
-  if (err) {
-    console.log("데이터베이스에 접속할 수 없습니다.");
-    process.exit(1);
-  }
-});
 
 //에러페이지 설정
 app.use(function (req, res, next) {

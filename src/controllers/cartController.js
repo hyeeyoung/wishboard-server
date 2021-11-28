@@ -1,17 +1,17 @@
-const Basket = require("../models/basket");
+const Cart = require("../models/cart");
 
 module.exports = {
-  selectBaksetInfo: async function (req, res) {
-    await Basket.selectBasket(req)
+  selectCartInfo: async function (req, res) {
+    await Cart.selectCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to selected the basket for data.");
+          console.log("Failed to selected the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니 정보 없습니다.",
           });
         } else {
-          console.log("Successfully selected data the basket!!");
+          console.log("Successfully selected data the cart!!");
           res.status(200).json(result);
           console.log(result);
         }
@@ -24,17 +24,17 @@ module.exports = {
         });
       });
   },
-  insertBaksetInfo: async function (req, res) {
-    await Basket.insertBasket(req)
+  insertCartInfo: async function (req, res) {
+    await Cart.insertCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to inserted the basket for data.");
+          console.log("Failed to inserted the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니에 추가할 수 없습니다.",
           });
         } else {
-          console.log("Successfully inserted data into the basket!!");
+          console.log("Successfully inserted data into the cart!!");
           res.status(200).json({
             success: true,
             message: "장바구니에 아이템 추가 성공",
@@ -56,17 +56,17 @@ module.exports = {
         }
       });
   },
-  updateBaksetInfo: async function (req, res) {
-    await Basket.updateBasket(req)
+  updateCartInfo: async function (req, res) {
+    await Cart.updateCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to updated the basket for data.");
+          console.log("Failed to updated the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니를 수정할 수 없습니다.",
           });
         } else {
-          console.log("Successfully updated data into the basket!!");
+          console.log("Successfully updated data into the cart!!");
           res.status(200).json({
             success: true,
             message: "장바구니 아이템 수정 성공",
@@ -81,17 +81,17 @@ module.exports = {
         });
       });
   },
-  deleteBaksetInfo: async function (req, res) {
-    await Basket.deleteBasket(req)
+  deleteCartInfo: async function (req, res) {
+    await Cart.deleteCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to deleted the basket for data.");
+          console.log("Failed to deleted the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니 아이템을 삭제할 수 없습니다.",
           });
         } else {
-          console.log("Successfully deleted data into the basket!!");
+          console.log("Successfully deleted data into the cart!!");
           res.status(200).json({
             success: true,
             message: "장바구니 아이템 삭제 성공",

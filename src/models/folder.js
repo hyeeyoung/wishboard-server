@@ -1,4 +1,4 @@
-const conn = require("../config/db");
+const pool = require("../config/db");
 
 module.exports = {
   selectFolder: async function (req) {
@@ -8,8 +8,9 @@ module.exports = {
   ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
     console.log(sqlSelect, userId);
 
-    const [rows] = await conn.get().query(sqlSelect, userId);
-    conn.releaseConn();
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, userId);
+    connection.release();
     return rows;
   },
   selectFolderList: async function (req) {
@@ -18,8 +19,9 @@ module.exports = {
     var sqlSelect = `SELECT f.folder_id, f.folder_name, f.folder_image, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
     console.log(sqlSelect);
 
-    const [rows] = await conn.get().query(sqlSelect, userId);
-    conn.releaseConn();
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, userId);
+    connection.release();
     return rows;
   },
   selectFolderItems: async function (req) {
@@ -28,14 +30,15 @@ module.exports = {
 
     var sqlSelect = `SELECT i.item_id, i.user_id, i.item_image, i.item_name,
     i.item_price, i.item_url, i.item_memo, b.item_id cart_item_id
-    FROM items i left outer join basket b ON i.item_id = b.item_id
+    FROM items i left outer join cart b ON i.item_id = b.item_id
     WHERE i.user_id = ? AND i.folder_id = ?
     ORDER BY i.create_at DESC`;
     var parmas = [userId, folderId];
     console.log(sqlSelect);
 
-    const [rows] = await conn.get().query(sqlSelect, parmas);
-    conn.releaseConn();
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, parmas);
+    connection.release();
     return rows;
   },
   insertFolder: async function (req) {
@@ -47,13 +50,13 @@ module.exports = {
     var params = [folderName, folderImage, userId];
     console.log(sqInsert);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn
-      .get()
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
       .query(sqInsert, params)
-      .then((await conn.get().getConnection()).commit())
-      .catch((await conn.get().getConnection()).rollback());
-    conn.releaseConn();
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
     return rows;
   },
   updateFolder: async function (req) {
@@ -66,13 +69,13 @@ module.exports = {
     var params = [folderName, folderImage, folderId, userId];
     console.log(sqlUpdate);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn
-      .get()
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
       .query(sqlUpdate, params)
-      .then((await conn.get().getConnection()).commit())
-      .catch((await conn.get().getConnection()).rollback());
-    conn.releaseConn();
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
     return rows;
   },
   updateFolderImage: async function (req) {
@@ -83,13 +86,13 @@ module.exports = {
     var params = [folderImage, folderId];
     console.log(sqlUpdate);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn
-      .get()
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
       .query(sqlUpdate, params)
-      .then((await conn.get().getConnection()).commit())
-      .catch((await conn.get().getConnection()).rollback());
-    conn.releaseConn();
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
     return rows;
   },
   deleteFolder: async function (req) {
@@ -98,13 +101,13 @@ module.exports = {
     var sqlDelete = `DELETE FROM folders WHERE folder_id = ?`;
     console.log("sqlDelete : " + sqlDelete);
 
-    await (await conn.get().getConnection()).beginTransaction();
-    const [rows] = await conn
-      .get()
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
       .query(sqlDelete, folderId)
-      .then((await conn.get().getConnection()).commit())
-      .catch((await conn.get().getConnection()).rollback());
-    conn.releaseConn();
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
     return rows;
   },
 };
