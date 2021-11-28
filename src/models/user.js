@@ -5,15 +5,12 @@ module.exports = {
   signUp: async function (req) {
     var email = req.body.email;
     var beforePw = req.body.password;
-    var nickname = req.body.nickname;
-    var profileImg = req.body.profile_img;
 
     //DB에 저장되는 비밀번호를 암호화
     const password = bcrypt.hashSync(beforePw, 10);
 
-    var sqlInsert =
-      "INSERT INTO users (email, password, nickname, profile_img) VALUES (?, ?, ?, ?)";
-    var params = [email, password, nickname, profileImg];
+    var sqlInsert = "INSERT INTO users (email, password) VALUES (?, ?)";
+    var params = [email, password];
 
     console.log(sqlInsert);
 
