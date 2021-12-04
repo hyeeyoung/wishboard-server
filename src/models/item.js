@@ -2,7 +2,7 @@ const pool = require("../config/db");
 
 module.exports = {
   insertItem: async function (req) {
-    var userId = Number(req.body.user_id);
+    var userId = Number(req.decoded);
     var folderId = req.body.folder_id;
 
     if (folderId != undefined) {
@@ -39,7 +39,7 @@ module.exports = {
     return rows;
   },
   selectItems: async function (req) {
-    var userId = Number(req.params.user_id);
+    var userId = Number(req.decoded);
     var sqlSelect =
       "SELECT i.item_id, i.user_id, i.folder_id, i.item_image, i.item_name, i.item_price, i.item_url, i.item_memo, b.item_id cart_item_id FROM items i left outer join cart b on i.item_id = b.item_id WHERE i.user_id = ? ORDER BY i.create_at DESC";
 

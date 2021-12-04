@@ -43,17 +43,10 @@ module.exports = {
       })
       .catch((err) => {
         console.log(err);
-        if ((err.code = "ER_DUP_ENTRY")) {
-          res.status(404).json({
-            success: false,
-            message: "이미 장바구니에 존재합니다.",
-          });
-        } else {
-          res.status(500).json({
-            success: false,
-            message: "wish boarad 서버 에러",
-          });
-        }
+        res.status(500).json({
+          success: false,
+          message: "wish boarad 서버 에러",
+        });
       });
   },
   updateCartInfo: async function (req, res) {

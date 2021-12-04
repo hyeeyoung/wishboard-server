@@ -2,7 +2,7 @@ const pool = require("../config/db");
 
 module.exports = {
   selectFolder: async function (req) {
-    var userId = Number(req.params.user_id);
+    var userId = Number(req.decoded);
 
     var sqlSelect = `SELECT f.user_id, f.folder_name, f.folder_image, f.folder_id, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i 
   ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
@@ -14,7 +14,7 @@ module.exports = {
     return rows;
   },
   selectFolderList: async function (req) {
-    var userId = Number(req.params.user_id);
+    var userId = Number(req.decoded);
 
     var sqlSelect = `SELECT f.folder_id, f.folder_name, f.folder_image, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
     console.log(sqlSelect);
@@ -25,7 +25,7 @@ module.exports = {
     return rows;
   },
   selectFolderItems: async function (req) {
-    var userId = Number(req.params.user_id);
+    var userId = Number(req.decoded);
     var folderId = Number(req.params.folder_id);
 
     var sqlSelect = `SELECT i.item_id, i.user_id, i.item_image, i.item_name,
@@ -44,7 +44,7 @@ module.exports = {
   insertFolder: async function (req) {
     var folderName = req.body.folder_name;
     var folderImage = req.body.folder_image;
-    var userId = Number(req.body.user_id);
+    var userId = Number(req.decoded);
 
     var sqInsert = `INSERt INTO folders(folder_name, folder_image, user_id) VALUES (?, ?, ?)`;
     var params = [folderName, folderImage, userId];
@@ -60,7 +60,7 @@ module.exports = {
     return rows;
   },
   updateFolder: async function (req) {
-    var userId = Number(req.body.user_id);
+    var userId = Number(req.decoded);
     var folderName = req.body.folder_name;
     var folderImage = req.body.folder_image;
     var folderId = Number(req.body.folder_id);
