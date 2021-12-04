@@ -1,8 +1,18 @@
 const express = require("express");
 const app = express();
-const bodyParser = require("body-parser"); // @brief bodyParse : 요청의 본문에 있는 데이터를 해석해서 req.body 객체로 만들어주는 미들웨어
+const bodyParser = require("body-parser");
 const path = require("path");
 const port = 3000;
+
+const authRouter = require("./routes/authRoutes");
+const userRouter = require("./routes/userRoutes");
+const itemRouter = require("./routes/itemRoutes");
+const cartRouter = require("./routes/cartRoutes");
+const folderRouter = require("./routes/folderRoutes");
+const notiRouter = require("./routes/notiRoutes");
+
+const passport = require("passport");
+const passportConfig = require("./config/passport");
 
 //기본 설정
 app.listen(port, () =>
@@ -20,12 +30,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(passport.initialize());
+passportConfig();
+
 //router 설정
-const userRouter = require("./routes/userRoutes");
-const itemRouter = require("./routes/itemRoutes");
-const cartRouter = require("./routes/cartRoutes");
-const folderRouter = require("./routes/folderRoutes");
-const notiRouter = require("./routes/notiRoutes");
+app.use("/auth", authRouter);
 app.use("/user", userRouter);
 app.use("/item", itemRouter);
 app.use("/cart", cartRouter);
