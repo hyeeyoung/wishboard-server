@@ -3,7 +3,7 @@ const pool = require("../config/db");
 
 module.exports = {
   selectCart: async function (req) {
-    var userId = Number(req.params.user_id);
+    var userId = Number(req.decoded);
 
     var sqlSelect =
       "SELECT a.item_id, a.item_image, a.item_name, a.item_price, b.item_count FROM items a JOIN cart b ON a.item_id = b.item_id WHERE b.user_id = ? ORDER BY a.item_id DESC";
@@ -16,7 +16,7 @@ module.exports = {
     return rows;
   },
   insertCart: async function (req) {
-    var userId = Number(req.body.user_id);
+    var userId = Number(req.decoded);
     var itemId = Number(req.body.item_id);
 
     var sqlInsert =
@@ -45,7 +45,7 @@ module.exports = {
           " "
       );
     }
-    var userId = req.body[0].user_id; // @prams: user_id는 한 명이므로
+    var userId = Number(req.decoded); // @prams: user_id는 한 명이므로
     var sqlUpdate = "UPDATE cart SET item_count = CASE ";
     var params = [];
 
@@ -72,7 +72,7 @@ module.exports = {
     return rows;
   },
   deleteCart: async function (req) {
-    var userId = Number(req.body.user_id);
+    var userId = Number(req.decoded);
     var itemId = Number(req.body.item_id);
 
     var sqlDelete = "DELETE FROM cart WHERE user_id = ? AND item_id = ?";

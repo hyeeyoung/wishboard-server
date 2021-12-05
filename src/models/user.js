@@ -37,4 +37,15 @@ module.exports = {
     connection.release();
     return rows;
   },
+
+  vaildateEmail: async function (req) {
+    var email = req.body.email;
+
+    var sqlSelect = "SELECT email FROM users WHERE email = ?";
+
+    const connection = await pool.connection(async (conn) => conn);
+    const row = await connection.query(sqlSelect, email);
+    connection.release();
+    return row[0].length >= 1 ? true : false;
+  },
 };
