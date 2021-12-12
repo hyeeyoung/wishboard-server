@@ -8,8 +8,6 @@ module.exports = {
     var sqlSelect =
       "SELECT a.item_id, a.item_image, a.item_name, a.item_price, b.item_count FROM items a JOIN cart b ON a.item_id = b.item_id WHERE b.user_id = ? ORDER BY a.item_id DESC";
 
-    console.log("sqlSelect : " + sqlSelect);
-
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
     connection.release();
@@ -23,8 +21,6 @@ module.exports = {
       "INSERT INTO cart (user_id, item_id, item_count) VALUES (?, ?, 1)";
     var params = [userId, itemId];
 
-    console.log("sqlInsert : " + sqlInsert);
-
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection
@@ -35,16 +31,6 @@ module.exports = {
     return rows;
   },
   updateCart: async function (req) {
-    for (var i = 0; i < req.body.length; i++) {
-      console.log(
-        req.body[i].user_id +
-          " " +
-          req.body[i].item_id +
-          " " +
-          req.body[i].item_count +
-          " "
-      );
-    }
     var userId = Number(req.decoded); // @prams: user_id는 한 명이므로
     var sqlUpdate = "UPDATE cart SET item_count = CASE ";
     var params = [];
@@ -59,8 +45,6 @@ module.exports = {
         params.push(userId);
       }
     }
-
-    console.log("sqlUpdate : " + sqlUpdate + "\nparams : " + params);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -77,8 +61,6 @@ module.exports = {
 
     var sqlDelete = "DELETE FROM cart WHERE user_id = ? AND item_id = ?";
     var params = [userId, itemId];
-
-    console.log("sqlDelete : " + sqlDelete + "\nparams : " + params);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();

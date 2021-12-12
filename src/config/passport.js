@@ -6,6 +6,9 @@ const JWTStrategy = require("passport-jwt").Strategy;
 const ExtractJWT = require("passport-jwt").ExtractJwt;
 const bcrypt = require("bcryptjs");
 require("dotenv").config({ path: "../.env" });
+const logger = require("./winston");
+
+const TAG = "PASSPORT ";
 
 const localStragegyOption = {
   usernameField: "email",
@@ -31,13 +34,13 @@ async function localVerify(email, password, done) {
         user = rows[0];
 
         const checkPassword = bcrypt.compareSync(password, user[0].password);
-        console.log(checkPassword);
+        logger.info(TAG + localVerify.name + "() : " + checkPassword);
         if (!checkPassword) return done(null, false);
 
         return done(null, user);
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         return done(null, false);
       });
     connection.release();
@@ -60,7 +63,7 @@ async function jwtVerify(payload, done) {
         return done(null, user);
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         return done(null, false);
       });
     connection.release();

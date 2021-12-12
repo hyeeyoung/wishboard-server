@@ -21,6 +21,7 @@
   "homepage": "https://github.com/hyejungg/cicd_test#readme",
   "dependencies": {
     "@mapbox/node-pre-gyp": "^1.0.7",
+    "app-root-path": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cardinal": "^2.1.1",
@@ -31,12 +32,15 @@
     "express": "^4.17.1",
     "firebase-admin": "^9.12.0",
     "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
     "mysql2": "^2.3.0",
     "npm": "^8.0.0",
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "webpack": "^5.64.2",
-    "webpack-cli": "^4.9.1"
+    "webpack-cli": "^4.9.1",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5"
   }
 }

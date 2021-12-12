@@ -6,7 +6,6 @@ module.exports = {
 
     var sqlSelect = `SELECT f.user_id, f.folder_name, f.folder_image, f.folder_id, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i 
   ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
-    console.log(sqlSelect, userId);
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -17,7 +16,6 @@ module.exports = {
     var userId = Number(req.decoded);
 
     var sqlSelect = `SELECT f.folder_id, f.folder_name, f.folder_image, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
-    console.log(sqlSelect);
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -34,7 +32,6 @@ module.exports = {
     WHERE i.user_id = ? AND i.folder_id = ?
     ORDER BY i.create_at DESC`;
     var parmas = [userId, folderId];
-    console.log(sqlSelect);
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, parmas);
@@ -48,7 +45,6 @@ module.exports = {
 
     var sqInsert = `INSERt INTO folders(folder_name, folder_image, user_id) VALUES (?, ?, ?)`;
     var params = [folderName, folderImage, userId];
-    console.log(sqInsert);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -67,7 +63,6 @@ module.exports = {
 
     var sqlUpdate = `UPDATE folders SET folder_name = ?, folder_image = ? WHERE folder_id = ? and user_id = ?`;
     var params = [folderName, folderImage, folderId, userId];
-    console.log(sqlUpdate);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -80,11 +75,10 @@ module.exports = {
   },
   updateFolderImage: async function (req) {
     var folderId = Number(req.body.folder_id);
-    var folderImage = req.body.folder_image; //@TODO : varchar니까 그대로. 수정?
+    var folderImage = req.body.folder_image;
 
     var sqlUpdate = `UPDATE folders SET folder_image = ? WHERE folder_id = ?`;
     var params = [folderImage, folderId];
-    console.log(sqlUpdate);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -99,7 +93,6 @@ module.exports = {
     var folderId = Number(req.body.folder_id);
 
     var sqlDelete = `DELETE FROM folders WHERE folder_id = ?`;
-    console.log("sqlDelete : " + sqlDelete);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
