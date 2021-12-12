@@ -1,7 +1,10 @@
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const logger = require("../config/winston");
 require("dotenv").config({ path: "../.env" });
+
+const TAG = "authController  ";
 
 module.exports = {
   signUp: async function (req, res) {
@@ -12,7 +15,7 @@ module.exports = {
         .then(() => {
           passport.authenticate("local", { session: false }, (err, user) => {
             if (err || !user) {
-              console.log(err);
+              logger.info(TAG + err || !user);
               return res.status(401).json({
                 success: false,
                 message: "wishboard 회원가입 성공 후 로그인 실패",
@@ -20,7 +23,7 @@ module.exports = {
             }
             req.login(user, { session: false }, (err) => {
               if (err) {
-                console.log(err);
+                logger.info(TAG + err);
                 return res.status(500).send(err);
               }
               const token = jwt.sign(
@@ -36,7 +39,7 @@ module.exports = {
           })(req, res);
         })
         .catch((err) => {
-          console.log(err);
+          logger.error(TAG + err);
           res.status(404).json({
             success: false,
             message: "wishboard 앱 회원가입 실패",
@@ -52,7 +55,7 @@ module.exports = {
   signIn: async function (req, res) {
     passport.authenticate("local", { session: false }, (err, user) => {
       if (err || !user) {
-        console.log(err);
+        logger.info(TAG + err || !user);
         return res.status(401).json({
           success: false,
           message: "아이디 혹은 비밀번호를 다시 확인해주세요.",
@@ -60,7 +63,7 @@ module.exports = {
       }
       req.login(user, { session: false }, (err) => {
         if (err) {
-          console.log(err);
+          logger.info(TAG + err);
           return res.status(500).send(err);
         }
         const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);

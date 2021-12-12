@@ -12,8 +12,6 @@ module.exports = {
     var sqlInsert = "INSERT INTO users (email, password) VALUES (?, ?)";
     var params = [email, password];
 
-    console.log(sqlInsert);
-
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection
@@ -29,8 +27,6 @@ module.exports = {
 
     var sqlSelect =
       "SELECT user_id, email, password FROM users WHERE email = ?";
-
-    console.log("sqlSelect : " + sqlSelect);
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, email);

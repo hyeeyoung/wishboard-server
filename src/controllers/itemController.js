@@ -1,4 +1,7 @@
 const Items = require("../models/item");
+const logger = require("../config/winston");
+
+const TAG = "ItemController ";
 
 module.exports = {
   insertItemInfo: async function (req, res) {
@@ -17,7 +20,7 @@ module.exports = {
         });
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
       });
   },
   selectHomeItemInfo: async function (req, res) {
@@ -29,12 +32,12 @@ module.exports = {
             message: "아이템 정보가 없습니다.",
           });
         } else {
-          console.log("rows : " + JSON.stringify(result));
+          logger.info(TAG + result);
           res.status(200).json(result);
         }
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         res.status(500).json({
           success: false,
           message: "wishboard 서버 에러",
@@ -45,7 +48,7 @@ module.exports = {
     await Items.selectItemsDetail(req)
       .then((result) => {
         if (result.length > 0) {
-          console.log("rows : " + JSON.stringify(result));
+          logger.info(TAG + result[0]);
           res.status(200).json(result[0]);
         } else {
           res.status(404).json({
@@ -55,7 +58,7 @@ module.exports = {
         }
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         res.status(500).json({
           success: false,
           message: "wishboard 서버 에러",
@@ -66,13 +69,11 @@ module.exports = {
     await Items.updateItemsDetail(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to updated the items for data.");
           res.status(400).json({
             success: false,
             message: "수정한 아이템이 없습니다.",
           });
         } else {
-          console.log("Successfully updated data into the items!!");
           res.status(200).json({
             success: true,
             message: "아이템 수정 성공",
@@ -80,7 +81,7 @@ module.exports = {
         }
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         res.status(500).json({
           success: false,
           message: "wish boarad 서버 에러",
@@ -91,13 +92,11 @@ module.exports = {
     await Items.deleteItems(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to deleted the items for data.");
           res.status(400).json({
             success: false,
             message: "삭제할 아이템이 없습니다.",
           });
         } else {
-          console.log("Successfully deleted data into the items!!");
           res.status(200).json({
             success: true,
             message: "아이템 삭제 성공",
@@ -105,7 +104,7 @@ module.exports = {
         }
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         res.status(500).json({
           success: false,
           message: "wish boarad 서버 에러",

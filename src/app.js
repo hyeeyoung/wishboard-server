@@ -1,8 +1,11 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
+const logger = require("./config/winston");
 const bodyParser = require("body-parser");
 const path = require("path");
-const port = 3000;
+require("dotenv").config({ path: "../.env" });
+const port = process.env.PORT || 3000;
 
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -13,11 +16,12 @@ const notiRouter = require("./routes/notiRoutes");
 
 const passport = require("passport");
 const passportConfig = require("./config/passport");
+const morganFormat = process.env.NODE_ENV !== "production" ? "dev" : "combined"; // NOTE: morgan 출력 형태
 
 //기본 설정
-app.listen(port, () =>
-  console.log(`Example app listening at http://localhost:${port}`)
-);
+app.use(morgan(morganFormat, { stream: logger.stream }));
+
+app.listen(port, () => logger.info(`Server start listening on port ${port}`));
 
 app.get("/", (req, res) => res.send("Welcome to WishBoard!!"));
 

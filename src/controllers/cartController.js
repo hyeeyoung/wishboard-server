@@ -1,23 +1,24 @@
 const Cart = require("../models/cart");
+const logger = require("../config/winston");
+
+const TAG = "cartContoller ";
 
 module.exports = {
   selectCartInfo: async function (req, res) {
     await Cart.selectCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to selected the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니 정보 없습니다.",
           });
         } else {
-          console.log("Successfully selected data the cart!!");
+          logger.info(TAG + result);
           res.status(200).json(result);
-          console.log(result);
         }
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         res.status(404).json({
           success: false,
           message: "wish boarad 서버 에러",
@@ -28,13 +29,11 @@ module.exports = {
     await Cart.insertCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to inserted the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니에 추가할 수 없습니다.",
           });
         } else {
-          console.log("Successfully inserted data into the cart!!");
           res.status(200).json({
             success: true,
             message: "장바구니에 아이템 추가 성공",
@@ -42,7 +41,7 @@ module.exports = {
         }
       })
       .catch((err) => {
-        console.log(err);
+        logger.error(TAG + err);
         res.status(500).json({
           success: false,
           message: "wish boarad 서버 에러",
@@ -53,13 +52,11 @@ module.exports = {
     await Cart.updateCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to updated the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니를 수정할 수 없습니다.",
           });
         } else {
-          console.log("Successfully updated data into the cart!!");
           res.status(200).json({
             success: true,
             message: "장바구니 아이템 수정 성공",
@@ -67,7 +64,6 @@ module.exports = {
         }
       })
       .catch((err) => {
-        console.log(err);
         res.status(500).json({
           success: false,
           message: "wish boarad 서버 에러",
@@ -78,13 +74,11 @@ module.exports = {
     await Cart.deleteCart(req)
       .then((result) => {
         if (result.length === 0) {
-          console.log("Failed to deleted the cart for data.");
           res.status(404).json({
             success: false,
             message: "장바구니 아이템을 삭제할 수 없습니다.",
           });
         } else {
-          console.log("Successfully deleted data into the cart!!");
           res.status(200).json({
             success: true,
             message: "장바구니 아이템 삭제 성공",
@@ -92,7 +86,7 @@ module.exports = {
         }
       })
       .catch((err) => {
-        console.log(err);
+        logger.err(TAG + err);
         res.status(500).json({
           success: false,
           message: "wish boarad 서버 에러",
