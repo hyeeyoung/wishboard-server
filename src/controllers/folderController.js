@@ -7,7 +7,7 @@ module.exports = {
   selectFolderInfo: async function (req, res) {
     await Folders.selectFolder(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (Array.isArray(result) && !result.length) {
           res.status(404).json({
             success: false,
             message: "폴더 정보가 없습니다.",
@@ -28,7 +28,7 @@ module.exports = {
   selectFolderList: async function (req, res) {
     await Folders.selectFolderList(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (Array.isArray(result) && !result.length) {
           res.status(404).json({
             success: false,
             message: "폴더 리스트 정보가 없습니다.",
@@ -47,9 +47,16 @@ module.exports = {
       });
   },
   selectFolderItemInfo: async function (req, res) {
+    if (!req.params.folder_id) {
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
+    }
+
     await Folders.selectFolderItems(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (Array.isArray(result) && !result.length) {
           res.status(404).json({
             success: false,
             message: "폴더 내 아이템 정보가 없습니다.",
@@ -68,9 +75,16 @@ module.exports = {
       });
   },
   insertFolder: async function (req, res) {
+    if (!req.body.folder_img || !req.body.folder_name) {
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
+    }
+
     await Folders.insertFolder(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(404).json({
             success: false,
             message: "폴더를 추가할 수 없습니다.",
@@ -91,9 +105,16 @@ module.exports = {
       });
   },
   updateFolder: async function (req, res) {
+    if (!req.body.folder_id || !req.body.folder_img || !req.body.folder_name) {
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
+    }
+
     await Folders.updateFolder(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(404).json({
             success: false,
             message: "폴더명을 수정할 수 없습니다.",
@@ -114,9 +135,16 @@ module.exports = {
       });
   },
   updateFolderImage: async function (req, res) {
+    if (!req.body.folder_id || !req.body.folder_img) {
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
+    }
+
     await Folders.updateFolderImage(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(404).json({
             success: false,
             message: "폴더 이미지 수정할 수 없습니다.",
@@ -137,9 +165,16 @@ module.exports = {
       });
   },
   deleteFolder: async function (req, res) {
+    if (!req.body.folder_id) {
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
+    }
+
     await Folders.deleteFolder(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(404).json({
             success: false,
             message: "폴더를 삭제할 수 없습니다.",

@@ -5,7 +5,7 @@ const TAG = "ItemController ";
 
 module.exports = {
   insertItemInfo: async function (req, res) {
-    if (!req.body.item_image) {
+    if (!req.body.item_img) {
       return res.status(400).json({
         success: false,
         message: "이미지 정보가 없습니다",
@@ -16,7 +16,7 @@ module.exports = {
       .then((result) => {
         res.status(200).json({
           success: true,
-          data: result.insertId,
+          message: "아이템 추가 성공",
         });
       })
       .catch((err) => {
@@ -26,7 +26,7 @@ module.exports = {
   selectHomeItemInfo: async function (req, res) {
     await Items.selectItems(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (Array.isArray(result) && !result.length) {
           res.status(404).json({
             success: false,
             message: "아이템 정보가 없습니다.",
@@ -47,14 +47,14 @@ module.exports = {
   selectItemDetailInfo: async function (req, res) {
     await Items.selectItemsDetail(req)
       .then((result) => {
-        if (result.length > 0) {
-          logger.info(TAG + result[0]);
-          res.status(200).json(result[0]);
-        } else {
+        if (Array.isArray(result) && !result.length) {
           res.status(404).json({
             success: false,
             message: "아이템 정보가 없습니다.",
           });
+        } else {
+          logger.info(TAG + result);
+          res.status(200).json(result);
         }
       })
       .catch((err) => {
@@ -66,9 +66,15 @@ module.exports = {
       });
   },
   updateItemDetailInfo: async function (req, res) {
+    if (!req.body.item_img || !req.body.item_name) {
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
+    }
     await Items.updateItemsDetail(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(400).json({
             success: false,
             message: "수정한 아이템이 없습니다.",
@@ -89,9 +95,15 @@ module.exports = {
       });
   },
   deleteItemDetailInfo: async function (req, res) {
+    if (!req.body.item_id) {
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
+    }
     await Items.deleteItems(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(400).json({
             success: false,
             message: "삭제할 아이템이 없습니다.",

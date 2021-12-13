@@ -53,7 +53,7 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows[0];
+    return rows.affectedRows == 1 ? true : false;
   },
   updateImage: async function (req) {
     var userId = Number(req.decoded);
