@@ -6,7 +6,7 @@ module.exports = {
     var userId = Number(req.decoded);
 
     var sqlSelect =
-      "SELECT a.item_id, a.item_image, a.item_name, a.item_price, b.item_count FROM items a JOIN cart b ON a.item_id = b.item_id WHERE b.user_id = ? ORDER BY a.item_id DESC";
+      "SELECT a.item_id, a.item_img, a.item_name, a.item_price, b.item_count FROM items a JOIN cart b ON a.item_id = b.item_id WHERE b.user_id = ? ORDER BY a.item_id DESC";
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -31,15 +31,15 @@ module.exports = {
     return rows;
   },
   updateCart: async function (req) {
-    var userId = Number(req.decoded); // @prams: user_id는 한 명이므로
+    var userId = Number(req.decoded);
     var sqlUpdate = "UPDATE cart SET item_count = CASE ";
     var params = [];
 
-    for (var i = 0; i < req.body.length; i++) {
+    for (var i = 0; i < Object.keys(req.body).length; i++) {
       sqlUpdate += "WHEN item_id = ? then ? ";
       params.push(req.body[i].item_id);
       params.push(req.body[i].item_count);
-      if (i == req.body.length - 1) {
+      if (i === Object.keys(req.body).length - 1) {
         //마지막 원소라면
         sqlUpdate += "ELSE item_count END WHERE user_id = ?";
         params.push(userId);
@@ -53,7 +53,7 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+    return rows.affectedRows >= 1 ? true : false;
   },
   deleteCart: async function (req) {
     var userId = Number(req.decoded);
@@ -69,6 +69,6 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+    return rows.affectedRows == 1 ? true : false;
   },
 };

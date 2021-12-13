@@ -7,7 +7,7 @@ module.exports = {
   selectCartInfo: async function (req, res) {
     await Cart.selectCart(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (Array.isArray(result) && !result.length) {
           res.status(404).json({
             success: false,
             message: "장바구니 정보 없습니다.",
@@ -26,6 +26,11 @@ module.exports = {
       });
   },
   insertCartInfo: async function (req, res) {
+    if (!req.body.item_id)
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
     await Cart.insertCart(req)
       .then((result) => {
         if (result.length === 0) {
@@ -51,7 +56,7 @@ module.exports = {
   updateCartInfo: async function (req, res) {
     await Cart.updateCart(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(404).json({
             success: false,
             message: "장바구니를 수정할 수 없습니다.",
@@ -64,6 +69,7 @@ module.exports = {
         }
       })
       .catch((err) => {
+        logger.err(TAG + err);
         res.status(500).json({
           success: false,
           message: "wish boarad 서버 에러",
@@ -71,9 +77,14 @@ module.exports = {
       });
   },
   deleteCartInfo: async function (req, res) {
+    if (!req.body.item_id)
+      return res.status(400).json({
+        success: false,
+        message: "잘못된 요청입니다.",
+      });
     await Cart.deleteCart(req)
       .then((result) => {
-        if (result.length === 0) {
+        if (!result) {
           res.status(404).json({
             success: false,
             message: "장바구니 아이템을 삭제할 수 없습니다.",
