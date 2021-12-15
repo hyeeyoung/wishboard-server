@@ -19,10 +19,13 @@ module.exports = {
     //   cleanAfterEveryBuildPatterns: ["dist"],
     // }),
     new webpack.DefinePlugin({
-      "process.env.HOST": JSON.stringify(process.env.HOST),
+      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+      "process.env.PORT": JSON.stringify(process.env.PORT),
+      "process.env.DB_HOST": JSON.stringify(process.env.DB_HOST),
       "process.env.DB_USER": JSON.stringify(process.env.DB_USER),
-      "process.env.PASSWORD": JSON.stringify(process.env.PASSWORD),
-      "process.env.DATABASE_NAME": JSON.stringify(process.env.DATABASE_NAME),
+      "process.env.DB_PASSWORD": JSON.stringify(process.env.DB_PASSWORD),
+      "process.env.DB_PORT": JSON.stringify(process.env.DB_PORT),
+      "process.env.DB_NAME": JSON.stringify(process.env.DB_NAME),
       "process.env.TYPE": JSON.stringify(process.env.TYPE),
       "process.env.PROJECT_ID": JSON.stringify(process.env.PROJECT_ID),
       "process.env.PRIVATE_KEY": JSON.stringify(process.env.PRIVATE_KEY),
@@ -36,6 +39,7 @@ module.exports = {
       "process.env.CLIENT_X509_CERT_URI": JSON.stringify(
         process.env.CLIENT_X509_CERT_URI
       ),
+      "process.env.JWT_SECRET_KEY": JSON.stringify(process.env.JWT_SECRET_KEY),
     }),
   ],
   stats: {
