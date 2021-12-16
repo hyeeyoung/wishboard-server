@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { StatusCode, ErrorMessage } = require("../utils/response");
+const { Unauthorized } = require("../utils/errors");
 require("dotenv").config({ path: "../.env" });
 
 exports.verifyToken = (req, res, next) => {
@@ -15,8 +16,9 @@ exports.verifyToken = (req, res, next) => {
     //     .status(419)
     //     .json({ success: false, message: "token 만료되었습니다." });
     // }
-    return res
-      .status(StatusCode.UNAUTHORIZED)
-      .json({ success: false, message: ErrorMessage.unvaildateToken });
+    throw new Unauthorized(ErrorMessage.unvaildateToken);
+    // return res
+    //   .status(StatusCode.UNAUTHORIZED)
+    //   .json({ success: false, message: ErrorMessage.unvaildateToken });
   }
 };
