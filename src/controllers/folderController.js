@@ -1,197 +1,118 @@
 const Folders = require("../models/folder");
 const logger = require("../config/winston");
+const { BadRequest } = require("../utils/errors");
+const {
+  StatusCode,
+  SuccessMessage,
+  ErrorMessage,
+} = require("../utils/response");
 
 const TAG = "folderController ";
 
 module.exports = {
-  selectFolderInfo: async function (req, res) {
+  selectFolderInfo: async function (req, res, next) {
     await Folders.selectFolder(req)
       .then((result) => {
-        if (Array.isArray(result) && !result.length) {
-          res.status(404).json({
-            success: false,
-            message: "폴더 정보가 없습니다.",
-          });
-        } else {
-          logger.info(TAG + result);
-          res.status(200).json(result);
-        }
+        logger.info(TAG + result);
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
+        next(err);
       });
   },
-  selectFolderList: async function (req, res) {
+  selectFolderList: async function (req, res, next) {
     await Folders.selectFolderList(req)
       .then((result) => {
-        if (Array.isArray(result) && !result.length) {
-          res.status(404).json({
-            success: false,
-            message: "폴더 리스트 정보가 없습니다.",
-          });
-        } else {
-          logger.info(TAG + result);
-          res.status(200).json(result);
-        }
+        logger.info(TAG + result);
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
+        next(err);
       });
   },
-  selectFolderItemInfo: async function (req, res) {
-    if (!req.params.folder_id) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
+  selectFolderItemInfo: async function (req, res, next) {
+    try {
+      if (!req.params.folder_id) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Folders.selectFolderItems(req).then((result) => {
+        logger.info(TAG + result);
+        res.status(StatusCode.OK).json(result);
       });
+    } catch (err) {
+      next(err);
     }
-
-    await Folders.selectFolderItems(req)
-      .then((result) => {
-        if (Array.isArray(result) && !result.length) {
-          res.status(404).json({
-            success: false,
-            message: "폴더 내 아이템 정보가 없습니다.",
-          });
-        } else {
-          logger.info(TAG + result);
-          res.status(200).json(result);
-        }
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
-      });
   },
-  insertFolder: async function (req, res) {
-    if (!req.body.folder_img || !req.body.folder_name) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
-      });
-    }
-
-    await Folders.insertFolder(req)
-      .then((result) => {
-        if (!result) {
-          res.status(404).json({
-            success: false,
-            message: "폴더를 추가할 수 없습니다.",
-          });
-        } else {
-          res.status(200).json({
+  insertFolder: async function (req, res, next) {
+    try {
+      if (!req.body.folder_img || !req.body.folder_name) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Folders.insertFolder(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "폴더 데이터베이스 추가 성공",
+            message: SuccessMessage.folderInsert,
           });
         }
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
       });
-  },
-  updateFolder: async function (req, res) {
-    if (!req.body.folder_id || !req.body.folder_img || !req.body.folder_name) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
-      });
+    } catch (err) {
+      next(err);
     }
-
-    await Folders.updateFolder(req)
-      .then((result) => {
-        if (!result) {
-          res.status(404).json({
-            success: false,
-            message: "폴더명을 수정할 수 없습니다.",
-          });
-        } else {
-          res.status(200).json({
-            success: true,
-            message: "폴더명 수정 성공",
-          });
-        }
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
-      });
   },
-  updateFolderImage: async function (req, res) {
-    if (!req.body.folder_id || !req.body.folder_img) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
-      });
-    }
-
-    await Folders.updateFolderImage(req)
-      .then((result) => {
-        if (!result) {
-          res.status(404).json({
-            success: false,
-            message: "폴더 이미지 수정할 수 없습니다.",
-          });
-        } else {
-          res.status(200).json({
+  updateFolder: async function (req, res, next) {
+    try {
+      if (
+        !req.body.folder_id ||
+        !req.body.folder_img ||
+        !req.body.folder_name
+      ) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Folders.updateFolder(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "폴더 이미지 수정 성공",
+            message: SuccessMessage.folderNameUpdate,
           });
         }
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
       });
+    } catch (err) {
+      next(err);
+    }
   },
-  deleteFolder: async function (req, res) {
-    if (!req.body.folder_id) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
-      });
-    }
-
-    await Folders.deleteFolder(req)
-      .then((result) => {
-        if (!result) {
-          res.status(404).json({
-            success: false,
-            message: "폴더를 삭제할 수 없습니다.",
-          });
-        } else {
-          res.status(200).json({
+  updateFolderImage: async function (req, res, next) {
+    try {
+      if (!req.body.folder_id || !req.body.folder_img) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Folders.updateFolderImage(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "폴더 삭제 성공",
+            message: SuccessMessage.folderImageUpdate,
           });
         }
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+  deleteFolder: async function (req, res, next) {
+    try {
+      if (!req.body.folder_id) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Folders.deleteFolder(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.folderDelete,
+          });
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
   },
 };

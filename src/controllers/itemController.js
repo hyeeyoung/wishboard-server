@@ -1,126 +1,85 @@
 const Items = require("../models/item");
 const logger = require("../config/winston");
+const { BadRequest } = require("../utils/errors");
+const {
+  StatusCode,
+  SuccessMessage,
+  ErrorMessage,
+} = require("../utils/response");
 
 const TAG = "ItemController ";
 
 module.exports = {
-  insertItemInfo: async function (req, res) {
-    if (!req.body.item_img) {
-      return res.status(400).json({
-        success: false,
-        message: "이미지 정보가 없습니다",
-      });
-    }
+  insertItemInfo: async function (req, res, next) {
+    try {
+      if (!req.body.item_img) {
+        throw new BadRequest(ErrorMessage.itemImageMiss);
+      }
 
-    await Items.insertItem(req)
-      .then((result) => {
-        res.status(200).json({
-          success: true,
-          message: "아이템 추가 성공",
-        });
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
+      await Items.insertItem(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.CREATED).json({
+            success: true,
+            message: SuccessMessage.itemInsert,
+          });
+        }
       });
+    } catch (err) {
+      next(err);
+    }
   },
-  selectHomeItemInfo: async function (req, res) {
+  selectHomeItemInfo: async function (req, res, next) {
     await Items.selectItems(req)
       .then((result) => {
-        if (Array.isArray(result) && !result.length) {
-          res.status(404).json({
-            success: false,
-            message: "아이템 정보가 없습니다.",
-          });
-        } else {
-          logger.info(TAG + result);
-          res.status(200).json(result);
-        }
+        logger.info(TAG + result);
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wishboard 서버 에러",
-        });
+        next(err);
       });
   },
   selectItemDetailInfo: async function (req, res) {
     await Items.selectItemsDetail(req)
       .then((result) => {
-        if (Array.isArray(result) && !result.length) {
-          res.status(404).json({
-            success: false,
-            message: "아이템 정보가 없습니다.",
-          });
-        } else {
-          logger.info(TAG + result);
-          res.status(200).json(result);
-        }
+        logger.info(TAG + result);
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wishboard 서버 에러",
-        });
+        next(err);
       });
   },
-  updateItemDetailInfo: async function (req, res) {
-    if (!req.body.item_img || !req.body.item_name) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
-      });
-    }
-    await Items.updateItemsDetail(req)
-      .then((result) => {
-        if (!result) {
-          res.status(400).json({
-            success: false,
-            message: "수정한 아이템이 없습니다.",
-          });
-        } else {
-          res.status(200).json({
+  updateItemDetailInfo: async function (req, res, next) {
+    try {
+      if (!req.body.item_img || !req.body.item_name) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Items.updateItemsDetail(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "아이템 수정 성공",
+            message: SuccessMessage.itemUpdate,
           });
         }
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
       });
+    } catch (err) {
+      next(err);
+    }
   },
-  deleteItemDetailInfo: async function (req, res) {
-    if (!req.body.item_id) {
-      return res.status(400).json({
-        success: false,
-        message: "잘못된 요청입니다.",
-      });
-    }
-    await Items.deleteItems(req)
-      .then((result) => {
-        if (!result) {
-          res.status(400).json({
-            success: false,
-            message: "삭제할 아이템이 없습니다.",
-          });
-        } else {
-          res.status(200).json({
+  deleteItemDetailInfo: async function (req, res, next) {
+    try {
+      if (!req.body.item_id) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Items.deleteItems(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "아이템 삭제 성공",
+            message: SuccessMessage.itemDelete,
           });
         }
-      })
-      .catch((err) => {
-        logger.error(TAG + err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
       });
+    } catch (err) {
+      next(err);
+    }
   },
 };

@@ -1,5 +1,6 @@
-// const conn = require("../config/db");
 const pool = require("../config/db");
+const { NotFound } = require("../utils/errors");
+const { ErrorMessage } = require("../utils/response");
 
 module.exports = {
   selectCart: async function (req) {
@@ -11,6 +12,10 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
     connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.cartNotFound);
+    }
     return rows;
   },
   insertCart: async function (req) {
@@ -28,7 +33,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.cartInsertError);
+    }
+    return true;
   },
   updateCart: async function (req) {
     var userId = Number(req.decoded);
@@ -46,6 +55,7 @@ module.exports = {
       }
     }
 
+    console.log(sqlUpdate + params);
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection
@@ -53,7 +63,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.cartUpdateError);
+    }
+    return true;
   },
   deleteCart: async function (req) {
     var userId = Number(req.decoded);
@@ -69,6 +83,10 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows == 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.cartDeleteError);
+    }
+    return true;
   },
 };
