@@ -1,5 +1,7 @@
 const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
+const { NotFound } = require("../utils/errors");
+const { ErrorMessage } = require("../utils/response");
 
 module.exports = {
   signUp: async function (req) {
@@ -53,7 +55,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows == 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userDeleteError);
+    }
+    return true;
   },
   updateImage: async function (req) {
     var userId = Number(req.decoded);
@@ -69,7 +75,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userProfileImgUpdateNotFound);
+    }
+    return true;
   },
   updateNickname: async function (req) {
     var userId = Number(req.decoded);
@@ -85,7 +95,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userNickNameUpdateNotFound);
+    }
+    return true;
   },
   updateInfo: async function (req) {
     var userId = Number(req.decoded);
@@ -103,7 +117,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userInfoUpdateNotFound);
+    }
+    return true;
   },
   // updateFCM: async function (req) { // TODO
   //   var userId = Number(req.decoded);
@@ -130,6 +148,10 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
     connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.userNotFound);
+    }
     return rows;
   },
 };

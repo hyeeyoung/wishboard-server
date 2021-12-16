@@ -18,6 +18,9 @@ const passport = require("passport");
 const passportConfig = require("./config/passport");
 const morganFormat = process.env.NODE_ENV !== "production" ? "dev" : "combined"; // NOTE: morgan 출력 형태
 
+const handleErrors = require("./middleware/handleError");
+const { NotFound } = require("./utils/errors");
+
 //기본 설정
 app.use(morgan(morganFormat, { stream: logger.stream }));
 
@@ -46,20 +49,9 @@ app.use("/folder", folderRouter);
 app.use("/noti", notiRouter);
 
 //에러페이지 설정
-app.use(function (req, res, next) {
-  var err = new Error("Not Found");
-  err.status = 404;
-  next(err);
+app.use((req, res, next) => {
+  throw new NotFound("API URL is invalid");
 });
-
-app.use(function (err, req, res, next) {
-  // @brief set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // @brief render the error page
-  res.status(err.status || 500);
-  res.render("error");
-});
+app.use(handleErrors);
 
 module.exports = app;

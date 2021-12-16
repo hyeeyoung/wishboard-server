@@ -3,11 +3,16 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const logger = require("../config/winston");
 require("dotenv").config({ path: "../.env" });
+const {
+  StatusCode,
+  SuccessMessage,
+  ErrorMessage,
+} = require("../utils/response");
 
 const TAG = "authController  ";
 
 module.exports = {
-  signUp: async function (req, res) {
+  signUp: async function (req, res, next) {
     const isVaildate = await User.vaildateEmail(req);
 
     if (!isVaildate) {
@@ -16,23 +21,22 @@ module.exports = {
           passport.authenticate("local", { session: false }, (err, user) => {
             if (err || !user) {
               logger.info(TAG + err || !user);
-              return res.status(401).json({
+              return res.status(StatusCode.CREATED).json({
                 success: false,
-                message: "wishboard 회원가입 성공 후 로그인 실패",
+                message: SuccessMessage.loginfailedAfterSuccessSignUp,
               });
             }
             req.login(user, { session: false }, (err) => {
               if (err) {
-                logger.info(TAG + err);
-                return res.status(500).send(err);
+                next(err);
               }
               const token = jwt.sign(
                 user[0].user_id,
                 process.env.JWT_SECRET_KEY
               );
-              return res.status(201).json({
+              return res.status(StatusCode.CREATED).json({
                 success: true,
-                message: "wishboard 회원가입 후 로그인 성공",
+                message: SuccessMessage.loginSuccessAfterSuccessSignUp,
                 token: token,
               });
             });
@@ -40,36 +44,36 @@ module.exports = {
         })
         .catch((err) => {
           logger.error(TAG + err);
-          res.status(404).json({
+          res.status(StatusCode.NOTFOUND).json({
             success: false,
-            message: "wishboard 앱 회원가입 실패",
+            message: ErrorMessage.signUpFailed,
           });
         });
     } else {
-      res.status(400).json({
+      res.status(StatusCode.BADREQUEST).json({
         success: false,
-        message: "이미 존재하는 아이디 입니다.",
+        message: ErrorMessage.vaildateEmail,
       });
     }
   },
-  signIn: async function (req, res) {
+  signIn: async function (req, res, next) {
     passport.authenticate("local", { session: false }, (err, user) => {
       if (err || !user) {
         logger.info(TAG + err || !user);
-        return res.status(401).json({
+        return res.status(StatusCode.BADREQUEST).json({
           success: false,
-          message: "아이디 혹은 비밀번호를 다시 확인해주세요.",
+          message: ErrorMessage.checkIDPasswordAgain,
         });
       }
       req.login(user, { session: false }, (err) => {
         if (err) {
           logger.info(TAG + err);
-          return res.status(500).send(err);
+          next(err);
         }
         const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-        return res.status(201).json({
+        return res.status(StatusCode.OK).json({
           success: true,
-          message: "wishboard 앱 로그인 성공",
+          message: SuccessMessage.loginSuccess,
           token: token,
         });
       });
