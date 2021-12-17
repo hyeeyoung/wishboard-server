@@ -1,7 +1,6 @@
 var pool = require("./db");
 const passport = require("passport");
 const LocalStragegy = require("passport-local").Strategy;
-// const JWTStrategy = require("passport-local").Strategy;
 const JWTStrategy = require("passport-jwt").Strategy;
 const ExtractJWT = require("passport-jwt").ExtractJwt;
 const bcrypt = require("bcryptjs");

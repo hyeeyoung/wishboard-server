@@ -1,4 +1,6 @@
 const pool = require("../config/db");
+const { NotFound } = require("../utils/errors");
+const { ErrorMessage } = require("../utils/response");
 
 module.exports = {
   selectFolder: async function (req) {
@@ -10,6 +12,10 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
     connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.folderNotFound);
+    }
     return rows;
   },
   selectFolderList: async function (req) {
@@ -20,6 +26,10 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
     connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.folderListNotFound);
+    }
     return rows;
   },
   selectFolderItems: async function (req) {
@@ -36,6 +46,10 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, parmas);
     connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.folderInItemNotFound);
+    }
     return rows;
   },
   insertFolder: async function (req) {
@@ -53,7 +67,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.folderInsertError);
+    }
+    return true;
   },
   updateFolder: async function (req) {
     var userId = Number(req.decoded);
@@ -71,7 +89,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.folderNameUpdateError);
+    }
+    return true;
   },
   updateFolderImage: async function (req) {
     var folderId = Number(req.body.folder_id);
@@ -87,7 +109,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.folderImageUpdateError);
+    }
+    return true;
   },
   deleteFolder: async function (req) {
     var folderId = Number(req.body.folder_id);
@@ -101,6 +127,10 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.folderDeleteError);
+    }
+    return true;
   },
 };

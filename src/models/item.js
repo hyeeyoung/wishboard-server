@@ -1,3 +1,5 @@
+const { NotFound } = require("../utils/errors");
+const { ErrorMessage } = require("../utils/response");
 const pool = require("../config/db");
 
 module.exports = {
@@ -34,7 +36,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.itemInsertError);
+    }
+    return true;
   },
   selectItems: async function (req) {
     var userId = Number(req.decoded);
@@ -44,6 +50,10 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, [userId]);
     connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.itemNotFound);
+    }
     return rows;
   },
   selectItemsDetail: async function (req) {
@@ -55,11 +65,15 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, [itemId]);
     connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.itemNotFound);
+    }
     return rows;
   },
   updateItemsDetail: async function (req) {
     var itemId = Number(req.params.item_id);
-    var folderId = Number(req.body.folder_id);
+    // var folderId = Number(req.body.folder_id);
     var itemName = req.body.item_name;
     var itemImage = req.body.item_img;
     var itemPrice = req.body.item_price;
@@ -67,16 +81,18 @@ module.exports = {
     var itemMemo = req.body.item_memo;
 
     var sqlUpdate =
-      "UPDATE items SET folder_id = ?, item_name = ?, item_img = ?, item_price = ?, item_url = ?, item_memo = ? WHERE item_id = ?";
-    var params = [
-      folderId,
-      itemName,
-      itemImage,
-      itemPrice,
-      itemUrl,
-      itemMemo,
-      itemId,
-    ];
+      "UPDATE items SET item_name = ?, item_img = ?, item_price = ?, item_url = ?, item_memo = ?";
+    var params = [itemName, itemImage, itemPrice, itemUrl, itemMemo];
+
+    //TODO 제약조건 때문에 우선 이렇게 해둠
+    if (req.body.folder_id) {
+      sqlUpdate += ", folder_id = ? WHERE item_id = ?";
+      params.push(Number(req.body.folder_id));
+      params.push(Number(itemId));
+    } else {
+      sqlUpdate += " WHERE item_id = ?";
+      params.push(Number(itemId));
+    }
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -85,7 +101,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows >= 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.itemUpdateError);
+    }
+    return true;
   },
   deleteItems: async function (req) {
     var itemId = Number(req.body.item_id);
@@ -98,6 +118,10 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows.affectedRows == 1 ? true : false;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.itemDeleteError);
+    }
+    return true;
   },
 };

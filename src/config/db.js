@@ -21,14 +21,11 @@ const pool = mysql.createPool({
   connectionLimit: 30,
 });
 
-// console.log(process.env.HOST);
-// console.log(pool);
 logger.info(TAG_SUCCESS);
 
 exports.connection = async function () {
   let connection = await pool.getConnection(async (conn) => conn);
   try {
-    // logger.info("DB connection Pool Success!");
     return connection;
   } catch (err) {
     switch (err.code) {
