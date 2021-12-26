@@ -38,7 +38,7 @@ module.exports = {
         next(err);
       });
   },
-  selectItemDetailInfo: async function (req, res) {
+  selectItemDetailInfo: async function (req, res, next) {
     await Items.selectItemsDetail(req)
       .then((result) => {
         logger.info(TAG + result);
