@@ -68,6 +68,7 @@ const ErrorMessage = {
   vaildateEmail: "이미 존재하는 아이디",
   checkIDPasswordAgain: "아이디 혹은 비밀번호를 다시 확인",
   unvaildateToken: "token이 유효하지 않음",
+  requestTokenAgain: "token 없음. 요청 token 확인",
 
   /*공통*/
   BadRequestMeg: "잘못된 요청",
