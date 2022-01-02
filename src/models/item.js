@@ -12,7 +12,7 @@ module.exports = {
     }
     var itemImg = req.body.item_img;
     var itemName = req.body.item_name;
-    var itemPrice = req.body.item_price;
+    var itemPrice = Number(req.body.item_price);
     var itemUrl = req.body.item_url;
     var itemMemo = req.body.item_memo;
 
@@ -76,7 +76,7 @@ module.exports = {
     // var folderId = Number(req.body.folder_id);
     var itemName = req.body.item_name;
     var itemImage = req.body.item_img;
-    var itemPrice = req.body.item_price;
+    var itemPrice = Number(req.body.item_price);
     var itemUrl = req.body.item_url;
     var itemMemo = req.body.item_memo;
 
