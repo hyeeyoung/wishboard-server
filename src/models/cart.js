@@ -55,7 +55,6 @@ module.exports = {
       }
     }
 
-    console.log(sqlUpdate + params);
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection
