@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hyejungg/cicd_test.git"
+    "url": "git+https://github.com/hyeeyoung/wishboard-server.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hyejungg/cicd_test/issues"
+    "url": "https://github.com/hyeeyoung/wishboard-server/issues"
   },
-  "homepage": "https://github.com/hyejungg/cicd_test#readme",
+  "homepage": "https://github.com/hyeeyoung/wishboard-server#readme",
   "dependencies": {
     "@mapbox/node-pre-gyp": "^1.0.7",
     "app-root-path": "^3.0.0",
