@@ -6,8 +6,15 @@ module.exports = {
   selectCart: async function (req) {
     var userId = Number(req.decoded);
 
-    var sqlSelect =
-      "SELECT a.item_id, a.item_img, a.item_name, a.item_price, b.item_count FROM items a JOIN cart b ON a.item_id = b.item_id WHERE b.user_id = ? ORDER BY a.item_id DESC";
+    var sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    CAST(i.create_at AS CHAR(10)) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, c.item_id cart_item_id , c.item_count item_count
+    FROM items i LEFT OUTER JOIN notification n 
+    ON i.item_id = n.item_id  
+    LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
+    ON i.folder_id = f.folder_id 
+    LEFT OUTER JOIN cart c
+    on i.item_id = c.item_id 
+    WHERE i.user_id = ? ORDER BY i.create_at DESC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -16,7 +23,28 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.cartNotFound);
     }
-    return rows;
+    let cartResponse = [];
+    for (var row of rows) {
+      wishItem = {
+        folder_id: row.folder_id,
+        folder_name: row.folder_name,
+        item_id: row.item_id,
+        item_img: row.item_img,
+        item_name: row.item_name,
+        item_price: row.item_price,
+        item_url: row.item_url,
+        item_memo: row.item_memo,
+        create_at: row.create_at,
+        item_notification_type: row.item_notification_type,
+        item_notification_date: row.item_notification_date,
+        cart_item_id: row.cart_item_id,
+      };
+      cartitemCount = {
+        item_count: row.item_count,
+      };
+      cartResponse.push({ wishItem, cartitemCount });
+    }
+    return cartResponse;
   },
   insertCart: async function (req) {
     var userId = Number(req.decoded);
