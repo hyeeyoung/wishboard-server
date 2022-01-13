@@ -1,6 +1,30 @@
 const pool = require("../config/db");
+const { CartResponse, WishItem, CartItemInfo } = require("../dto/cartResponse");
 const { NotFound } = require("../utils/errors");
 const { ErrorMessage } = require("../utils/response");
+
+function responseConverter(rows) {
+  let cartResponse = new CartResponse();
+  Object.keys(rows).forEach((value) => {
+    const wishItem = new WishItem(
+      rows[value].folder_id,
+      rows[value].folder_name,
+      rows[value].item_id,
+      rows[value].item_img,
+      rows[value].item_name,
+      rows[value].item_price,
+      rows[value].item_url,
+      rows[value].item_memo,
+      rows[value].create_at,
+      rows[value].item_notification_type,
+      rows[value].item_notification_date,
+      rows[value].cart_item_id
+    );
+    const cartItemInfo = new CartItemInfo(rows[value].item_count);
+    cartResponse.setCartResponse(wishItem, cartItemInfo);
+  });
+  return cartResponse.getCartResponse();
+}
 
 module.exports = {
   selectCart: async function (req) {
@@ -23,27 +47,8 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.cartNotFound);
     }
-    let cartResponse = [];
-    for (var row of rows) {
-      wishItem = {
-        folder_id: row.folder_id,
-        folder_name: row.folder_name,
-        item_id: row.item_id,
-        item_img: row.item_img,
-        item_name: row.item_name,
-        item_price: row.item_price,
-        item_url: row.item_url,
-        item_memo: row.item_memo,
-        create_at: row.create_at,
-        item_notification_type: row.item_notification_type,
-        item_notification_date: row.item_notification_date,
-        cart_item_id: row.cart_item_id,
-      };
-      cartitemCount = {
-        item_count: row.item_count,
-      };
-      cartResponse.push({ wishItem, cartitemCount });
-    }
+
+    const cartResponse = responseConverter(rows);
     return cartResponse;
   },
   insertCart: async function (req) {
