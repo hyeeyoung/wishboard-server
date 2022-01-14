@@ -1,14 +1,36 @@
 class CartResponse {
   constructor() {
-    this.cartResponse = [];
+    this.cartArray = [];
   }
 
-  setCartResponse(wishItem, cartItemInfo) {
-    this.cartResponse.push({ wishItem, cartItemInfo });
+  addCartResponseItem(wishItem, cartItemInfo) {
+    this.cartArray.push({ wishItem, cartItemInfo });
   }
 
   getCartResponse() {
-    return this.cartResponse;
+    return this.cartArray;
+  }
+
+  convertToResponse(rows) {
+    Object.keys(rows).forEach((value) => {
+      const wishItem = new WishItem(
+        rows[value].folder_id,
+        rows[value].folder_name,
+        rows[value].item_id,
+        rows[value].item_img,
+        rows[value].item_name,
+        rows[value].item_price,
+        rows[value].item_url,
+        rows[value].item_memo,
+        rows[value].create_at,
+        rows[value].item_notification_type,
+        rows[value].item_notification_date,
+        rows[value].cart_item_id
+      );
+      const cartItemInfo = new CartItemInfo(rows[value].item_count);
+      this.addCartResponseItem(wishItem, cartItemInfo);
+    });
+    return this.getCartResponse();
   }
 }
 
