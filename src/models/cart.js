@@ -1,30 +1,7 @@
 const pool = require("../config/db");
-const { CartResponse, WishItem, CartItemInfo } = require("../dto/cartResponse");
+const { CartResponse } = require("../dto/cartResponse");
 const { NotFound } = require("../utils/errors");
 const { ErrorMessage } = require("../utils/response");
-
-function responseConverter(rows) {
-  let cartResponse = new CartResponse();
-  Object.keys(rows).forEach((value) => {
-    const wishItem = new WishItem(
-      rows[value].folder_id,
-      rows[value].folder_name,
-      rows[value].item_id,
-      rows[value].item_img,
-      rows[value].item_name,
-      rows[value].item_price,
-      rows[value].item_url,
-      rows[value].item_memo,
-      rows[value].create_at,
-      rows[value].item_notification_type,
-      rows[value].item_notification_date,
-      rows[value].cart_item_id
-    );
-    const cartItemInfo = new CartItemInfo(rows[value].item_count);
-    cartResponse.setCartResponse(wishItem, cartItemInfo);
-  });
-  return cartResponse.getCartResponse();
-}
 
 module.exports = {
   selectCart: async function (req) {
@@ -36,7 +13,7 @@ module.exports = {
     ON i.item_id = n.item_id  
     LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
     ON i.folder_id = f.folder_id 
-    LEFT OUTER JOIN cart c
+    INNER JOIN cart c
     on i.item_id = c.item_id 
     WHERE i.user_id = ? ORDER BY i.create_at DESC`;
 
@@ -48,7 +25,7 @@ module.exports = {
       throw new NotFound(ErrorMessage.cartNotFound);
     }
 
-    const cartResponse = responseConverter(rows);
+    const cartResponse = new CartResponse().convertToResponse(rows);
     return cartResponse;
   },
   insertCart: async function (req) {
