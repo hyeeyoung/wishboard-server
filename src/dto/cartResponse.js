@@ -36,43 +36,43 @@ class CartResponse {
 
 class WishItem {
   constructor(
-    folderId,
-    folderName,
-    itemId,
-    itemImg,
-    itemName,
-    itemPrice,
-    itemUrl,
-    itemMemo,
-    createAt,
-    itemNotificationType,
-    itemNotificationDate,
-    cartItemId
+    folder_id,
+    folder_name,
+    item_id,
+    item_img,
+    item_name,
+    item_price,
+    item_url,
+    item_memo,
+    create_at,
+    item_notification_type,
+    item_notification_date,
+    cart_item_id
   ) {
-    this.folderId = folderId;
-    this.folderName = folderName;
-    this.itemId = itemId;
-    this.itemImg = itemImg;
-    this.itemName = itemName;
-    this.itemPrice = itemPrice;
-    this.itemUrl = itemUrl;
-    this.itemMemo = itemMemo;
-    this.createAt = createAt;
-    this.itemNotificationType = itemNotificationType;
-    this.itemNotificationDate = itemNotificationDate;
-    this.cartItemId = cartItemId;
+    this.folder_id = folder_id;
+    this.folder_name = folder_name;
+    this.item_id = item_id;
+    this.item_img = item_img;
+    this.item_name = item_name;
+    this.item_price = item_price;
+    this.item_url = item_url;
+    this.item_memo = item_memo;
+    this.create_at = create_at;
+    this.item_notification_type = item_notification_type;
+    this.item_notification_date = item_notification_date;
+    this.cart_item_id = cart_item_id;
   }
 }
 
 class CartItemInfo {
-  constructor(itemCount) {
-    this.itemCount = itemCount;
+  constructor(item_count) {
+    this.item_count = item_count;
   }
   getCartItemInfo() {
-    return this.itemCount;
+    return this.item_count;
   }
-  setCartItemInfo(itemCount) {
-    this.itemCount = itemCount;
+  setCartItemInfo(item_count) {
+    this.item_count = item_count;
   }
 }
 
