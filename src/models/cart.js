@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { CartResponse } = require("../dto/cartResponse");
 const { NotFound } = require("../utils/errors");
 const { ErrorMessage } = require("../utils/response");
 
@@ -12,7 +13,7 @@ module.exports = {
     ON i.item_id = n.item_id  
     LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
     ON i.folder_id = f.folder_id 
-    LEFT OUTER JOIN cart c
+    INNER JOIN cart c
     on i.item_id = c.item_id 
     WHERE i.user_id = ? ORDER BY i.create_at DESC`;
 
@@ -23,27 +24,8 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.cartNotFound);
     }
-    let cartResponse = [];
-    for (var row of rows) {
-      wishItem = {
-        folder_id: row.folder_id,
-        folder_name: row.folder_name,
-        item_id: row.item_id,
-        item_img: row.item_img,
-        item_name: row.item_name,
-        item_price: row.item_price,
-        item_url: row.item_url,
-        item_memo: row.item_memo,
-        create_at: row.create_at,
-        item_notification_type: row.item_notification_type,
-        item_notification_date: row.item_notification_date,
-        cart_item_id: row.cart_item_id,
-      };
-      cartitemCount = {
-        item_count: row.item_count,
-      };
-      cartResponse.push({ wishItem, cartitemCount });
-    }
+
+    const cartResponse = new CartResponse().convertToResponse(rows);
     return cartResponse;
   },
   insertCart: async function (req) {
