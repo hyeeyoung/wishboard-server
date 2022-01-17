@@ -28,7 +28,7 @@ module.exports = {
       next(err);
     }
   },
-  selectHomeItemInfo: async function (req, res, next) {
+  selectItemInfo: async function (req, res, next) {
     await Items.selectItems(req)
       .then((result) => {
         logger.info(TAG + result);
@@ -38,22 +38,12 @@ module.exports = {
         next(err);
       });
   },
-  selectItemDetailInfo: async function (req, res, next) {
-    await Items.selectItemsDetail(req)
-      .then((result) => {
-        logger.info(TAG + result);
-        res.status(StatusCode.OK).json(result);
-      })
-      .catch((err) => {
-        next(err);
-      });
-  },
-  updateItemDetailInfo: async function (req, res, next) {
+  updateItemInfo: async function (req, res, next) {
     try {
       if (!req.body.item_img || !req.body.item_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await Items.updateItemsDetail(req).then((result) => {
+      await Items.updateItems(req).then((result) => {
         if (result) {
           res.status(StatusCode.OK).json({
             success: true,
@@ -65,7 +55,7 @@ module.exports = {
       next(err);
     }
   },
-  deleteItemDetailInfo: async function (req, res, next) {
+  deleteItemInfo: async function (req, res, next) {
     try {
       if (!req.body.item_id) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
