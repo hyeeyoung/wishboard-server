@@ -23,6 +23,13 @@ const SuccessMessage = {
   folderImageUpdate: "폴더이미지 수정 성공",
   folderDelete: "폴더 삭제 성공",
 
+  /*알림*/
+  notiInsert: "알림 추가 성공",
+  notiUpdate: "알림 수정 성공",
+  notiReadStateUpdate: "알림 읽음 상태 수정 성공",
+  notiDelete: "알림 삭제 성공",
+  notiFCMSend: "알림 전송 성공",
+
   /*사용자*/
   userInfoUpdate: "사용자 정보 수정 성공",
   userNickNameUpdate: "사용자 닉네임 수정 성공",
@@ -56,6 +63,14 @@ const ErrorMessage = {
   folderImageUpdateError: "수정된 폴더명 없음",
   folderInsertError: "추가된 폴더 없음",
   folderDeleteError: "삭제된 폴더 없음",
+
+  /*알림*/
+  notiNotFound: "알림 정보 없음",
+  notiUpdateError: "수정된 알림 없음",
+  notiReadStateUpdateError: "수정된 알림 읽음 상태 없음",
+  notiInsertError: "추가된 알림 없음",
+  notiDeleteError: "삭제된 알림 없음",
+  notiFCMSendError: "전송된 알림 없음. FCM 에러",
 
   /*사용자*/
   userNotFound: "사용자 정보 없음",
