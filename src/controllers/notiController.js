@@ -8,23 +8,36 @@ const {
   ErrorMessage,
 } = require("../utils/response");
 
-const admin = require('firebase-admin');
-const serviceAccount = require('../../serviceAccountKey.json');
+const admin = require("firebase-admin");
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert({
+    type: process.env.FIREBASE_TYPE,
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+    private_key: process.env.FIREBASE_PRIVATE_KEY,
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    client_id: process.env.FIREBASE_CLIENT_ID,
+    auth_uri: process.env.FIREBASE_AUTH_URI,
+    token_uri: process.env.FIREBASE_TOKEN_URI,
+    auth_provider_x509_cert_url:
+      process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URI,
+    client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URI,
+  }),
 });
 
 const TAG = "notiContoller ";
 
 function sendNotification(message) {
-  return admin.messaging().send(message)
+  return admin
+    .messaging()
+    .send(message)
     .then(function (response) {
-      logger.info(`${SuccessMessage.notiFCMSend}: ${response}`)
-      return true
+      logger.info(`${SuccessMessage.notiFCMSend}: ${response}`);
+      return true;
     })
     .catch(function (err) {
-      logger.error(TAG + err)
-      return false
+      logger.error(TAG + err);
+      return false;
     });
 }
 
@@ -41,7 +54,11 @@ module.exports = {
   },
   insertNotiInfo: async function (req, res, next) {
     try {
-      if (!req.body.item_id || !req.body.item_notification_type || !req.body.item_notification_date) {
+      if (
+        !req.body.item_id ||
+        !req.body.item_notification_type ||
+        !req.body.item_notification_date
+      ) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
@@ -50,12 +67,12 @@ module.exports = {
           title: Strings.notiMessageTitle,
           message: `${req.body.item_notification_type} ${Strings.notiMessageDescription}`,
           isScheduled: Strings.true,
-          scheduledTime: req.body.item_notification_date
+          scheduledTime: req.body.item_notification_date,
         },
-        token: req.body.fcm_token
+        token: req.body.fcm_token,
       };
 
-      const isSuccessful = await sendNotification(message)
+      const isSuccessful = await sendNotification(message);
       if (!isSuccessful) {
         return res.status(StatusCode.BADREQUEST).json({
           success: false,
@@ -76,7 +93,11 @@ module.exports = {
   },
   updateNotiInfo: async function (req, res, next) {
     try {
-      if (!req.body.item_id || !req.body.item_notification_type || !req.body.item_notification_date) {
+      if (
+        !req.body.item_id ||
+        !req.body.item_notification_type ||
+        !req.body.item_notification_date
+      ) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       await Noti.updateNoti(req).then((result) => {
