@@ -25,7 +25,7 @@ class CartResponse {
         rows[value].create_at,
         rows[value].item_notification_type,
         rows[value].item_notification_date,
-        rows[value].cart_item_id
+        rows[value].cart_state
       );
       const cartItemInfo = new CartItemInfo(rows[value].item_count);
       this.addCartResponseItem(wishItem, cartItemInfo);
@@ -47,7 +47,7 @@ class WishItem {
     create_at,
     item_notification_type,
     item_notification_date,
-    cart_item_id
+    cart_state
   ) {
     this.folder_id = folder_id;
     this.folder_name = folder_name;
@@ -60,7 +60,7 @@ class WishItem {
     this.create_at = create_at;
     this.item_notification_type = item_notification_type;
     this.item_notification_date = item_notification_date;
-    this.cart_item_id = cart_item_id;
+    this.cart_state = cart_state;
   }
 }
 
