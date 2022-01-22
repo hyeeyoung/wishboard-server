@@ -37,18 +37,20 @@ module.exports = {
     }
   },
   updateCartInfo: async function (req, res, next) {
-    await Cart.updateCart(req)
-      .then((result) => {
-        if (result) {
-          res.status(StatusCode.OK).json({
-            success: true,
-            message: SuccessMessage.cartUpdate,
-          });
-        }
-      })
-      .catch((err) => {
-        next(err);
-      });
+    try {
+      if (!req.body.item_id || !req.body.item_count) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      const result = await Cart.updateCart(req);
+      if (result) {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.cartUpdate,
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
   },
   deleteCartInfo: async function (req, res, next) {
     try {

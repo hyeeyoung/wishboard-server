@@ -51,19 +51,11 @@ module.exports = {
   },
   updateCart: async function (req) {
     var userId = Number(req.decoded);
-    var sqlUpdate = "UPDATE cart SET item_count = CASE ";
-    var params = [];
-
-    for (var i = 0; i < Object.keys(req.body).length; i++) {
-      sqlUpdate += "WHEN item_id = ? then ? ";
-      params.push(req.body[i].item_id);
-      params.push(req.body[i].item_count);
-      if (i === Object.keys(req.body).length - 1) {
-        //마지막 원소라면
-        sqlUpdate += "ELSE item_count END WHERE user_id = ?";
-        params.push(userId);
-      }
-    }
+    var itemId = Number(req.body.item_id);
+    var itemCount = Number(req.body.item_count);
+    var sqlUpdate =
+      "UPDATE cart SET item_count = ? WHERE item_id = ? AND user_id = ?";
+    var params = [itemCount, itemId, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
