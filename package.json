@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "lint": "eslint .",
     "dev": "webpack --config ./webpack.config.js --mode development",
     "build": "webpack --config ./webpack.config.js --mode production",
     "app": "echo \"Error: no test specified\" && exit 1",
@@ -20,12 +21,9 @@
   },
   "homepage": "https://github.com/hyeeyoung/wishboard-server#readme",
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^1.0.7",
     "app-root-path": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
-    "cardinal": "^2.1.1",
-    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
@@ -37,11 +35,16 @@
     "passport": "^0.5.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "pm2": "^5.1.2",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
+    "eslint": "^8.7.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "pm2": "^5.1.2",
+    "prettier": "2.5.1",
     "webpack": "^5.65.0",
     "webpack-cli": "^4.9.1"
   }
