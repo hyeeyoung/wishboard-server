@@ -40,7 +40,7 @@ module.exports = {
   },
   updateItemInfo: async function (req, res, next) {
     try {
-      if (!req.body.item_img || !req.body.item_name) {
+      if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       await Items.updateItems(req).then((result) => {
@@ -57,7 +57,7 @@ module.exports = {
   },
   deleteItemInfo: async function (req, res, next) {
     try {
-      if (!req.body.item_id) {
+      if (!req.params.item_id) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       await Items.deleteItems(req).then((result) => {
