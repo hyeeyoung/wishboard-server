@@ -1,15 +1,15 @@
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const logger = require("../config/winston");
-require("dotenv").config({ path: "../.env" });
+const passport = require('passport');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const logger = require('../config/winston');
+require('dotenv').config({ path: '../.env' });
 const {
   StatusCode,
   SuccessMessage,
   ErrorMessage,
-} = require("../utils/response");
+} = require('../utils/response');
 
-const TAG = "authController  ";
+const TAG = 'authController  ';
 
 module.exports = {
   signUp: async function (req, res, next) {
@@ -18,7 +18,7 @@ module.exports = {
     if (!isVaildate) {
       await User.signUp(req)
         .then(() => {
-          passport.authenticate("local", { session: false }, (err, user) => {
+          passport.authenticate('local', { session: false }, (err, user) => {
             if (err || !user) {
               logger.info(TAG + err || !user);
               return res.status(StatusCode.CREATED).json({
@@ -32,7 +32,7 @@ module.exports = {
               }
               const token = jwt.sign(
                 user[0].user_id,
-                process.env.JWT_SECRET_KEY
+                process.env.JWT_SECRET_KEY,
               );
               return res.status(StatusCode.CREATED).json({
                 success: true,
@@ -57,7 +57,7 @@ module.exports = {
     }
   },
   signIn: async function (req, res, next) {
-    passport.authenticate("local", { session: false }, (err, user) => {
+    passport.authenticate('local', { session: false }, (err, user) => {
       if (err || !user) {
         logger.info(TAG + err || !user);
         return res.status(StatusCode.BADREQUEST).json({
