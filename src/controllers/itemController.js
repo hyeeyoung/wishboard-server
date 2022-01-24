@@ -1,19 +1,19 @@
-const Items = require("../models/item");
-const logger = require("../config/winston");
-const { BadRequest } = require("../utils/errors");
+const Items = require('../models/item');
+const logger = require('../config/winston');
+const { BadRequest } = require('../utils/errors');
 const {
   StatusCode,
   SuccessMessage,
   ErrorMessage,
-} = require("../utils/response");
+} = require('../utils/response');
 
-const TAG = "ItemController ";
+const TAG = 'ItemController ';
 
 module.exports = {
   insertItemInfo: async function (req, res, next) {
     try {
-      if (!req.body.item_img) {
-        throw new BadRequest(ErrorMessage.itemImageMiss);
+      if (!req.body.item_name) {
+        throw new BadRequest(ErrorMessage.itemNameMiss);
       }
 
       await Items.insertItem(req).then((result) => {

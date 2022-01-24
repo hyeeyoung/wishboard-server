@@ -1,10 +1,11 @@
-const itemController = require("../controllers/itemController");
-const { verifyToken } = require("../middleware/auth");
-var router = require("express").Router();
+const itemController = require('../controllers/itemController');
+const { verifyToken } = require('../middleware/auth');
+const express = require('express');
+const router = new express.Router();
 
-router.post("/", verifyToken, itemController.insertItemInfo);
-router.get("/", verifyToken, itemController.selectItemInfo);
-router.put("/:item_id", verifyToken, itemController.updateItemInfo);
-router.delete("/", verifyToken, itemController.deleteItemInfo);
+router.post('/', verifyToken, itemController.insertItemInfo);
+router.get('/', verifyToken, itemController.selectItemInfo);
+router.put('/:item_id', verifyToken, itemController.updateItemInfo);
+router.delete('/:item_id', verifyToken, itemController.deleteItemInfo);
 
 module.exports = router;

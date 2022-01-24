@@ -1,25 +1,26 @@
-const { NotFound } = require("../utils/errors");
-const { ErrorMessage } = require("../utils/response");
-const pool = require("../config/db");
+const { NotFound } = require('../utils/errors');
+const { ErrorMessage } = require('../utils/response');
+const pool = require('../config/db');
 
 module.exports = {
   insertItem: async function (req) {
-    var userId = Number(req.decoded);
-    var folderId = req.body.folder_id;
+    const userId = Number(req.decoded);
+    let folderId = req.body.folder_id;
 
     if (folderId != undefined) {
       folderId = Number(req.body.folder_id);
     }
-    var itemImg = req.body.item_img;
-    var itemName = req.body.item_name;
-    var itemPrice = Number(req.body.item_price);
-    var itemUrl = req.body.item_url;
-    var itemMemo = req.body.item_memo;
+    const itemImg = req.body.item_img === 'NaN' ? null : req.body.item_img;
+    const itemName = req.body.item_name;
+    const itemPrice =
+      req.body.item_price == 'NaN' ? 0 : Number(req.body.item_price);
+    const itemUrl = req.body.item_url;
+    const itemMemo = req.body.item_memo;
 
-    var sqlInsert =
-      "INSERT INTO items (user_id, folder_id, item_img, item_name, item_price, item_url, item_memo) VALUES(?,?,?,?,?,?,?)";
+    const sqlInsert =
+      'INSERT INTO items (user_id, folder_id, item_img, item_name, item_price, item_url, item_memo) VALUES(?,?,?,?,?,?,?)';
 
-    var params = [
+    const params = [
       userId,
       folderId,
       itemImg,
@@ -43,8 +44,8 @@ module.exports = {
     return true;
   },
   selectItems: async function (req) {
-    var userId = Number(req.decoded);
-    var sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    const userId = Number(req.decoded);
+    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
       CAST(i.create_at AS CHAR(10)) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, c.item_id cart_item_id 
       FROM items i LEFT OUTER JOIN notification n 
       ON i.item_id = n.item_id  
@@ -63,29 +64,30 @@ module.exports = {
     return rows;
   },
   updateItems: async function (req) {
-    var userId = Number(req.decoded);
-    var itemId = Number(req.params.item_id);
-    // var folderId = Number(req.body.folder_id);
-    var itemName = req.body.item_name;
-    var itemImage = req.body.item_img;
-    var itemPrice = Number(req.body.item_price);
-    var itemUrl = req.body.item_url;
-    var itemMemo = req.body.item_memo;
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const itemName = req.body.item_name;
+    const itemImg = req.body.item_img === 'NaN' ? null : req.body.item_img;
+    const itemPrice =
+      req.body.item_price == 'NaN' ? 0 : Number(req.body.item_price);
 
-    var sqlUpdate =
-      "UPDATE items SET item_name = ?, item_img = ?, item_price = ?, item_url = ?, item_memo = ?";
-    var params = [itemName, itemImage, itemPrice, itemUrl, itemMemo];
+    const itemUrl = req.body.item_url;
+    const itemMemo = req.body.item_memo;
 
-    //TODO 제약조건 때문에 우선 이렇게 해둠
+    let sqlUpdate =
+      'UPDATE items SET item_name = ?, item_img = ?, item_price = ?, item_url = ?, item_memo = ?';
+    const params = [itemName, itemImg, itemPrice, itemUrl, itemMemo];
+
+    // TODO 제약조건 때문에 우선 이렇게 해둠
     if (req.body.folder_id) {
-      sqlUpdate += ", folder_id = ? WHERE item_id = ?";
+      sqlUpdate += ', folder_id = ? WHERE item_id = ?';
       params.push(Number(req.body.folder_id));
       params.push(Number(itemId));
     } else {
-      sqlUpdate += " WHERE item_id = ?";
+      sqlUpdate += ' WHERE item_id = ?';
       params.push(Number(itemId));
     }
-    sqlUpdate += " AND user_id = ?";
+    sqlUpdate += ' AND user_id = ?';
     params.push(Number(userId));
 
     const connection = await pool.connection(async (conn) => conn);
@@ -102,10 +104,10 @@ module.exports = {
     return true;
   },
   deleteItems: async function (req) {
-    var userId = Number(req.decoded);
-    var itemId = Number(req.body.item_id);
-    var sqlDelete = "DELETE FROM items WHERE item_id = ? AND user_id = ?";
-    var params = [itemId, userId];
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const sqlDelete = 'DELETE FROM items WHERE item_id = ? AND user_id = ?';
+    const params = [itemId, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
