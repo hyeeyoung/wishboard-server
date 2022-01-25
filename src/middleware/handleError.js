@@ -1,5 +1,5 @@
-const { GeneralError } = require("../utils/errors");
-const logger = require("../config/winston");
+const { GeneralError } = require('../utils/errors');
+const logger = require('../config/winston');
 
 const handleErrors = (err, req, res, next) => {
   logger.error(err);
@@ -11,7 +11,7 @@ const handleErrors = (err, req, res, next) => {
   }
   return res.status(500).json({
     success: false,
-    message: "wishboard 서버 에러",
+    message: 'wishboard 서버 에러',
   });
 };
 

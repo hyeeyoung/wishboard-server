@@ -1,17 +1,17 @@
-const pool = require("../config/db");
-const bcrypt = require("bcryptjs");
-const { NotFound } = require("../utils/errors");
-const { ErrorMessage } = require("../utils/response");
+const pool = require('../config/db');
+const bcrypt = require('bcryptjs');
+const { NotFound } = require('../utils/errors');
+const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
   signUp: async function (req) {
-    var email = req.body.email;
-    var beforePw = req.body.password;
+    const email = req.body.email;
+    const beforePw = req.body.password;
 
     const password = bcrypt.hashSync(beforePw, 10);
 
-    var sqlInsert = "INSERT INTO users (email, password) VALUES (?, ?)";
-    var params = [email, password];
+    const sqlInsert = 'INSERT INTO users (email, password) VALUES (?, ?)';
+    const params = [email, password];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -23,10 +23,10 @@ module.exports = {
     return rows;
   },
   signIn: async function (req) {
-    var email = req.body.email;
+    const email = req.body.email;
 
-    var sqlSelect =
-      "SELECT user_id, email, password FROM users WHERE email = ?";
+    const sqlSelect =
+      'SELECT user_id, email, password FROM users WHERE email = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, email);
@@ -34,9 +34,9 @@ module.exports = {
     return rows;
   },
   vaildateEmail: async function (req) {
-    var email = req.body.email;
+    const email = req.body.email;
 
-    var sqlSelect = "SELECT email FROM users WHERE email = ?";
+    const sqlSelect = 'SELECT email FROM users WHERE email = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     const row = await connection.query(sqlSelect, email);
@@ -44,9 +44,9 @@ module.exports = {
     return row[0].length >= 1 ? true : false;
   },
   deleteUser: async function (req) {
-    var userId = Number(req.decoded);
+    const userId = Number(req.decoded);
 
-    var sqlDelete = "DELETE FROM users WHERE user_id = ?";
+    const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -62,11 +62,11 @@ module.exports = {
     return true;
   },
   updateImage: async function (req) {
-    var userId = Number(req.decoded);
-    var profileImg = req.body.profile_img;
+    const userId = Number(req.decoded);
+    const profileImg = req.body.profile_img;
 
-    var sqlUpdate = "UPDATE users SET profile_img = ? WHERE user_id = ?";
-    var params = [profileImg, userId];
+    const sqlUpdate = 'UPDATE users SET profile_img = ? WHERE user_id = ?';
+    const params = [profileImg, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -82,11 +82,11 @@ module.exports = {
     return true;
   },
   updateNickname: async function (req) {
-    var userId = Number(req.decoded);
-    var nickname = req.body.nickname;
+    const userId = Number(req.decoded);
+    const nickname = req.body.nickname;
 
-    var sqlUpdate = "UPDATE users SET nickname = ? WHERE user_id = ?";
-    var params = [nickname, userId];
+    const sqlUpdate = 'UPDATE users SET nickname = ? WHERE user_id = ?';
+    const params = [nickname, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -102,13 +102,13 @@ module.exports = {
     return true;
   },
   updateInfo: async function (req) {
-    var userId = Number(req.decoded);
-    var nickname = req.body.nickname;
-    var profileImg = req.body.profile_img;
+    const userId = Number(req.decoded);
+    const nickname = req.body.nickname;
+    const profileImg = req.body.profile_img;
 
-    var sqlUpdate =
-      "UPDATE users SET nickname = ?, profile_img = ? WHERE user_id = ?";
-    var params = [nickname, profileImg, userId];
+    const sqlUpdate =
+      'UPDATE users SET nickname = ?, profile_img = ? WHERE user_id = ?';
+    const params = [nickname, profileImg, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -140,10 +140,10 @@ module.exports = {
   //   return rows.affectedRows >= 1 ? true : false;
   // },
   selectInfo: async function (req) {
-    var userId = Number(req.decoded);
+    const userId = Number(req.decoded);
 
-    var sqlSelect =
-      "SELECT email, profile_img, nickname, fcm_token FROM users WHERE user_id = ?";
+    const sqlSelect =
+      'SELECT email, profile_img, nickname, fcm_token FROM users WHERE user_id = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);

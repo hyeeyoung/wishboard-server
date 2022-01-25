@@ -1,13 +1,13 @@
-const User = require("../models/user");
-const logger = require("../config/winston");
-const { BadRequest } = require("../utils/errors");
+const User = require('../models/user');
+const logger = require('../config/winston');
+const { BadRequest } = require('../utils/errors');
 const {
   StatusCode,
   SuccessMessage,
   ErrorMessage,
-} = require("../utils/response");
+} = require('../utils/response');
 
-const TAG = "userController ";
+const TAG = 'userController ';
 
 module.exports = {
   deleteUserOne: async function (req, res, next) {
