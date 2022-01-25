@@ -51,7 +51,7 @@ module.exports = {
   },
   updateCart: async function (req) {
     const userId = Number(req.decoded);
-    const itemId = Number(req.body.item_id);
+    const itemId = Number(req.params.item_id);
     const itemCount = Number(req.body.item_count);
     const sqlUpdate =
       'UPDATE cart SET item_count = ? WHERE item_id = ? AND user_id = ?';
@@ -72,7 +72,7 @@ module.exports = {
   },
   deleteCart: async function (req) {
     const userId = Number(req.decoded);
-    const itemId = Number(req.body.item_id);
+    const itemId = Number(req.params.item_id);
 
     const sqlDelete = 'DELETE FROM cart WHERE user_id = ? AND item_id = ?';
     const params = [userId, itemId];

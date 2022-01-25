@@ -1,3 +1,5 @@
+/** TODO reafatoring 필요
+ * 쿼리 결과 값이 필드 값인 snake_case로 표현하여 다음과 같이 표현  */
 class CartResponse {
   constructor() {
     this.cartArray = [];
@@ -25,7 +27,7 @@ class CartResponse {
         rows[value].create_at,
         rows[value].item_notification_type,
         rows[value].item_notification_date,
-        rows[value].cart_state
+        rows[value].cart_state,
       );
       const cartItemInfo = new CartItemInfo(rows[value].item_count);
       this.addCartResponseItem(wishItem, cartItemInfo);
@@ -36,43 +38,43 @@ class CartResponse {
 
 class WishItem {
   constructor(
-    folder_id,
-    folder_name,
-    item_id,
-    item_img,
-    item_name,
-    item_price,
-    item_url,
-    item_memo,
-    create_at,
-    item_notification_type,
-    item_notification_date,
-    cart_state
+    folderId,
+    folderName,
+    itemId,
+    itemImg,
+    itemName,
+    itemPrice,
+    itemUrl,
+    itemMemo,
+    createAt,
+    itemNotificationType,
+    itemNotificationDate,
+    cartState,
   ) {
-    this.folder_id = folder_id;
-    this.folder_name = folder_name;
-    this.item_id = item_id;
-    this.item_img = item_img;
-    this.item_name = item_name;
-    this.item_price = item_price;
-    this.item_url = item_url;
-    this.item_memo = item_memo;
-    this.create_at = create_at;
-    this.item_notification_type = item_notification_type;
-    this.item_notification_date = item_notification_date;
-    this.cart_state = cart_state;
+    this.folder_id = folderId;
+    this.folder_name = folderName;
+    this.item_id = itemId;
+    this.item_img = itemImg;
+    this.item_name = itemName;
+    this.item_price = itemPrice;
+    this.item_url = itemUrl;
+    this.item_memo = itemMemo;
+    this.create_at = createAt;
+    this.item_notification_type = itemNotificationType;
+    this.item_notification_date = itemNotificationDate;
+    this.cart_state = cartState;
   }
 }
 
 class CartItemInfo {
-  constructor(item_count) {
-    this.item_count = item_count;
+  constructor(itemCount) {
+    this.item_count = itemCount;
   }
   getCartItemInfo() {
     return this.item_count;
   }
-  setCartItemInfo(item_count) {
-    this.item_count = item_count;
+  setCartItemInfo(itemCount) {
+    this.item_count = itemCount;
   }
 }
 

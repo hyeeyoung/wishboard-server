@@ -1,13 +1,13 @@
-const Cart = require("../models/cart");
-const logger = require("../config/winston");
+const Cart = require('../models/cart');
+const logger = require('../config/winston');
 const {
   StatusCode,
   SuccessMessage,
   ErrorMessage,
-} = require("../utils/response");
-const { BadRequest } = require("../utils/errors");
+} = require('../utils/response');
+const { BadRequest } = require('../utils/errors');
 
-const TAG = "cartContoller ";
+const TAG = 'cartContoller ';
 
 module.exports = {
   selectCartInfo: async function (req, res, next) {
@@ -38,7 +38,7 @@ module.exports = {
   },
   updateCartInfo: async function (req, res, next) {
     try {
-      if (!req.body.item_id || !req.body.item_count) {
+      if (!req.body.item_count) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       const result = await Cart.updateCart(req);
@@ -53,19 +53,15 @@ module.exports = {
     }
   },
   deleteCartInfo: async function (req, res, next) {
-    try {
-      if (!req.body.item_id) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
-      }
-      const result = await Cart.deleteCart(req);
-      if (result) {
+    await Cart.deleteCart(req)
+      .then(() => {
         res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.cartDelete,
         });
-      }
-    } catch (err) {
-      next(err);
-    }
+      })
+      .catch((err) => {
+        next(err);
+      });
   },
 };
