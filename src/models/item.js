@@ -10,10 +10,9 @@ module.exports = {
     if (folderId != undefined) {
       folderId = Number(req.body.folder_id);
     }
-    const itemImg = req.body.item_img === 'NaN' ? null : req.body.item_img;
+    const itemImg = req.body.item_img;
     const itemName = req.body.item_name;
-    const itemPrice =
-      req.body.item_price == 'NaN' ? 0 : Number(req.body.item_price);
+    const itemPrice = !req.body.item_price ? 0 : req.body.item_price;
     const itemUrl = req.body.item_url;
     const itemMemo = req.body.item_memo;
 
@@ -61,16 +60,14 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.itemNotFound);
     }
-    return rows;
+    return Object.setPrototypeOf(rows, []);
   },
   updateItems: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
     const itemName = req.body.item_name;
-    const itemImg = req.body.item_img === 'NaN' ? null : req.body.item_img;
-    const itemPrice =
-      req.body.item_price == 'NaN' ? 0 : Number(req.body.item_price);
-
+    const itemImg = req.body.item_img;
+    const itemPrice = !req.body.item_price ? 0 : Number(req.body.item_price);
     const itemUrl = req.body.item_url;
     const itemMemo = req.body.item_memo;
 
