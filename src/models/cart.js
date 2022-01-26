@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const { CartResponse } = require('../dto/cartResponse');
+const { CartItem } = require('../dto/cartResponse');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
@@ -24,9 +24,11 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.cartNotFound);
     }
-
-    const cartResponse = new CartResponse().convertToResponse(rows);
-    return cartResponse;
+    const cartItems = [];
+    rows.forEach((row) => {
+      cartItems.push(new CartItem().convertToCartItem(row));
+    });
+    return cartItems;
   },
   insertCart: async function (req) {
     const userId = Number(req.decoded);

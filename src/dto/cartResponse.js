@@ -1,38 +1,28 @@
 /** TODO reafatoring 필요
  * 쿼리 결과 값이 필드 값인 snake_case로 표현하여 다음과 같이 표현  */
-class CartResponse {
-  constructor() {
-    this.cartArray = [];
+class CartItem {
+  constructor(wishItem, cartItemInfo) {
+    this.wishItem = wishItem;
+    this.cartItemInfo = cartItemInfo;
   }
 
-  addCartResponseItem(wishItem, cartItemInfo) {
-    this.cartArray.push({ wishItem, cartItemInfo });
-  }
-
-  getCartResponse() {
-    return this.cartArray;
-  }
-
-  convertToResponse(rows) {
-    Object.keys(rows).forEach((value) => {
-      const wishItem = new WishItem(
-        rows[value].folder_id,
-        rows[value].folder_name,
-        rows[value].item_id,
-        rows[value].item_img,
-        rows[value].item_name,
-        rows[value].item_price,
-        rows[value].item_url,
-        rows[value].item_memo,
-        rows[value].create_at,
-        rows[value].item_notification_type,
-        rows[value].item_notification_date,
-        rows[value].cart_state,
-      );
-      const cartItemInfo = new CartItemInfo(rows[value].item_count);
-      this.addCartResponseItem(wishItem, cartItemInfo);
-    });
-    return this.getCartResponse();
+  convertToCartItem(row) {
+    this.wishItem = new WishItem(
+      row.folder_id,
+      row.folder_name,
+      row.item_id,
+      row.item_img,
+      row.item_name,
+      row.item_price,
+      row.item_url,
+      row.item_memo,
+      row.create_at,
+      row.item_notification_type,
+      row.item_notification_date,
+      row.cart_state,
+    );
+    this.cartItemInfo = new CartItemInfo(row.item_count);
+    return this;
   }
 }
 
@@ -64,6 +54,12 @@ class WishItem {
     this.item_notification_date = itemNotificationDate;
     this.cart_state = cartState;
   }
+  getWishItem() {
+    return this.wishItem;
+  }
+  setWIshItem(wishItem) {
+    this.wishItem = wishItem;
+  }
 }
 
 class CartItemInfo {
@@ -79,7 +75,7 @@ class CartItemInfo {
 }
 
 module.exports = {
-  CartResponse,
+  CartItem,
   WishItem,
   CartItemInfo,
 };
