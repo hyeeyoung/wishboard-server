@@ -1,44 +1,25 @@
-const Noti = require("../models/noti");
-const logger = require("../config/winston");
-const { BadRequest } = require("../utils/errors");
-const { Strings } = require("../utils/strings");
+const Noti = require('../models/noti');
+const logger = require('../config/winston');
+const { BadRequest } = require('../utils/errors');
+const { Strings } = require('../utils/strings');
+const { firebaseApp } = require('../config/firebaseClinet');
 const {
   StatusCode,
   SuccessMessage,
   ErrorMessage,
-} = require("../utils/response");
+} = require('../utils/response');
 
-const admin = require("firebase-admin");
-admin.initializeApp({
-  credential: admin.credential.cert({
-    type: process.env.FIREBASE_TYPE,
-    project_id: process.env.FIREBASE_PROJECT_ID,
-    private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    private_key: process.env.FIREBASE_PRIVATE_KEY,
-    client_email: process.env.FIREBASE_CLIENT_EMAIL,
-    client_id: process.env.FIREBASE_CLIENT_ID,
-    auth_uri: process.env.FIREBASE_AUTH_URI,
-    token_uri: process.env.FIREBASE_TOKEN_URI,
-    auth_provider_x509_cert_url:
-      process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URI,
-    client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URI,
-  }),
-});
+const TAG = 'notiContoller ';
 
-const TAG = "notiContoller ";
-
-function sendNotification(message) {
-  return admin
-    .messaging()
-    .send(message)
-    .then(function (response) {
-      logger.info(`${SuccessMessage.notiFCMSend}: ${response}`);
-      return true;
-    })
-    .catch(function (err) {
-      logger.error(TAG + err);
-      return false;
-    });
+async function sendNotification(message) {
+  try {
+    const response = await firebaseApp.messaging().send(message);
+    logger.info(`${SuccessMessage.notiFCMSend}: ${response}`);
+    return true;
+  } catch (err) {
+    logger.error(TAG + err);
+    return false;
+  }
 }
 
 module.exports = {
@@ -94,7 +75,6 @@ module.exports = {
   updateNotiInfo: async function (req, res, next) {
     try {
       if (
-        !req.body.item_id ||
         !req.body.item_notification_type ||
         !req.body.item_notification_date
       ) {
@@ -113,36 +93,27 @@ module.exports = {
     }
   },
   updateNotiReadStateInfo: async function (req, res, next) {
-    try {
-      if (!req.body.item_id) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
-      }
-      await Noti.updateNotiReadState(req).then((result) => {
-        if (result) {
-          res.status(StatusCode.OK).json({
-            success: true,
-            message: SuccessMessage.notiReadStateUpdate,
-          });
-        }
+    await Noti.updateNotiReadState(req)
+      .then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.notiReadStateUpdate,
+        });
+      })
+      .catch((err) => {
+        next(err);
       });
-    } catch (err) {
-      next(err);
-    }
   },
   deleteNotiInfo: async function (req, res, next) {
-    try {
-      if (!req.body.item_id) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
-      }
-      const result = await Noti.deleteNoti(req);
-      if (result) {
+    await Noti.deleteNoti(req)
+      .then(() => {
         res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.notiDelete,
         });
-      }
-    } catch (err) {
-      next(err);
-    }
+      })
+      .catch((err) => {
+        next(err);
+      });
   },
 };

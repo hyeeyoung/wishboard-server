@@ -1,22 +1,17 @@
-const pool = require("../config/db");
-const { NotFound } = require("../utils/errors");
-const { ErrorMessage } = require("../utils/response");
+const pool = require('../config/db');
+const { NotFound } = require('../utils/errors');
+const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
   insertNoti: async function (req) {
-    var userId = Number(req.decoded);
-    var itemId = req.body.item_id;
-    var notiType = req.body.item_notification_type;
-    var notiDate = req.body.item_notification_date;
+    const userId = Number(req.decoded);
+    const itemId = req.body.item_id;
+    const notiType = req.body.item_notification_type;
+    const notiDate = req.body.item_notification_date;
 
-    var sqlInsert =
-      "INSERT INTO notification (user_id, item_id, item_notification_type, item_notification_date) VALUES(?,?,?,?)";
-    var params = [
-      userId,
-      itemId,
-      notiType,
-      notiDate,
-    ];
+    const sqlInsert =
+      'INSERT INTO notification (user_id, item_id, item_notification_type, item_notification_date) VALUES(?,?,?,?)';
+    const params = [userId, itemId, notiType, notiDate];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -32,8 +27,8 @@ module.exports = {
     return true;
   },
   selectNoti: async function (req) {
-    var userId = Number(req.decoded);
-    var sqlSelect = `SELECT i.item_id, i.item_img, i.item_name, n.item_notification_type, 
+    const userId = Number(req.decoded);
+    const sqlSelect = `SELECT i.item_id, i.item_img, i.item_name, n.item_notification_type, 
         CAST(n.item_notification_date AS CHAR(19)) item_notification_date, n.read_state 
         FROM notification n JOIN items i 
         ON n.item_id = i.item_id 
@@ -47,17 +42,18 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.notiNotFound);
     }
-    return rows;
+
+    return Object.setPrototypeOf(rows, []);
   },
   updateNoti: async function (req) {
-    var userId = Number(req.decoded);
-    var itemId = Number(req.body.item_id);
-    var notiType = req.body.item_notification_type;
-    var notiDate = req.body.item_notification_date;
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const notiType = req.body.item_notification_type;
+    const notiDate = req.body.item_notification_date;
 
-    var sqlUpdate =
-      "UPDATE notification SET item_notification_type = ?, item_notification_date = ? WHERE user_id = ? AND item_id = ?";
-    var params = [notiType, notiDate, userId, itemId];
+    const sqlUpdate =
+      'UPDATE notification SET item_notification_type = ?, item_notification_date = ? WHERE user_id = ? AND item_id = ?';
+    const params = [notiType, notiDate, userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -73,11 +69,12 @@ module.exports = {
     return true;
   },
   updateNotiReadState: async function (req) {
-    var userId = Number(req.decoded);
-    var itemId = Number(req.body.item_id);
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
 
-    var sqlUpdate = "UPDATE notification SET read_state = 1 WHERE user_id = ? AND item_id = ?";
-    var params = [userId, itemId];
+    const sqlUpdate =
+      'UPDATE notification SET read_state = 1 WHERE user_id = ? AND item_id = ?';
+    const params = [userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -93,11 +90,12 @@ module.exports = {
     return true;
   },
   deleteNoti: async function (req) {
-    var userId = Number(req.decoded);
-    var itemId = Number(req.body.item_id);
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
 
-    var sqlDelete = "DELETE FROM notification WHERE user_id = ? AND item_id = ?";
-    var params = [userId, itemId];
+    const sqlDelete =
+      'DELETE FROM notification WHERE user_id = ? AND item_id = ?';
+    const params = [userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
