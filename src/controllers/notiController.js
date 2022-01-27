@@ -47,7 +47,7 @@ module.exports = {
         data: {
           title: Strings.notiMessageTitle,
           message: `${req.body.item_notification_type} ${Strings.notiMessageDescription}`,
-          isScheduled: Strings.true,
+          isScheduled: true.toString(),
           scheduledTime: req.body.item_notification_date,
         },
         token: req.body.fcm_token,
