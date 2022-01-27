@@ -62,7 +62,7 @@ module.exports = {
     }
     return Object.setPrototypeOf(rows, []);
   },
-  updateItems: async function (req) {
+  updateItem: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
     const itemName = req.body.item_name;
@@ -70,22 +70,23 @@ module.exports = {
     const itemPrice = !req.body.item_price ? 0 : Number(req.body.item_price);
     const itemUrl = req.body.item_url;
     const itemMemo = req.body.item_memo;
+    const folderId = Number(req.body.folder_id);
 
     let sqlUpdate =
-      'UPDATE items SET item_name = ?, item_img = ?, item_price = ?, item_url = ?, item_memo = ?';
-    const params = [itemName, itemImg, itemPrice, itemUrl, itemMemo];
+      'UPDATE items SET item_name = ?, item_price = ?, item_url = ?, item_memo = ?';
+    const params = [itemName, itemPrice, itemUrl, itemMemo];
 
-    // TODO 제약조건 때문에 우선 이렇게 해둠
-    if (req.body.folder_id) {
-      sqlUpdate += ', folder_id = ? WHERE item_id = ?';
-      params.push(Number(req.body.folder_id));
-      params.push(Number(itemId));
-    } else {
-      sqlUpdate += ' WHERE item_id = ?';
-      params.push(Number(itemId));
+    if (itemImg != undefined) {
+      sqlUpdate += ', item_img = ?';
+      params.push(itemImg);
     }
-    sqlUpdate += ' AND user_id = ?';
-    params.push(Number(userId));
+    if (folderId != undefined) {
+      sqlUpdate += ', folder_id = ?';
+      params.push(folderId);
+    }
+    sqlUpdate += ' WHERE item_id = ? AND user_id = ?';
+    params.push(itemId);
+    params.push(userId);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -100,7 +101,7 @@ module.exports = {
     }
     return true;
   },
-  deleteItems: async function (req) {
+  deleteItem: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
     const sqlDelete = 'DELETE FROM items WHERE item_id = ? AND user_id = ?';
