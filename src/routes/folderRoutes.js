@@ -1,17 +1,18 @@
-const folderController = require("../controllers/folderController");
-const { verifyToken } = require("../middleware/auth");
-var router = require("express").Router();
+const folderController = require('../controllers/folderController');
+const { verifyToken } = require('../middleware/auth');
+const express = require('express');
+const router = new express.Router();
 
-router.get("/", verifyToken, folderController.selectFolderInfo);
-router.get("/list", verifyToken, folderController.selectFolderList);
+router.get('/', verifyToken, folderController.selectFolderInfo);
+router.get('/list', verifyToken, folderController.selectFolderList);
 router.get(
-  "/item/:folder_id",
+  '/item/:folder_id',
   verifyToken,
-  folderController.selectFolderItemInfo
-);
-router.post("/", verifyToken, folderController.insertFolder);
-router.put("/", verifyToken, folderController.updateFolder);
-router.put("/item/image", folderController.updateFolderImage);
-router.delete("/", folderController.deleteFolder);
+  folderController.selectFolderItemInfo,
+); // TODO 필요 없어 보이나 아직 프론트 폴더 작업 진행 전이니 보류
+router.post('/', verifyToken, folderController.insertFolder);
+router.put('/:folder_id', verifyToken, folderController.updateFolder);
+router.put('/image/:folder_id', folderController.updateFolderImage); // TODO 필요 없어 보이나 아직 프론트 폴더 작업 진행 전이니 보류
+router.delete('/:folder_id', folderController.deleteFolder);
 
 module.exports = router;

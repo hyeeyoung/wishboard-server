@@ -1,13 +1,15 @@
-const pool = require("../config/db");
-const { NotFound } = require("../utils/errors");
-const { ErrorMessage } = require("../utils/response");
+const pool = require('../config/db');
+const { NotFound } = require('../utils/errors');
+const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
   selectFolder: async function (req) {
-    var userId = Number(req.decoded);
+    const userId = Number(req.decoded);
 
-    var sqlSelect = `SELECT f.user_id, f.folder_name, f.folder_img, f.folder_id, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i 
-  ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
+    const sqlSelect = `SELECT f.user_id, f.folder_name, f.folder_img, f.folder_id, ifnull(i.item_count, 0) item_count
+    FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(folder_id) item_count 
+    FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id 
+    WHERE f.user_id = ? ORDER BY create_at DESC;`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -16,12 +18,13 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.folderNotFound);
     }
-    return rows;
+    return Object.setPrototypeOf(rows, []);
   },
   selectFolderList: async function (req) {
-    var userId = Number(req.decoded);
+    const userId = Number(req.decoded);
 
-    var sqlSelect = `SELECT f.folder_id, f.folder_name, f.folder_img, ifnull(i.item_count, 0) item_count FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(*) item_count FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id WHERE f.user_id = ?`;
+    const sqlSelect = `SELECT folder_id, folder_name, folder_img FROM folders
+    WHERE user_id = ? ORDER BY create_at DESC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -30,18 +33,20 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.folderListNotFound);
     }
-    return rows;
+    return Object.setPrototypeOf(rows, []);
   },
   selectFolderItems: async function (req) {
-    var userId = Number(req.decoded);
-    var folderId = Number(req.params.folder_id);
+    // TODO selectFolderItems가 필요 없어 보이나 아직 프론트 폴더 작업 진행 전이니 보류
+    const userId = Number(req.decoded);
+    const folderId = Number(req.params.folder_id);
 
-    var sqlSelect = `SELECT i.item_id, i.user_id, i.item_img, i.item_name,
-    i.item_price, i.item_url, i.item_memo, b.item_id cart_item_id
-    FROM items i left outer join cart b ON i.item_id = b.item_id
+    const sqlSelect = `SELECT i.item_id, i.user_id, i.item_img, i.item_name,
+    i.item_price, i.item_url, i.item_memo, IF(c.item_id IS NULL, false, true) as cart_state
+    FROM items i left outer join cart c ON i.item_id = c.item_id
     WHERE i.user_id = ? AND i.folder_id = ?
     ORDER BY i.create_at DESC`;
-    var parmas = [userId, folderId];
+
+    const parmas = [userId, folderId];
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, parmas);
@@ -50,15 +55,15 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.folderInItemNotFound);
     }
-    return rows;
+    return Object.setPrototypeOf(rows, []);
   },
   insertFolder: async function (req) {
-    var folderName = req.body.folder_name;
-    var folderImg = req.body.folder_img;
-    var userId = Number(req.decoded);
+    const folderName = req.body.folder_name;
+    const folderImg = req.body.folder_img;
+    const userId = Number(req.decoded);
 
-    var sqInsert = `INSERt INTO folders(folder_name, folder_img, user_id) VALUES (?, ?, ?)`;
-    var params = [folderName, folderImg, userId];
+    const sqInsert = `INSERt INTO folders(folder_name, folder_img, user_id) VALUES (?, ?, ?)`;
+    const params = [folderName, folderImg, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -74,13 +79,13 @@ module.exports = {
     return true;
   },
   updateFolder: async function (req) {
-    var userId = Number(req.decoded);
-    var folderName = req.body.folder_name;
-    var folderImg = req.body.folder_img;
-    var folderId = Number(req.body.folder_id);
+    const userId = Number(req.decoded);
+    const folderName = req.body.folder_name;
+    const folderImg = req.body.folder_img;
+    const folderId = Number(req.params.folder_id);
 
-    var sqlUpdate = `UPDATE folders SET folder_name = ?, folder_img = ? WHERE folder_id = ? and user_id = ?`;
-    var params = [folderName, folderImg, folderId, userId];
+    const sqlUpdate = `UPDATE folders SET folder_name = ?, folder_img = ? WHERE folder_id = ? and user_id = ?`;
+    const params = [folderName, folderImg, folderId, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -96,11 +101,13 @@ module.exports = {
     return true;
   },
   updateFolderImage: async function (req) {
-    var folderId = Number(req.body.folder_id);
-    var folderImg = req.body.folder_img;
+    /** TODO updateFolder로 처리하면 될 것 같아 필요 없어 보이나
+     *       아직 프론트 폴더 작업 진행 전이니 보류             */
+    const folderId = Number(req.params.folder_id);
+    const folderImg = req.body.folder_img;
 
-    var sqlUpdate = `UPDATE folders SET folder_img = ? WHERE folder_id = ?`;
-    var params = [folderImg, folderId];
+    const sqlUpdate = `UPDATE folders SET folder_img = ? WHERE folder_id = ?`;
+    const params = [folderImg, folderId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -116,9 +123,9 @@ module.exports = {
     return true;
   },
   deleteFolder: async function (req) {
-    var folderId = Number(req.body.folder_id);
+    const folderId = Number(req.params.folder_id);
 
-    var sqlDelete = `DELETE FROM folders WHERE folder_id = ?`;
+    const sqlDelete = `DELETE FROM folders WHERE folder_id = ?`;
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
