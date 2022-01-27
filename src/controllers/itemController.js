@@ -43,7 +43,7 @@ module.exports = {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await Items.updateItems(req).then((result) => {
+      await Items.updateItem(req).then((result) => {
         if (result) {
           res.status(StatusCode.OK).json({
             success: true,
@@ -60,7 +60,7 @@ module.exports = {
       if (!req.params.item_id) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await Items.deleteItems(req).then((result) => {
+      await Items.deleteItem(req).then((result) => {
         if (result) {
           res.status(StatusCode.OK).json({
             success: true,
