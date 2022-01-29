@@ -60,7 +60,7 @@ const ErrorMessage = {
   folderListNotFound: '폴더리스트 정보 없음',
   folderInItemNotFound: '폴더 내 아이템 정보 없음',
   folderNameUpdateError: '수정된 폴더명 없음',
-  folderImageUpdateError: '수정된 폴더명 없음',
+  folderThumbnailUpdateError: '수정된 폴더 썸네일 없음',
   folderInsertError: '추가된 폴더 없음',
   folderDeleteError: '삭제된 폴더 없음',
 

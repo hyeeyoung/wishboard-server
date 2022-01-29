@@ -9,10 +9,10 @@ router.get(
   '/item/:folder_id',
   verifyToken,
   folderController.selectFolderItemInfo,
-); // TODO 필요 없어 보이나 아직 프론트 폴더 작업 진행 전이니 보류
+);
 router.post('/', verifyToken, folderController.insertFolder);
 router.put('/:folder_id', verifyToken, folderController.updateFolder);
-router.put('/image/:folder_id', folderController.updateFolderImage); // TODO 필요 없어 보이나 아직 프론트 폴더 작업 진행 전이니 보류
+router.put('/image/:folder_id', folderController.updateFolderThumbnail);
 router.delete('/:folder_id', folderController.deleteFolder);
 
 module.exports = router;

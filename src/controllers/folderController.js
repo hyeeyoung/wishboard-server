@@ -31,7 +31,6 @@ module.exports = {
       });
   },
   selectFolderItemInfo: async function (req, res, next) {
-    // TODO 필요 없어 보이나 아직 프론트 폴더 작업 진행 전이니 보류
     await Folders.selectFolderItems(req)
       .then((result) => {
         logger.info(TAG + result);
@@ -75,13 +74,12 @@ module.exports = {
       next(err);
     }
   },
-  updateFolderImage: async function (req, res, next) {
-    // TODO 필요 없어 보이나 아직 프론트 폴더 작업 진행 전이니 보류
-    await Folders.updateFolderImage(req)
+  updateFolderThumbnail: async function (req, res, next) {
+    await Folders.updateFolderThumbnail(req)
       .then(() => {
         res.status(StatusCode.OK).json({
           success: true,
-          message: SuccessMessage.folderImageUpdate,
+          message: SuccessMessage.folderThumbnailUpdateError,
         });
       })
       .catch((err) => {
