@@ -16,7 +16,16 @@
         "camelCase" : "warn",
         "prettier/prettier": "error",
         "no-unused-vars": "warn",
-        "no-bitwise": "off"
+        "no-bitwise": "off",
+        "require-jsdoc":[ "error", {
+            "require": {
+                "FunctionDeclaration": false,
+                "MethodDefinition": false,
+                "ClassDeclaration": false,
+                "ArrowFunctionExpression": false,
+                "FunctionExpression": false
+            }
+        }]
     },
     "ignorePatterns": [
         "node_modules/"

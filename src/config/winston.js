@@ -1,7 +1,7 @@
-const winston = require("winston");
-const winstonDaily = require("winston-daily-rotate-file");
+const winston = require('winston');
+const WinstonDaily = require('winston-daily-rotate-file');
 const { combine, timestamp, printf, colorize } = winston.format;
-var appRoot = require("app-root-path");
+const appRoot = require('app-root-path');
 
 const logDir = `${appRoot}/logs`;
 const logFormat = printf((info) => {
@@ -15,24 +15,24 @@ const logFormat = printf((info) => {
 const logger = winston.createLogger({
   format: combine(
     timestamp({
-      format: "YYYY-MM-DD HH:mm:ss",
+      format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    logFormat
+    logFormat,
   ),
   transports: [
-    //0, 1, 2 level과 0 level 로그 파일, 5 level 로그 파일 별도 보관
-    new winstonDaily({
-      level: "info",
-      datePattern: "YYYY-MM-DD",
+    // 0, 1, 2 level과 0 level 로그 파일, 5 level 로그 파일 별도 보관
+    new WinstonDaily({
+      level: 'info',
+      datePattern: 'YYYY-MM-DD',
       dirname: logDir,
       filename: `%DATE%.log`,
       maxFiles: 10000,
       //   zippedArchive: true,
     }),
-    new winstonDaily({
-      level: "error",
-      datePattern: "YYYY-MM-DD",
-      dirname: logDir + "/error",
+    new WinstonDaily({
+      level: 'error',
+      datePattern: 'YYYY-MM-DD',
+      dirname: logDir + '/error',
       filename: `%DATE%_error.log`,
       maxFiles: 10000,
       zippedArchive: true,
@@ -46,11 +46,11 @@ logger.stream = {
   },
 };
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
       format: winston.format.combine(colorize({ all: true }), logFormat),
-    })
+    }),
   );
 }
 

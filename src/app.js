@@ -1,56 +1,57 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const morgan = require("morgan");
-const logger = require("./config/winston");
-const bodyParser = require("body-parser");
-const path = require("path");
-require("dotenv").config({ path: "../.env" });
-const port = process.env.PORT || 3000;
+const helmet = require('helmet');
+const hpp = require('hpp');
+const morgan = require('morgan');
+const logger = require('./config/winston');
+const bodyParser = require('body-parser');
+require('dotenv').config({ path: '../.env' });
+const port = process.env.PORT;
+const nodeEnv = process.env.NODE_ENV;
 
-const authRouter = require("./routes/authRoutes");
-const userRouter = require("./routes/userRoutes");
-const itemRouter = require("./routes/itemRoutes");
-const cartRouter = require("./routes/cartRoutes");
-const folderRouter = require("./routes/folderRoutes");
-const notiRouter = require("./routes/notiRoutes");
+const passport = require('passport');
+const passportConfig = require('./config/passport');
 
-const passport = require("passport");
-const passportConfig = require("./config/passport");
-const morganFormat = process.env.NODE_ENV !== "production" ? "dev" : "combined"; // NOTE: morgan 출력 형태
+const handleErrors = require('./middleware/handleError');
+const { NotFound } = require('./utils/errors');
+const { ErrorMessage } = require('./utils/response');
 
-const handleErrors = require("./middleware/handleError");
-const { NotFound } = require("./utils/errors");
+/** 기본 설정 */
 
-//기본 설정
+// 서버 환경에 따라 다르게 설정 (배포/개발)
+if (nodeEnv === 'production') {
+  morganFormat = 'combined';
+  app.use(helmet());
+  app.use(hpp());
+} else {
+  morganFormat = 'development';
+}
+
 app.use(morgan(morganFormat, { stream: logger.stream }));
-
-app.listen(port, () => logger.info(`Server start listening on port ${port}`));
-
-app.get("/", (req, res) => res.send("Welcome to WishBoard!!"));
-
-app.set("port", port || 3000);
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+app.listen(port, () =>
+  logger.info(`Server start listening on port ${port} | ${nodeEnv}`),
+);
+app.get('/', (req, res) => res.send('Welcome to WishBoard!!'));
+app.set('port', port);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(express.static(path.join(__dirname, "public")));
-
+/** passport 설정 */
 app.use(passport.initialize());
 passportConfig();
 
-//router 설정
-app.use("/auth", authRouter);
-app.use("/user", userRouter);
-app.use("/item", itemRouter);
-app.use("/cart", cartRouter);
-app.use("/folder", folderRouter);
-app.use("/noti", notiRouter);
+/** router 설정 */
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/user', require('./routes/userRoutes'));
+app.use('/item', require('./routes/itemRoutes'));
+app.use('/cart', require('./routes/cartRoutes'));
+app.use('/folder', require('./routes/folderRoutes'));
+app.use('/noti', require('./routes/notiRoutes'));
 
-//에러페이지 설정
+/** 에러페이지 설정 */
 app.use((req, res, next) => {
-  throw new NotFound("API URL is invalid");
+  throw new NotFound(ErrorMessage.ApiUrlIsInvalid);
 });
 app.use(handleErrors);
 

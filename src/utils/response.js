@@ -87,6 +87,7 @@ const ErrorMessage = {
 
   /* 공통*/
   BadRequestMeg: '잘못된 요청',
+  ApiUrlIsInvalid: '잘못된 경로',
 };
 
 module.exports = { StatusCode, SuccessMessage, ErrorMessage };
