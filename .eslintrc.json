@@ -13,7 +13,7 @@
         "sourceType": "module"
     },
     "rules": {
-        "camelCase" : "warn",
+        "camelCase" : "off",
         "prettier/prettier": "error",
         "no-unused-vars": "warn",
         "no-bitwise": "off",
