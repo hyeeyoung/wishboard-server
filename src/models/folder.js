@@ -115,7 +115,7 @@ module.exports = {
     connection.release();
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.folderImageUpdateError);
+      throw new NotFound(ErrorMessage.folderThumbnailUpdateError);
     }
     return true;
   },
