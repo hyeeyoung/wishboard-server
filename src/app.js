@@ -20,14 +20,15 @@ const { ErrorMessage } = require('./utils/response');
 
 // 서버 환경에 따라 다르게 설정 (배포/개발)
 if (nodeEnv === 'production') {
-  morganFormat = 'combined';
+  morganFormat = 'combined'; // Apache 표준
   app.use(helmet());
   app.use(hpp());
 } else {
-  morganFormat = 'development';
+  morganFormat = 'dev';
 }
 
 app.use(morgan(morganFormat, { stream: logger.stream }));
+app.use(morganMiddleware);
 app.listen(port, () =>
   logger.info(`Server start listening on port ${port} | ${nodeEnv}`),
 );

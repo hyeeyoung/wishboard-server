@@ -37,6 +37,7 @@ const logger = winston.createLogger({
       maxFiles: 10000,
       zippedArchive: true,
     }),
+    new winston.transports.Console({ handleExceptions: true }),
   ],
 });
 
