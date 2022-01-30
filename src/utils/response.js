@@ -34,6 +34,7 @@ const SuccessMessage = {
   userInfoUpdate: '사용자 정보 수정 성공',
   userNickNameUpdate: '사용자 닉네임 수정 성공',
   userProfileImgUpdate: '사용자 프로필 이미지 수정 성공',
+  userFcmTokenUpdate: '사용자 Fcm Token 수정 성공',
   userDelete: '사용자 삭제 성공',
 
   loginSuccessAfterSuccessSignUp: 'wishboard 회원가입 후 로그인 성공',
@@ -77,6 +78,7 @@ const ErrorMessage = {
   userInfoUpdateNotFound: '수정된 사용자 정보 없음',
   userNickNameUpdateNotFound: '수정된 사용자 닉네임 없음',
   userProfileImgUpdateNotFound: '수정된 사용자 프로필 이미지 없음',
+  userFcmTokenUpdateNotFound: '수정된 사용자 fcm token 없음',
   userDeleteError: '삭제된 사용자 없음',
 
   signUpFailed: 'wishboard 앱 회원가입 실패',
