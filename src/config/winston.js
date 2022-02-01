@@ -20,14 +20,14 @@ const logger = winston.createLogger({
     logFormat,
   ),
   transports: [
-    // 0, 1, 2 level과 0 level 로그 파일, 5 level 로그 파일 별도 보관
+    // 0, 1, 2 level과 0 level 로그 파일 별도 보관
     new WinstonDaily({
-      level: 'info',
+      level: 'debug',
       datePattern: 'YYYY-MM-DD',
       dirname: logDir,
       filename: `%DATE%.log`,
       maxFiles: 10000,
-      //   zippedArchive: true,
+      zippedArchive: true,
     }),
     new WinstonDaily({
       level: 'error',
@@ -37,7 +37,6 @@ const logger = winston.createLogger({
       maxFiles: 10000,
       zippedArchive: true,
     }),
-    new winston.transports.Console({ handleExceptions: true }),
   ],
 });
 
