@@ -28,7 +28,6 @@ if (nodeEnv === 'production') {
 }
 
 app.use(morgan(morganFormat, { stream: logger.stream }));
-app.use(morganMiddleware);
 app.listen(port, () =>
   logger.info(`Server start listening on port ${port} | ${nodeEnv}`),
 );
