@@ -46,12 +46,11 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       await Folders.insertFolder(req).then((result) => {
-        if (result) {
-          res.status(StatusCode.CREATED).json({
-            success: true,
-            message: SuccessMessage.folderInsert,
-          });
-        }
+        res.status(StatusCode.CREATED).json({
+          success: true,
+          message: SuccessMessage.folderInsert,
+          data: result,
+        });
       });
     } catch (err) {
       next(err);

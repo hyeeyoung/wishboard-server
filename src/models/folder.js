@@ -75,7 +75,7 @@ module.exports = {
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.folderInsertError);
     }
-    return true;
+    return Number(rows.insertId);
   },
   updateFolder: async function (req) {
     const userId = Number(req.decoded);
