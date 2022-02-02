@@ -76,11 +76,13 @@ module.exports = {
       'UPDATE items SET item_name = ?, item_price = ?, item_url = ?, item_memo = ?';
     const params = [itemName, itemPrice, itemUrl, itemMemo];
 
-    if (itemImg != undefined) {
+    // 어아탬이미지 null 경우에만 동작
+    if (!itemImg) {
       sqlUpdate += ', item_img = ?';
       params.push(itemImg);
     }
-    if (folderId != undefined) {
+    // 폴더id가 있을 경우에만 동작
+    if (folderId) {
       sqlUpdate += ', folder_id = ?';
       params.push(folderId);
     }
