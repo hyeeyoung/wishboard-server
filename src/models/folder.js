@@ -5,7 +5,7 @@ const { ErrorMessage } = require('../utils/response');
 module.exports = {
   selectFolder: async function (req) {
     const userId = Number(req.decoded);
-    
+
     const sqlSelect = `SELECT f.folder_id, f.folder_name, i.item_img folder_thumbnail, ifnull(ic.item_count, 0) item_count
     FROM folders f LEFT OUTER JOIN (SELECT folder_id, item_img FROM items ORDER BY create_at DESC LIMIT 1) i
     ON f.folder_id = i.folder_id 
