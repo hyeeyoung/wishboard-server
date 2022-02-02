@@ -37,7 +37,7 @@ module.exports = {
               return res.status(StatusCode.CREATED).json({
                 success: true,
                 message: SuccessMessage.loginSuccessAfterSuccessSignUp,
-                token: token,
+                data: token,
               });
             });
           })(req, res);
@@ -74,7 +74,7 @@ module.exports = {
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
-          token: token,
+          data: token,
         });
       });
     })(req, res);
