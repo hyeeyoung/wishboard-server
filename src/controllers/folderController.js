@@ -71,18 +71,6 @@ module.exports = {
       next(err);
     }
   },
-  updateFolderThumbnail: async function (req, res, next) {
-    await Folders.updateFolderThumbnail(req)
-      .then(() => {
-        res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.folderThumbnailUpdateError,
-        });
-      })
-      .catch((err) => {
-        next(err);
-      });
-  },
   deleteFolder: async function (req, res, next) {
     await Folders.deleteFolder(req)
       .then(() => {

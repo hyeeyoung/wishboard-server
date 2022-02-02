@@ -12,7 +12,6 @@ router.get(
 );
 router.post('/', verifyToken, folderController.insertFolder);
 router.put('/:folder_id', verifyToken, folderController.updateFolder);
-router.put('/image/:folder_id', folderController.updateFolderThumbnail);
 router.delete('/:folder_id', folderController.deleteFolder);
 
 module.exports = router;

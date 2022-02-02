@@ -65,11 +65,10 @@ module.exports = {
   },
   insertFolder: async function (req) {
     const folderName = req.body.folder_name;
-    const folderThumbnail = req.body.folder_thumbnail;
     const userId = Number(req.decoded);
 
-    const sqInsert = `INSERT INTO folders(folder_name, folder_thumbnail, user_id) VALUES (?, ?, ?)`;
-    const params = [folderName, folderThumbnail, userId];
+    const sqInsert = `INSERT INTO folders(folder_name, user_id) VALUES (?, ?)`;
+    const params = [folderName, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -87,11 +86,10 @@ module.exports = {
   updateFolder: async function (req) {
     const userId = Number(req.decoded);
     const folderName = req.body.folder_name;
-    const folderThumbnail = req.body.folder_thumbnail;
     const folderId = Number(req.params.folder_id);
 
-    const sqlUpdate = `UPDATE folders SET folder_name = ?, folder_thumbnail = ? WHERE folder_id = ? and user_id = ?`;
-    const params = [folderName, folderThumbnail, folderId, userId];
+    const sqlUpdate = `UPDATE folders SET folder_name = ? WHERE folder_id = ? and user_id = ?`;
+    const params = [folderName, folderId, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -103,26 +101,6 @@ module.exports = {
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.folderNameUpdateError);
-    }
-    return true;
-  },
-  updateFolderThumbnail: async function (req) {
-    const folderId = Number(req.params.folder_id);
-    const folderThumbnail = req.body.folder_thumbnail;
-
-    const sqlUpdate = `UPDATE folders SET folder_thumbnail = ? WHERE folder_id = ?`;
-    const params = [folderThumbnail, folderId];
-
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
-
-    if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.folderThumbnailUpdateError);
     }
     return true;
   },
