@@ -61,13 +61,11 @@ module.exports = {
       if (!req.body.folder_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await Folders.updateFolder(req).then((result) => {
-        if (result) {
-          res.status(StatusCode.OK).json({
-            success: true,
-            message: SuccessMessage.folderNameUpdate,
-          });
-        }
+      await Folders.updateFolder(req).then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.folderNameUpdate,
+        });
       });
     } catch (err) {
       next(err);
