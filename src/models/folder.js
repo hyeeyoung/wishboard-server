@@ -6,10 +6,12 @@ module.exports = {
   selectFolder: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT f.user_id, f.folder_name, f.folder_thumbnail, f.folder_id, ifnull(i.item_count, 0) item_count
-    FROM folders f LEFT OUTER JOIN (SELECT folder_id, count(folder_id) item_count 
-    FROM items GROUP BY folder_id) i ON f.folder_id = i.folder_id 
-    WHERE f.user_id = ? ORDER BY create_at DESC;`;
+    const sqlSelect = `SELECT f.user_id, f.folder_name, i.item_img folder_thumbnail, ifnull(ic.item_count, 0) item_count
+    FROM folders f LEFT OUTER JOIN (SELECT folder_id, item_img FROM items ORDER BY create_at DESC LIMIT 1) i
+    ON f.folder_id = i.folder_id 
+    LEFT OUTER JOIN (SELECT folder_id, count(folder_id) item_count FROM items GROUP BY folder_id) ic
+    ON f.folder_id = ic.folder_id
+    WHERE f.user_id = ? GROUP BY f.folder_id ORDER BY f.create_at DESC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -23,8 +25,10 @@ module.exports = {
   selectFolderList: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT folder_id, folder_name, folder_thumbnail FROM folders
-    WHERE user_id = ? ORDER BY create_at DESC`;
+    const sqlSelect = `SELECT f.folder_id, f.folder_name, i.item_img folder_thumbnail FROM folders f
+    LEFT OUTER JOIN (SELECT folder_id, item_img FROM items ORDER BY create_at DESC LIMIT 1) i
+    ON f.folder_id = i.folder_id 
+    WHERE f.user_id = ? ORDER BY f.create_at DESC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -40,8 +44,11 @@ module.exports = {
     const folderId = Number(req.params.folder_id);
 
     const sqlSelect = `SELECT i.item_id, i.user_id, i.item_img, i.item_name,
-    i.item_price, i.item_url, i.item_memo, IF(c.item_id IS NULL, false, true) as cart_state
-    FROM items i left outer join cart c ON i.item_id = c.item_id
+    i.item_price, i.item_url, i.item_memo, IF(c.item_id IS NULL, false, true) as cart_state, 
+    CAST(i.create_at AS CHAR(10)) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date
+    FROM items i LEFT OUTER JOIN notification n 
+    ON i.item_id = n.item_id  
+    LEFT OUTER JOIN cart c ON i.item_id = c.item_id
     WHERE i.user_id = ? AND i.folder_id = ?
     ORDER BY i.create_at DESC`;
 
