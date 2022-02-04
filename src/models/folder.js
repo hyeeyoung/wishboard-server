@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const { NotFound } = require('../utils/errors');
+const { NotFound, BadRequest } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
@@ -129,5 +129,23 @@ module.exports = {
       throw new NotFound(ErrorMessage.folderDeleteError);
     }
     return true;
+  },
+  vaildateFolder: async function (req) {
+    const userId = Number(req.decoded);
+    const folderName = req.body.folder_name;
+
+    const sqlSelect =
+      'SELECT folder_name FROM folders WHERE user_id = ? AND folder_name = ?';
+    const params = [userId, folderName];
+
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, params);
+    connection.release();
+
+    if (rows.length >= 1) {
+      throw new BadRequest(ErrorMessage.vaildateFolder);
+    }
+
+    return false;
   },
 };
