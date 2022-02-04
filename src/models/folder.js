@@ -111,14 +111,16 @@ module.exports = {
     return true;
   },
   deleteFolder: async function (req) {
+    const userId = Number(req.decoded);
     const folderId = Number(req.params.folder_id);
 
-    const sqlDelete = `DELETE FROM folders WHERE folder_id = ?`;
+    const sqlDelete = `DELETE FROM folders WHERE folder_id = ? AND user_id = ?`;
+    const params = [folderId, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection
-      .query(sqlDelete, folderId)
+      .query(sqlDelete, params)
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
