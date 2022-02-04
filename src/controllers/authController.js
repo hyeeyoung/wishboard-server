@@ -50,7 +50,7 @@ module.exports = {
           });
         });
     } else {
-      res.status(StatusCode.BADREQUEST).json({
+      res.status(StatusCode.CONFLICT).json({
         success: false,
         message: ErrorMessage.vaildateEmail,
       });

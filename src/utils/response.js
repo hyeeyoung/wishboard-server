@@ -4,6 +4,7 @@ const StatusCode = {
   BADREQUEST: 400,
   UNAUTHORIZED: 401,
   NOTFOUND: 404,
+  CONFLICT: 409,
 };
 
 const SuccessMessage = {
