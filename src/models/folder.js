@@ -1,5 +1,5 @@
 const pool = require('../config/db');
-const { NotFound, BadRequest } = require('../utils/errors');
+const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
@@ -143,7 +143,7 @@ module.exports = {
     connection.release();
 
     if (rows.length >= 1) {
-      throw new BadRequest(ErrorMessage.vaildateFolder);
+      throw new Conflict(ErrorMessage.vaildateFolder);
     }
 
     return false;
