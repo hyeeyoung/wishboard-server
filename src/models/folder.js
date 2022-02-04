@@ -6,12 +6,15 @@ module.exports = {
   selectFolder: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT f.folder_id, f.folder_name, i.item_img folder_thumbnail, ifnull(ic.item_count, 0) item_count
-    FROM folders f LEFT OUTER JOIN (SELECT folder_id, item_img FROM items ORDER BY create_at DESC LIMIT 1) i
+    const sqlSelect = `SELECT f.folder_id, f.folder_name, i.folder_thumbnail, ifnull(ic.item_count, 0) item_count FROM folders f 
+    LEFT OUTER JOIN (
+    (SELECT a.folder_id, a.item_img folder_thumbnail, a.create_at
+    FROM items a INNER JOIN (SELECT max(create_at) create_at FROM items GROUP BY folder_id) b
+    WHERE a.create_at = b.create_at)) i
     ON f.folder_id = i.folder_id 
     LEFT OUTER JOIN (SELECT folder_id, count(folder_id) item_count FROM items GROUP BY folder_id) ic
     ON f.folder_id = ic.folder_id
-    WHERE f.user_id = ? GROUP BY f.folder_id ORDER BY f.create_at DESC`;
+    WHERE f.user_id = ? ORDER BY f.create_at DESC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
@@ -25,8 +28,11 @@ module.exports = {
   selectFolderList: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT f.folder_id, f.folder_name, i.item_img folder_thumbnail FROM folders f
-    LEFT OUTER JOIN (SELECT folder_id, item_img FROM items ORDER BY create_at DESC LIMIT 1) i
+    const sqlSelect = `SELECT f.folder_id, f.folder_name, i.folder_thumbnail FROM folders f 
+    LEFT OUTER JOIN (
+    (SELECT a.folder_id, a.item_img folder_thumbnail, a.create_at
+    FROM items a INNER JOIN (SELECT max(create_at) create_at FROM items GROUP BY folder_id) b
+    WHERE a.create_at = b.create_at)) i
     ON f.folder_id = i.folder_id 
     WHERE f.user_id = ? ORDER BY f.create_at DESC`;
 
