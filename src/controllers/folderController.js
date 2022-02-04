@@ -45,13 +45,17 @@ module.exports = {
       if (!req.body.folder_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await Folders.insertFolder(req).then((result) => {
-        res.status(StatusCode.CREATED).json({
-          success: true,
-          message: SuccessMessage.folderInsert,
-          data: result,
+      const isVaildate = await Folders.vaildateFolder(req);
+
+      if (!isVaildate) {
+        await Folders.insertFolder(req).then((result) => {
+          res.status(StatusCode.CREATED).json({
+            success: true,
+            message: SuccessMessage.folderInsert,
+            data: result,
+          });
         });
-      });
+      }
     } catch (err) {
       next(err);
     }
@@ -61,12 +65,16 @@ module.exports = {
       if (!req.body.folder_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await Folders.updateFolder(req).then(() => {
-        res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.folderNameUpdate,
+      const isVaildate = await Folders.vaildateFolder(req);
+
+      if (!isVaildate) {
+        await Folders.updateFolder(req).then(() => {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.folderNameUpdate,
+          });
         });
-      });
+      }
     } catch (err) {
       next(err);
     }
