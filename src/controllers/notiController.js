@@ -2,7 +2,7 @@ const Noti = require('../models/noti');
 const logger = require('../config/winston');
 const { BadRequest } = require('../utils/errors');
 const { Strings } = require('../utils/strings');
-const { firebaseApp } = require('../config/firebaseClinet');
+const { firebaseAdmin } = require('../config/firebaseAdmin');
 const {
   StatusCode,
   SuccessMessage,
@@ -13,7 +13,7 @@ const TAG = 'notiContoller ';
 
 async function sendNotification(message) {
   try {
-    const response = await firebaseApp.messaging().send(message);
+    const response = await firebaseAdmin.messaging().send(message);
     logger.info(`${SuccessMessage.notiFCMSend}: ${response}`);
     return true;
   } catch (err) {
