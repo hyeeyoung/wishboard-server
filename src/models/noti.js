@@ -1,11 +1,11 @@
 const pool = require('../config/db');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
+const { Strings } = require('../utils/strings');
 
 module.exports = {
-  insertNoti: async function (req) {
+  insertNoti: async function (req, itemId) {
     const userId = Number(req.decoded);
-    const itemId = req.body.item_id;
     const notiType = req.body.item_notification_type;
     const notiDate = req.body.item_notification_date;
 
@@ -45,29 +45,6 @@ module.exports = {
 
     return Object.setPrototypeOf(rows, []);
   },
-  updateNoti: async function (req) {
-    const userId = Number(req.decoded);
-    const itemId = Number(req.params.item_id);
-    const notiType = req.body.item_notification_type;
-    const notiDate = req.body.item_notification_date;
-
-    const sqlUpdate =
-      'UPDATE notification SET item_notification_type = ?, item_notification_date = ? WHERE user_id = ? AND item_id = ?';
-    const params = [notiType, notiDate, userId, itemId];
-
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
-
-    if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.notiUpdateError);
-    }
-    return true;
-  },
   updateNotiReadState: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
@@ -89,6 +66,38 @@ module.exports = {
     }
     return true;
   },
+  upsertNoti: async function (req) {
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const itemNotiType = req.body.item_notification_type;
+    const itemNotiDate = req.body.item_notification_date;
+
+    const sqlUpsert = `INSERT INTO notification (user_id, item_id, item_notification_type, item_notification_date)
+    VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE item_notification_type = ?, item_notification_date = ?`;
+
+    const params = [
+      userId,
+      itemId,
+      itemNotiType,
+      itemNotiDate,
+      itemNotiType,
+      itemNotiDate,
+    ];
+
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
+      .query(sqlUpsert, params)
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.notiUpsertError);
+    }
+
+    return rows.affectedRows === 1 ? Strings.INSERT : Strings.UPSERT;
+  },
   deleteNoti: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
@@ -105,9 +114,6 @@ module.exports = {
       .catch(await connection.rollback());
     connection.release();
 
-    if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.notiDeleteError);
-    }
-    return true;
+    return rows.affectedRows < 1 ? false : true;
   },
 };

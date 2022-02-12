@@ -1,4 +1,5 @@
 const Items = require('../models/item');
+const Noti = require('../models/noti');
 const logger = require('../config/winston');
 const { BadRequest } = require('../utils/errors');
 const {
@@ -6,6 +7,7 @@ const {
   SuccessMessage,
   ErrorMessage,
 } = require('../utils/response');
+const { Strings } = require('../utils/strings');
 
 const TAG = 'ItemController ';
 
@@ -16,9 +18,19 @@ module.exports = {
         throw new BadRequest(ErrorMessage.itemNameMiss);
       }
 
-      await Items.insertItem(req).then((result) => {
-        if (result) {
-          res.status(StatusCode.CREATED).json({
+      await Items.insertItem(req).then((itemId) => {
+        if (
+          req.body.item_notification_date &&
+          req.body.item_notification_type
+        ) {
+          Noti.insertNoti(req, itemId).then(() => {
+            return res.status(StatusCode.CREATED).json({
+              success: true,
+              message: SuccessMessage.itemAndNotiInsert,
+            });
+          });
+        } else {
+          return res.status(StatusCode.CREATED).json({
             success: true,
             message: SuccessMessage.itemInsert,
           });
@@ -43,11 +55,43 @@ module.exports = {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await Items.updateItem(req).then((result) => {
-        if (result) {
-          res.status(StatusCode.OK).json({
-            success: true,
-            message: SuccessMessage.itemUpdate,
+
+      await Items.updateItem(req).then(() => {
+        if (
+          req.body.item_notification_date &&
+          req.body.item_notification_type
+        ) {
+          //* item 수정 후 item_noti_~에 따라 알림여부를 noti에 수정/추가
+          Noti.upsertNoti(req).then((state) => {
+            if (state === Strings.INSERT) {
+              return res.status(StatusCode.CREATED).json({
+                success: true,
+                message: SuccessMessage.itemUpdateAndNotiInsert,
+              });
+            }
+
+            if (state === Strings.UPSERT) {
+              return res.status(StatusCode.OK).json({
+                success: true,
+                message: SuccessMessage.itemAndNotiUpdate,
+              });
+            }
+          });
+        } else {
+          //* item 수정 후 item_noti_~가 null인 경우, noti에 존재하면 삭제
+          Noti.deleteNoti(req).then((result) => {
+            if (result) {
+              return res.status(StatusCode.OK).json({
+                success: true,
+                message: SuccessMessage.itemUpdateAndNotiDelete,
+              });
+            } else {
+              //* 아이템만 수정
+              return res.status(StatusCode.OK).json({
+                success: true,
+                message: SuccessMessage.itemUpdate,
+              });
+            }
           });
         }
       });
@@ -64,7 +108,7 @@ module.exports = {
         if (result) {
           res.status(StatusCode.OK).json({
             success: true,
-            message: SuccessMessage.itemDelete,
+            message: SuccessMessage.itemAndNotiDelete,
           });
         }
       });
