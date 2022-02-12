@@ -40,7 +40,7 @@ module.exports = {
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.itemInsertError);
     }
-    return true;
+    return Number(rows.insertId);
   },
   selectItems: async function (req) {
     const userId = Number(req.decoded);
