@@ -21,6 +21,9 @@ const SuccessMessage = {
   notiReadStateUpdate: '알림 읽음 상태 수정 성공',
   notiFCMSend: '알림 전송 성공',
 
+  notiPushServiceStart: '푸쉬 알림 서비스 시작',
+  notiPushServiceExit: '푸쉬 알림 서비스 종료',
+
   /* 장바구니*/
   cartInsert: '장바구니 추가 성공',
   cartUpdate: '장바구니 수정 성공',
@@ -70,10 +73,11 @@ const ErrorMessage = {
 
   /* 알림*/
   notiNotFound: '알림 정보 없음',
-  notiTodayNotFound: '오늘 날짜 기준, 5분 전 알림 정보 없음',
+  notiTodayNotFound: '오늘 날짜 기준, 예정된 알림 정보 없음',
   notiReadStateUpdateError: '수정된 알림 읽음 상태 없음',
-  notiFCMSendError: '전송된 알림 없음. FCM 에러',
+  notiFCMSendError: 'FCM 토큰 에러. 토큰이 없거나 잘못된 경우',
   notiUpsertError: '추가되거나 수정된 알림 없음',
+  notiSendFailed: 'Firebase FCM server로 전송 실패',
 
   /* 사용자*/
   userNotFound: '사용자 정보 없음',
