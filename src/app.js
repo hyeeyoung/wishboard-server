@@ -17,7 +17,6 @@ const { NotFound } = require('./utils/errors');
 const { ErrorMessage } = require('./utils/response');
 
 /** 기본 설정 */
-
 // 서버 환경에 따라 다르게 설정 (배포/개발)
 if (nodeEnv === 'production') {
   morganFormat = 'combined'; // Apache 표준
@@ -26,8 +25,8 @@ if (nodeEnv === 'production') {
 } else {
   morganFormat = 'dev';
 }
-
 app.use(morgan(morganFormat, { stream: logger.stream }));
+
 app.listen(port, () =>
   logger.info(`Server start listening on port ${port} | ${nodeEnv}`),
 );
