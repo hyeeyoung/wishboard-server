@@ -1,6 +1,9 @@
 const { firebaseAdmin } = require('../config/firebaseAdmin');
 const Noti = require('../models/noti');
-const { oneDataMessage, anyDataMessage } = require('../utils/notiPushMessage');
+const {
+  dataMessage,
+  dataMessageWithCount,
+} = require('../utils/notiPushMessage');
 const logger = require('../config/winston');
 const { SuccessMessage, ErrorMessage } = require('../utils/response');
 
@@ -31,20 +34,21 @@ module.exports = {
       .then((notiData) => {
         let message;
         if (notiData.length === 1) {
-          message = oneDataMessage(
+          message = dataMessage(
             notiData[0].item_notification_type,
             notiData[0].item_id,
             notiData[0].fcm_token,
           );
         } else {
           const notiCount = notiData.length;
-          message = anyDataMessage(
+          message = dataMessageWithCount(
             notiData[0].item_notification_type,
             notiData[0].item_id,
             notiCount,
             notiData[0].fcm_token,
           );
         }
+        console.log(message);
         sendFcmTokenToFirebase(message).catch(() => {
           logger.error(ErrorMessage.notiSendFailed);
           return res.status(StatusCode.NOTFOUND).json({

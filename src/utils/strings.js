@@ -1,9 +1,7 @@
 const Strings = {
   /* 알림 */
   notiMessageTitle: '상품일정알림',
-  besidesTheNoti: ' 알림 외 ',
-  anyMore: ' 개의',
-  haveItNoti: ' 알림이 있습니다.',
+  haveItNoti: '알림이 있습니다.',
 
   INSERT: 'INSERT',
   UPSERT: 'UPSERT',
