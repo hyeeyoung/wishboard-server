@@ -16,7 +16,7 @@ const message = {
 };
 
 function dataMessage(itemNotiType, itemId, deviceFcmToken) {
-  message.notification.body = Strings.haveItNoti;
+  message.notification.body = Strings.notiMessageDescription;
   message.data.notiType = itemNotiType;
   message.data.itemId = String(itemId);
   message.token = deviceFcmToken;
@@ -24,7 +24,8 @@ function dataMessage(itemNotiType, itemId, deviceFcmToken) {
 }
 
 function dataMessageWithCount(itemNotiType, itemId, notiCount, deviceFcmToken) {
-  message.notification.body = `${notiCount}개의 ` + Strings.haveItNoti;
+  message.notification.body =
+    `${notiCount}개의 ` + Strings.notiMessageDescription;
   message.data.notiType = itemNotiType;
   message.data.itemId = String(itemId);
   message.token = deviceFcmToken;
