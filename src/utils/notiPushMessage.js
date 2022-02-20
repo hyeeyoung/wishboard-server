@@ -8,29 +8,27 @@ const message = {
     body: '',
   },
   data: {
+    notiType: '',
     itemId: '',
     pushType: Strings.NOTI_SCREEN,
   },
   token: '',
 };
 
-function oneDataMessage(itemNotiType, itemId, deviceFcmToken) {
-  message.notification.body = itemNotiType + Strings.haveItNoti;
+function dataMessage(itemNotiType, itemId, deviceFcmToken) {
+  message.notification.body = Strings.haveItNoti;
+  message.data.notiType = itemNotiType;
   message.data.itemId = String(itemId);
   message.token = deviceFcmToken;
   return message;
 }
 
-function anyDataMessage(itemNotiType, itemId, notiCount, deviceFcmToken) {
-  message.notification.body =
-    itemNotiType +
-    Strings.besidesTheNoti +
-    notiCount +
-    Strings.anyMore +
-    Strings.haveItNoti;
+function dataMessageWithCount(itemNotiType, itemId, notiCount, deviceFcmToken) {
+  message.notification.body = `${notiCount}개의 ` + Strings.haveItNoti;
+  message.data.notiType = itemNotiType;
   message.data.itemId = String(itemId);
   message.token = deviceFcmToken;
   return message;
 }
 
-module.exports = { oneDataMessage, anyDataMessage };
+module.exports = { dataMessage, dataMessageWithCount };

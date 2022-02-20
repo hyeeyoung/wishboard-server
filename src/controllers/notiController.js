@@ -7,6 +7,7 @@ const {
 } = require('../utils/response');
 const { BadRequest } = require('../utils/errors');
 const schedule = require('node-schedule');
+const { Strings } = require('../utils/strings');
 const { sendSchduledService } = require('../middleware/notiScheduler');
 
 const TAG = 'notiContoller ';
@@ -44,8 +45,7 @@ module.exports = {
 
       if (pushService) {
         logger.info(Strings.pushNotiSchedulerStart);
-        // TODO 배치 동작 시간 바꾸기 (현재 1분마다)
-        task.scheduleJob('* * * * *', function () {
+        task.scheduleJob('0/5 * * * *', function () {
           sendSchduledService(req);
         });
         return res.status(StatusCode.OK).json({

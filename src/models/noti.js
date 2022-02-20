@@ -119,15 +119,15 @@ module.exports = {
   selectNotiFrom5minAgo: async function (req) {
     const userId = Number(req.decoded);
 
-    // TODO 주석은 진짜 5분 전일 때만 가져오는 쿼리. 예외 발생 or 30초 정도 늦게 요청 시 알림이 없을 수도 있음.
-    // const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, u.fcm_token FROM notification n
-    // INNER JOIN users u ON n.user_id = u.user_id
-    // WHERE DATE(n.item_notification_date) = DATE(CURRENT_DATE()) AND MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 5 MINUTE))
-    // ORDER BY n.item_notification_date ASC`;
     const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, n.user_id, u.fcm_token FROM notification n 
     INNER JOIN users u ON n.user_id = u.user_id
-    WHERE n.item_notification_date >= (now() - INTERVAL 5 MINUTE) AND n.user_id = ?
+    WHERE WHERE MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 5 MINUTE)) AND n.user_id = ?
     ORDER BY n.item_notification_date ASC`;
+    // TODO 테스트용(<= / >=) 쿼리. 나중에 삭제
+    // const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, n.user_id, u.fcm_token FROM notification n
+    // INNER JOIN users u ON n.user_id = u.user_id
+    // WHERE n.item_notification_date >= (now() - INTERVAL 5 MINUTE) AND n.user_id = ?
+    // ORDER BY n.item_notification_date ASC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
