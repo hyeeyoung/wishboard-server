@@ -48,7 +48,6 @@ module.exports = {
             notiData[0].fcm_token,
           );
         }
-        console.log(message);
         sendFcmTokenToFirebase(message).catch(() => {
           logger.error(ErrorMessage.notiSendFailed);
           return res.status(StatusCode.NOTFOUND).json({
