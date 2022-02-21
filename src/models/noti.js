@@ -123,11 +123,6 @@ module.exports = {
     INNER JOIN users u ON n.user_id = u.user_id
     WHERE MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 5 MINUTE)) AND n.user_id = ?
     ORDER BY n.item_notification_date ASC`;
-    // TODO 테스트용(<= / >=) 쿼리. 나중에 삭제
-    // const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, n.user_id, u.fcm_token FROM notification n
-    // INNER JOIN users u ON n.user_id = u.user_id
-    // WHERE n.item_notification_date >= (now() - INTERVAL 5 MINUTE) AND n.user_id = ?
-    // ORDER BY n.item_notification_date ASC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
