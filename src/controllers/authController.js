@@ -8,67 +8,69 @@ const {
   SuccessMessage,
   ErrorMessage,
 } = require('../utils/response');
+const { NotFound, BadRequest } = require('../utils/errors');
 
 const TAG = 'authController  ';
 
 module.exports = {
   signUp: async function (req, res, next) {
-    const isVaildate = await User.vaildateEmail(req);
+    try {
+      // TODO DTO 만들어서 req.body로 넘기지 않도록 수정하기 (전체적으로)
+      if (!req.body.email || !req.body.password) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
 
-    if (!isVaildate) {
-      await User.signUp(req)
-        .then(() => {
-          passport.authenticate('local', { session: false }, (err, user) => {
-            if (err || !user) {
-              logger.info(TAG + err || !user);
-              return res.status(StatusCode.CREATED).json({
-                success: false,
-                message: SuccessMessage.loginfailedAfterSuccessSignUp,
-              });
-            }
-            req.login(user, { session: false }, (err) => {
-              if (err) {
-                next(err);
+      const isVaildate = await User.vaildateEmail(req);
+
+      if (!isVaildate) {
+        // 회원가입 후 바로 로그인 수행하여 토큰 발급
+        await User.signUp(req)
+          .then(() => {
+            passport.authenticate('local', { session: false }, (err, user) => {
+              if (err || !user) {
+                logger.info(TAG + err || !user);
+                return res.status(StatusCode.CREATED).json({
+                  success: false,
+                  message: SuccessMessage.loginfailedAfterSuccessSignUp,
+                });
               }
-              const token = jwt.sign(
-                user[0].user_id,
-                process.env.JWT_SECRET_KEY,
-              );
-              return res.status(StatusCode.CREATED).json({
-                success: true,
-                message: SuccessMessage.loginSuccessAfterSuccessSignUp,
-                data: token,
+              req.login(user, { session: false }, (err) => {
+                if (err) {
+                  next(err);
+                }
+                const token = jwt.sign(
+                  user[0].user_id,
+                  process.env.JWT_SECRET_KEY,
+                );
+                return res.status(StatusCode.CREATED).json({
+                  success: true,
+                  message: SuccessMessage.loginSuccessAfterSuccessSignUp,
+                  data: token,
+                });
               });
-            });
-          })(req, res);
-        })
-        .catch((err) => {
-          logger.error(TAG + err);
-          res.status(StatusCode.NOTFOUND).json({
-            success: false,
-            message: ErrorMessage.signUpFailed,
+            })(req, res);
+          })
+          .catch((err) => {
+            logger.error(TAG + err);
+            throw new NotFound(ErrorMessage.signUpFailed);
           });
-        });
-    } else {
-      res.status(StatusCode.CONFLICT).json({
-        success: false,
-        message: ErrorMessage.vaildateEmail,
-      });
+      }
+    } catch (err) {
+      next(err);
     }
   },
   signIn: async function (req, res, next) {
-    passport.authenticate('local', { session: false }, (err, user) => {
-      if (err || !user) {
-        logger.info(TAG + err || !user);
-        return res.status(StatusCode.BADREQUEST).json({
-          success: false,
-          message: ErrorMessage.checkIDPasswordAgain,
-        });
+    try {
+      if (!req.body.email || !req.body.password) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      req.login(user, { session: false }, (err) => {
-        if (err) {
-          logger.info(TAG + err);
-          next(err);
+      passport.authenticate('local', { session: false }, (err, user) => {
+        if (err || !user) {
+          logger.info(TAG + err || !user);
+          return res.status(StatusCode.BADREQUEST).json({
+            success: false,
+            message: ErrorMessage.checkIDPasswordAgain,
+          });
         }
         const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
         return res.status(StatusCode.OK).json({
@@ -79,7 +81,10 @@ module.exports = {
             push_state: user[0].push_state,
           },
         });
-      });
-    })(req, res);
+      })(req, res, next);
+    } catch (err) {
+      next(err);
+    }
   },
+  sendMail: async function (req, res, next) {},
 };

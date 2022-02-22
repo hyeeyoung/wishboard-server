@@ -1,6 +1,6 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
-const { NotFound } = require('../utils/errors');
+const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
@@ -41,7 +41,12 @@ module.exports = {
     const connection = await pool.connection(async (conn) => conn);
     const row = await connection.query(sqlSelect, email);
     connection.release();
-    return row[0].length >= 1 ? true : false;
+
+    if (row.length >= 1) {
+      throw new Conflict(ErrorMessage.vaildateEmail);
+    }
+
+    return false;
   },
   deleteUser: async function (req) {
     const userId = Number(req.decoded);
@@ -157,6 +162,6 @@ module.exports = {
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.userNotFound);
     }
-    return rows;
+    return Object.setPrototypeOf(rows, []);
   },
 };
