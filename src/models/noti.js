@@ -50,7 +50,7 @@ module.exports = {
     const itemId = Number(req.params.item_id);
 
     const sqlUpdate =
-      'UPDATE notification SET read_state = 1 WHERE user_id = ? AND item_id = ?';
+      'UPDATE notifications SET read_state = 1 WHERE user_id = ? AND item_id = ?';
     const params = [userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
@@ -72,7 +72,7 @@ module.exports = {
     const itemNotiType = req.body.item_notification_type;
     const itemNotiDate = req.body.item_notification_date;
 
-    const sqlUpsert = `INSERT INTO notification (user_id, item_id, item_notification_type, item_notification_date)
+    const sqlUpsert = `INSERT INTO notifications (user_id, item_id, item_notification_type, item_notification_date)
     VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE item_notification_type = ?, item_notification_date = ?`;
 
     const params = [
