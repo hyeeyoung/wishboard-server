@@ -46,7 +46,7 @@ module.exports = {
     const userId = Number(req.decoded);
     const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
     CAST(i.create_at AS CHAR(10)) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
-    FROM items i LEFT OUTER JOIN notification n 
+    FROM items i LEFT OUTER JOIN notifications n 
     ON i.item_id = n.item_id  
     LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
     ON i.folder_id = f.folder_id 
