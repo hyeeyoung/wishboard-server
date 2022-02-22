@@ -30,7 +30,7 @@ module.exports = {
     const userId = Number(req.decoded);
     const sqlSelect = `SELECT i.item_id, i.item_img, i.item_name, i.item_url, n.item_notification_type, 
         CAST(n.item_notification_date AS CHAR(19)) item_notification_date, n.read_state 
-        FROM notification n JOIN items i 
+        FROM notifications n JOIN items i 
         ON n.item_id = i.item_id 
         WHERE n.user_id = ? and n.item_notification_date <= NOW() 
         ORDER BY n.item_notification_date DESC`;
@@ -50,7 +50,7 @@ module.exports = {
     const itemId = Number(req.params.item_id);
 
     const sqlUpdate =
-      'UPDATE notification SET read_state = 1 WHERE user_id = ? AND item_id = ?';
+      'UPDATE notifications SET read_state = 1 WHERE user_id = ? AND item_id = ?';
     const params = [userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
@@ -72,7 +72,7 @@ module.exports = {
     const itemNotiType = req.body.item_notification_type;
     const itemNotiDate = req.body.item_notification_date;
 
-    const sqlUpsert = `INSERT INTO notification (user_id, item_id, item_notification_type, item_notification_date)
+    const sqlUpsert = `INSERT INTO notifications (user_id, item_id, item_notification_type, item_notification_date)
     VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE item_notification_type = ?, item_notification_date = ?`;
 
     const params = [
@@ -103,7 +103,7 @@ module.exports = {
     const itemId = Number(req.params.item_id);
 
     const sqlDelete =
-      'DELETE FROM notification WHERE user_id = ? AND item_id = ?';
+      'DELETE FROM notifications WHERE user_id = ? AND item_id = ?';
     const params = [userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
@@ -119,7 +119,7 @@ module.exports = {
   selectNotiFrom5minAgo: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, n.user_id, u.fcm_token FROM notification n 
+    const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, n.user_id, u.fcm_token FROM notifications n 
     INNER JOIN users u ON n.user_id = u.user_id
     WHERE MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 5 MINUTE)) AND n.user_id = ?
     ORDER BY n.item_notification_date ASC`;
