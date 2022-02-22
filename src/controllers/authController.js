@@ -74,7 +74,10 @@ module.exports = {
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
-          data: token,
+          data: {
+            token: token,
+            push_state: user[0].push_state,
+          },
         });
       });
     })(req, res);
