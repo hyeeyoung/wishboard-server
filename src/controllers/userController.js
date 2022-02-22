@@ -1,13 +1,10 @@
 const User = require('../models/user');
-const logger = require('../config/winston');
 const { BadRequest } = require('../utils/errors');
 const {
   StatusCode,
   SuccessMessage,
   ErrorMessage,
 } = require('../utils/response');
-
-const TAG = 'userController ';
 
 module.exports = {
   deleteUserOne: async function (req, res, next) {
@@ -85,7 +82,6 @@ module.exports = {
   selectUserInfo: async function (req, res, next) {
     await User.selectInfo(req)
       .then((result) => {
-        logger.info(TAG + result);
         res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {

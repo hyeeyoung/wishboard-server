@@ -1,6 +1,5 @@
 const Items = require('../models/item');
 const Noti = require('../models/noti');
-const logger = require('../config/winston');
 const { BadRequest } = require('../utils/errors');
 const {
   StatusCode,
@@ -8,8 +7,6 @@ const {
   ErrorMessage,
 } = require('../utils/response');
 const { Strings } = require('../utils/strings');
-
-const TAG = 'ItemController ';
 
 module.exports = {
   insertItemInfo: async function (req, res, next) {
@@ -43,7 +40,6 @@ module.exports = {
   selectItemInfo: async function (req, res, next) {
     await Items.selectItems(req)
       .then((result) => {
-        logger.info(TAG + result);
         res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {

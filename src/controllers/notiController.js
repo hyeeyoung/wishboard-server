@@ -10,14 +10,12 @@ const schedule = require('node-schedule');
 const { Strings } = require('../utils/strings');
 const { sendSchduledService } = require('../middleware/notiScheduler');
 
-const TAG = 'notiContoller ';
 const task = schedule;
 
 module.exports = {
   selectNotiInfo: async function (req, res, next) {
     await Noti.selectNoti(req)
       .then((result) => {
-        logger.info(TAG + result);
         res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
