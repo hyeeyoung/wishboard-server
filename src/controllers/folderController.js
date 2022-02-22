@@ -1,5 +1,4 @@
 const Folders = require('../models/folder');
-const logger = require('../config/winston');
 const { BadRequest } = require('../utils/errors');
 const {
   StatusCode,
@@ -7,13 +6,10 @@ const {
   ErrorMessage,
 } = require('../utils/response');
 
-const TAG = 'folderController ';
-
 module.exports = {
   selectFolderInfo: async function (req, res, next) {
     await Folders.selectFolder(req)
       .then((result) => {
-        logger.info(TAG + result);
         res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
@@ -23,7 +19,6 @@ module.exports = {
   selectFolderList: async function (req, res, next) {
     await Folders.selectFolderList(req)
       .then((result) => {
-        logger.info(TAG + result);
         res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
@@ -33,7 +28,6 @@ module.exports = {
   selectFolderItemInfo: async function (req, res, next) {
     await Folders.selectFolderItems(req)
       .then((result) => {
-        logger.info(TAG + result);
         res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {

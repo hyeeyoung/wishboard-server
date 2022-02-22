@@ -1,5 +1,4 @@
 const Cart = require('../models/cart');
-const logger = require('../config/winston');
 const {
   StatusCode,
   SuccessMessage,
@@ -7,13 +6,10 @@ const {
 } = require('../utils/response');
 const { BadRequest } = require('../utils/errors');
 
-const TAG = 'cartContoller ';
-
 module.exports = {
   selectCartInfo: async function (req, res, next) {
     await Cart.selectCart(req)
       .then((result) => {
-        logger.info(TAG + result);
         res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
