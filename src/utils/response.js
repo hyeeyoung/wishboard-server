@@ -41,6 +41,7 @@ const SuccessMessage = {
   userProfileImgUpdate: '사용자 프로필 이미지 수정 성공',
   userFcmTokenUpdate: '사용자 Fcm Token 수정 성공',
   userDelete: '사용자 삭제 성공',
+  userPushStateUpdate: '사용자 푸쉬 알림 여부 수정 성공',
 
   loginSuccessAfterSuccessSignUp: 'wishboard 회원가입 후 로그인 성공',
   loginfailedAfterSuccessSignUp: 'wishboard 회원가입 성공 후 로그인 실패',
@@ -86,6 +87,7 @@ const ErrorMessage = {
   userProfileImgUpdateNotFound: '수정된 사용자 프로필 이미지 없음',
   userFcmTokenUpdateNotFound: '수정된 사용자 fcm token 없음',
   userDeleteError: '삭제된 사용자 없음',
+  userPushStateUpdateNotFound: '수정된 사용자 푸쉬 알림 여부 없음',
 
   signUpFailed: 'wishboard 앱 회원가입 실패',
   vaildateEmail: '이미 존재하는 아이디',
