@@ -149,6 +149,26 @@ module.exports = {
 
     return true;
   },
+  updatePushState: async function (req, pushState) {
+    const userId = Number(req.decoded);
+
+    const sqlUpdate = 'UPDATE users SET push_state = ? WHERE user_id = ?';
+    const params = [pushState, userId];
+
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
+      .query(sqlUpdate, params)
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userPushStateUpdateNotFound);
+    }
+
+    return true;
+  },
   selectInfo: async function (req) {
     const userId = Number(req.decoded);
 

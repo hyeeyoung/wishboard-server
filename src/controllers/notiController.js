@@ -1,4 +1,5 @@
 const Noti = require('../models/noti');
+const User = require('../models/user');
 const logger = require('../config/winston');
 const {
   StatusCode,
@@ -42,18 +43,22 @@ module.exports = {
       const pushService = req.query.push === 'true' ? true : false;
 
       if (pushService) {
-        logger.info(Strings.pushNotiSchedulerStart);
-        task.scheduleJob('0/5 * * * *', function () {
-          sendSchduledService(req);
-        });
-        return res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.notiPushServiceStart,
+        await User.updatePushState(req, pushService).then(() => {
+          logger.info(Strings.pushNotiSchedulerStart);
+          task.scheduleJob('0/5 * * * *', function () {
+            sendSchduledService(req);
+          });
+          return res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.notiPushServiceStart,
+          });
         });
       } else {
         if (task != null) {
-          logger.info(Strings.pushNotiSchedulerEnd);
-          task.gracefulShutdown();
+          await User.updatePushState(req, pushService).then(() => {
+            logger.info(Strings.pushNotiSchedulerEnd);
+            task.gracefulShutdown();
+          });
         }
         return res.status(StatusCode.OK).json({
           success: true,
