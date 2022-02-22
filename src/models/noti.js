@@ -10,7 +10,7 @@ module.exports = {
     const notiDate = req.body.item_notification_date;
 
     const sqlInsert =
-      'INSERT INTO notification (user_id, item_id, item_notification_type, item_notification_date) VALUES(?,?,?,?)';
+      'INSERT INTO notifications (user_id, item_id, item_notification_type, item_notification_date) VALUES(?,?,?,?)';
     const params = [userId, itemId, notiType, notiDate];
 
     const connection = await pool.connection(async (conn) => conn);
