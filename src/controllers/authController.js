@@ -8,7 +8,9 @@ const {
   SuccessMessage,
   ErrorMessage,
 } = require('../utils/response');
-const { NotFound, BadRequest } = require('../utils/errors');
+const { NotFound, BadRequest, Conflict } = require('../utils/errors');
+const transport = require('../middleware/mailTransport');
+const { generateMessage } = require('../utils/sendMailMessage');
 
 const TAG = 'authController  ';
 
@@ -20,7 +22,7 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
-      const isVaildate = await User.vaildateEmail(req);
+      const isVaildate = await User.validateEmail(req);
 
       if (!isVaildate) {
         // 회원가입 후 바로 로그인 수행하여 토큰 발급
@@ -54,6 +56,8 @@ module.exports = {
             logger.error(TAG + err);
             throw new NotFound(ErrorMessage.signUpFailed);
           });
+      } else {
+        throw new Conflict(ErrorMessage.validateEmail);
       }
     } catch (err) {
       next(err);
@@ -86,5 +90,33 @@ module.exports = {
       next(err);
     }
   },
-  sendMail: async function (req, res, next) {},
+  sendMail: async function (req, res, next) {
+    try {
+      if (!req.body.email) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+
+      const isVaildate = await User.validateEmail(req);
+      if (isVaildate) {
+        const mailMessage = generateMessage(req.body.email);
+        transport
+          .sendMail(mailMessage)
+          .then(() => {
+            logger.info(SuccessMessage.sendMailForDynamicLink);
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: SuccessMessage.sendMailForDynamicLink,
+            });
+          })
+          .catch((err) => {
+            logger.error(err);
+            throw new NotFound(ErrorMessage.sendMailFailed);
+          });
+      } else {
+        throw new NotFound(ErrorMessage.unvalidateUser);
+      }
+    } catch (err) {
+      next(err);
+    }
+  },
 };

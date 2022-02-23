@@ -88,4 +88,19 @@ module.exports = {
         next(err);
       });
   },
+  updateUserPassword: async function (req, res, next) {
+    try {
+      if (!req.body.email || !req.body.password) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await User.updatePasswrod(req).then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.userPasswordUpdate,
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
 };

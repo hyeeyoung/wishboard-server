@@ -19,6 +19,6 @@ exports.verifyToken = (req, res, next) => {
     throw new Unauthorized(ErrorMessage.requestTokenAgain);
     // return res
     //   .status(StatusCode.UNAUTHORIZED)
-    //   .json({ success: false, message: ErrorMessage.unvaildateToken });
+    //   .json({ success: false, message: ErrorMessage.unvalidateToken });
   }
 };

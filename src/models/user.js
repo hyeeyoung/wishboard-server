@@ -1,17 +1,17 @@
 const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
-const { NotFound, Conflict } = require('../utils/errors');
+const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
   signUp: async function (req) {
     const email = req.body.email;
-    const beforePw = req.body.password;
+    const password = req.body.password;
 
-    const password = bcrypt.hashSync(beforePw, 10);
+    const hashPassword = bcrypt.hashSync(password, 10);
 
     const sqlInsert = 'INSERT INTO users (email, password) VALUES (?, ?)';
-    const params = [email, password];
+    const params = [email, hashPassword];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -33,7 +33,7 @@ module.exports = {
     connection.release();
     return rows;
   },
-  vaildateEmail: async function (req) {
+  validateEmail: async function (req) {
     const email = req.body.email;
 
     const sqlSelect = 'SELECT email FROM users WHERE email = ?';
@@ -42,11 +42,7 @@ module.exports = {
     const row = await connection.query(sqlSelect, email);
     connection.release();
 
-    if (row.length >= 1) {
-      throw new Conflict(ErrorMessage.vaildateEmail);
-    }
-
-    return false;
+    return row[0].length >= 1 ? true : false;
   },
   deleteUser: async function (req) {
     const userId = Number(req.decoded);
@@ -165,6 +161,28 @@ module.exports = {
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userPushStateUpdateNotFound);
+    }
+
+    return true;
+  },
+  updatePasswrod: async function (req) {
+    const email = req.body.email;
+    const password = req.body.password;
+    const hashPassword = bcrypt.hashSync(password, 10);
+
+    const sqlUpdate = 'UPDATE users SET password = ? WHERE email = ?';
+    const params = [hashPassword, email];
+
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
+      .query(sqlUpdate, params)
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userPasswordUpdateNotFound);
     }
 
     return true;
