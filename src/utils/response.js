@@ -42,10 +42,12 @@ const SuccessMessage = {
   userFcmTokenUpdate: '사용자 Fcm Token 수정 성공',
   userDelete: '사용자 삭제 성공',
   userPushStateUpdate: '사용자 푸쉬 알림 여부 수정 성공',
+  userPasswordUpdate: '사용자 비밀번호 수정 성공',
 
   loginSuccessAfterSuccessSignUp: 'wishboard 회원가입 후 로그인 성공',
   loginfailedAfterSuccessSignUp: 'wishboard 회원가입 성공 후 로그인 실패',
   loginSuccess: 'wishboard 앱 로그인 성공',
+  sendMailForDynamicLink: '비밀번호 찾기를 위한 동적링크 메일로 전송 성공',
 };
 
 const ErrorMessage = {
@@ -88,12 +90,15 @@ const ErrorMessage = {
   userFcmTokenUpdateNotFound: '수정된 사용자 fcm token 없음',
   userDeleteError: '삭제된 사용자 없음',
   userPushStateUpdateNotFound: '수정된 사용자 푸쉬 알림 여부 없음',
+  userPasswordUpdateNotFound: '수정된 사용자 비밀번호 없음',
 
   signUpFailed: 'wishboard 앱 회원가입 실패',
-  vaildateEmail: '이미 존재하는 아이디',
+  validateEmail: '이미 존재하는 아이디',
+  unvalidateUser: '존재하지 않는 유저',
   checkIDPasswordAgain: '아이디 혹은 비밀번호를 다시 확인',
-  unvaildateToken: 'token이 유효하지 않음',
+  unvalidateToken: 'token이 유효하지 않음',
   requestTokenAgain: 'token 없음. 요청 token 확인',
+  sendMailFailed: '새 비밀번호 지정을 위한 메일 전송 실패',
 
   /* 공통*/
   BadRequestMeg: '잘못된 요청',

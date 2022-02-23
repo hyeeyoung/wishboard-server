@@ -51,7 +51,15 @@ module.exports = {
       'process.env.FIREBASE_CLIENT_X509_CERT_URI': JSON.stringify(
         process.env.FIREBASE_CLIENT_X509_CERT_URI,
       ),
-      'process.env.JWT_SECRET_KEY': JSON.stringify(process.env.JWT_SECRET_KEY),
+      'process.env.WISHBOARD_NAVER_ID': JSON.stringify(
+        process.env.WISHBOARD_NAVER_ID,
+      ),
+      'process.env.WISHBOARD_NAVER_PW': JSON.stringify(
+        process.env.WISHBOARD_NAVER_PW,
+      ),
+      'process.env.FIREBASE_LINK_TO_ANDROID': JSON.stringify(
+        process.env.FIREBASE_LINK_TO_ANDROID,
+      ),
     }),
   ],
   stats: {
