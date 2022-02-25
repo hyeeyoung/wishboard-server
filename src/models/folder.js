@@ -143,7 +143,7 @@ module.exports = {
     connection.release();
 
     if (rows.length >= 1) {
-      throw new Conflict(ErrorMessage.vaildateFolder);
+      throw new Conflict(ErrorMessage.validateFolder);
     }
 
     return false;

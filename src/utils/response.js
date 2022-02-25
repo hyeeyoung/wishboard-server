@@ -65,7 +65,7 @@ const ErrorMessage = {
   cartDeleteError: '삭제된 장바구니 없음',
 
   /* 폴더*/
-  vaildateFolder: '이미 존재하는 폴더명',
+  validateFolder: '이미 존재하는 폴더명',
   folderNotFound: '폴더 정보 없음',
   folderListNotFound: '폴더리스트 정보 없음',
   folderInItemNotFound: '폴더 내 아이템 정보 없음',
