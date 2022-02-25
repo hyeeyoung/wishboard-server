@@ -63,6 +63,9 @@ module.exports = {
     return true;
   },
   validateNickname: async function (req) {
+    if (!req.body.nickname) {
+      return true;
+    }
     const nickname = req.body.nickname;
 
     const sqlSelect = 'SELECT nickname FROM users WHERE nickname = ?';
@@ -77,20 +80,57 @@ module.exports = {
 
     return false;
   },
+  updateImage: async function (req) {
+    const userId = Number(req.decoded);
+    const profileImg = req.body.profile_img;
+
+    const sqlUpdate = 'UPDATE users SET profile_img = ? WHERE user_id = ?';
+    const params = [profileImg, userId];
+
+    console.log(sqlUpdate);
+    console.log(params);
+
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
+      .query(sqlUpdate, params)
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userProfileImgUpdateNotFound);
+    }
+    return true;
+  },
+  updateNickname: async function (req) {
+    const userId = Number(req.decoded);
+    const nickname = req.body.nickname;
+
+    const sqlUpdate = 'UPDATE users SET nickname = ? WHERE user_id = ?';
+    const params = [nickname, userId];
+
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
+      .query(sqlUpdate, params)
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userNickNameUpdateNotFound);
+    }
+    return true;
+  },
   updateInfo: async function (req) {
     const userId = Number(req.decoded);
     const nickname = req.body.nickname;
     const profileImg = req.body.profile_img;
 
-    let sqlUpdate = 'UPDATE users SET nickname = ?';
-    const params = [nickname];
-
-    if (profileImg) {
-      sqlUpdate += ' , profile_img = ?';
-      params.push(profileImg);
-    }
-    sqlUpdate += ' WHERE user_id = ?';
-    params.push(userId);
+    const sqlUpdate =
+      'UPDATE users SET nickname = ?, profile_img = ? WHERE user_id = ?';
+    const params = [nickname, profileImg, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();

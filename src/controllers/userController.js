@@ -21,19 +21,37 @@ module.exports = {
   },
   updateUserInfo: async function (req, res, next) {
     try {
-      if (!req.body.nickname) {
+      if (!req.body.nickname && !req.body.profile_img) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
       const isValidate = await User.validateNickname(req);
 
       if (!isValidate) {
-        await User.updateInfo(req).then(() => {
-          res.status(StatusCode.OK).json({
-            success: true,
-            message: SuccessMessage.userInfoUpdate,
+        if (req.body.nickname && !req.body.profile_img) {
+          await User.updateNickname(req).then(() => {
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: SuccessMessage.userNickNameUpdate,
+            });
           });
-        });
+        } else if (req.body.nickname && req.body.profile_img) {
+          await User.updateInfo(req).then(() => {
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: SuccessMessage.userInfoUpdate,
+            });
+          });
+        }
+      } else {
+        if (req.body.profile_img) {
+          await User.updateImage(req).then(() => {
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: SuccessMessage.userProfileImgUpdate,
+            });
+          });
+        }
       }
     } catch (err) {
       next(err);
