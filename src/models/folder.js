@@ -130,7 +130,7 @@ module.exports = {
     }
     return true;
   },
-  vaildateFolder: async function (req) {
+  validateFolder: async function (req) {
     const userId = Number(req.decoded);
     const folderName = req.body.folder_name;
 
@@ -143,7 +143,7 @@ module.exports = {
     connection.release();
 
     if (rows.length >= 1) {
-      throw new Conflict(ErrorMessage.vaildateFolder);
+      throw new Conflict(ErrorMessage.validateFolder);
     }
 
     return false;

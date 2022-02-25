@@ -59,9 +59,9 @@ module.exports = {
       if (!req.body.folder_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      const isVaildate = await Folders.vaildateFolder(req);
+      const isValidate = await Folders.validateFolder(req);
 
-      if (!isVaildate) {
+      if (!isValidate) {
         await Folders.updateFolder(req).then(() => {
           res.status(StatusCode.OK).json({
             success: true,

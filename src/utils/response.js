@@ -37,8 +37,6 @@ const SuccessMessage = {
 
   /* 사용자*/
   userInfoUpdate: '사용자 정보 수정 성공',
-  userNickNameUpdate: '사용자 닉네임 수정 성공',
-  userProfileImgUpdate: '사용자 프로필 이미지 수정 성공',
   userFcmTokenUpdate: '사용자 Fcm Token 수정 성공',
   userDelete: '사용자 삭제 성공',
   userPushStateUpdate: '사용자 푸쉬 알림 여부 수정 성공',
@@ -65,7 +63,7 @@ const ErrorMessage = {
   cartDeleteError: '삭제된 장바구니 없음',
 
   /* 폴더*/
-  vaildateFolder: '이미 존재하는 폴더명',
+  validateFolder: '이미 존재하는 폴더명',
   folderNotFound: '폴더 정보 없음',
   folderListNotFound: '폴더리스트 정보 없음',
   folderInItemNotFound: '폴더 내 아이템 정보 없음',
@@ -83,10 +81,9 @@ const ErrorMessage = {
   notiSendFailed: 'Firebase FCM server로 전송 실패',
 
   /* 사용자*/
+  validateNickname: '이미 존재하는 닉네임',
   userNotFound: '사용자 정보 없음',
   userInfoUpdateNotFound: '수정된 사용자 정보 없음',
-  userNickNameUpdateNotFound: '수정된 사용자 닉네임 없음',
-  userProfileImgUpdateNotFound: '수정된 사용자 프로필 이미지 없음',
   userFcmTokenUpdateNotFound: '수정된 사용자 fcm token 없음',
   userDeleteError: '삭제된 사용자 없음',
   userPushStateUpdateNotFound: '수정된 사용자 푸쉬 알림 여부 없음',

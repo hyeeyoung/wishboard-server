@@ -21,45 +21,20 @@ module.exports = {
   },
   updateUserInfo: async function (req, res, next) {
     try {
-      if (!req.body.nickname || !req.body.profile_img) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
-      }
-      await User.updateInfo(req).then(() => {
-        res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.userInfoUpdate,
-        });
-      });
-    } catch (err) {
-      next(err);
-    }
-  },
-  updateUserImage: async function (req, res, next) {
-    try {
-      if (!req.body.profile_img) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
-      }
-      await User.updateImage(req).then(() => {
-        res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.userProfileImgUpdate,
-        });
-      });
-    } catch (err) {
-      next(err);
-    }
-  },
-  updateUserNickname: async function (req, res, next) {
-    try {
       if (!req.body.nickname) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await User.updateNickname(req).then(() => {
-        res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.userNickNameUpdate,
+
+      const isValidate = await User.validateNickname(req);
+
+      if (!isValidate) {
+        await User.updateInfo(req).then(() => {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.userInfoUpdate,
+          });
         });
-      });
+      }
     } catch (err) {
       next(err);
     }
