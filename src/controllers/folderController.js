@@ -46,7 +46,7 @@ module.exports = {
           res.status(StatusCode.CREATED).json({
             success: true,
             message: SuccessMessage.folderInsert,
-            data: result,
+            data: { result },
           });
         });
       }
