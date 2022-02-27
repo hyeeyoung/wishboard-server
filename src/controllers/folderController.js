@@ -39,7 +39,7 @@ module.exports = {
       if (!req.body.folder_name) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      const isVaildate = await Folders.vaildateFolder(req);
+      const isVaildate = await Folders.validateFolder(req);
 
       if (!isVaildate) {
         await Folders.insertFolder(req).then((result) => {
