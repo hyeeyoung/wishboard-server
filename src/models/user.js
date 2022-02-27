@@ -22,17 +22,6 @@ module.exports = {
     connection.release();
     return rows;
   },
-  signIn: async function (req) {
-    const email = req.body.email;
-
-    const sqlSelect =
-      'SELECT user_id, email, password FROM users WHERE email = ?';
-
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, email);
-    connection.release();
-    return rows;
-  },
   validateEmail: async function (req) {
     const email = req.body.email;
 

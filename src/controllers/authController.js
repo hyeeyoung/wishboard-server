@@ -47,7 +47,7 @@ module.exports = {
                 return res.status(StatusCode.CREATED).json({
                   success: true,
                   message: SuccessMessage.loginSuccessAfterSuccessSignUp,
-                  data: token,
+                  data: { token },
                 });
               });
             })(req, res);
@@ -77,12 +77,13 @@ module.exports = {
           });
         }
         const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
+        const pushState = user[0].push_state;
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
           data: {
-            token: token,
-            push_state: user[0].push_state,
+            token,
+            pushState,
           },
         });
       })(req, res, next);
