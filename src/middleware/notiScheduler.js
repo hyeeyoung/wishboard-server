@@ -30,7 +30,7 @@ module.exports = {
    * 데이터가 있을 경우 firebase에 fcm 토큰 전송
    */
   sendSchduledService: async function (req, res) {
-    await Noti.selectNotiFrom5minAgo(req)
+    await Noti.selectNotiFrom30minAgo(req)
       .then((notiData) => {
         let message;
         if (notiData.length === 1) {

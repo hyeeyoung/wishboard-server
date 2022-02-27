@@ -116,12 +116,12 @@ module.exports = {
 
     return rows.affectedRows < 1 ? false : true;
   },
-  selectNotiFrom5minAgo: async function (req) {
+  selectNotiFrom30minAgo: async function (req) {
     const userId = Number(req.decoded);
 
     const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, n.user_id, u.fcm_token FROM notifications n 
     INNER JOIN users u ON n.user_id = u.user_id
-    WHERE MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 5 MINUTE)) AND n.user_id = ? AND u.push_state = true
+    WHERE MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 30 MINUTE)) AND n.user_id = ? AND u.push_state = true
     ORDER BY n.item_notification_date ASC`;
 
     const connection = await pool.connection(async (conn) => conn);

@@ -45,7 +45,7 @@ module.exports = {
       if (pushService) {
         await User.updatePushState(req, pushService).then(() => {
           logger.info(Strings.pushNotiSchedulerStart);
-          task.scheduleJob('0/5 * * * *', function () {
+          task.scheduleJob('0/30 * * * *', function () {
             sendSchduledService(req);
           });
           return res.status(StatusCode.OK).json({
