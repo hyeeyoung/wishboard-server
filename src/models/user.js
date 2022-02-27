@@ -201,7 +201,7 @@ module.exports = {
     const userId = Number(req.decoded);
 
     const sqlSelect =
-      'SELECT email, profile_img, nickname, fcm_token FROM users WHERE user_id = ?';
+      'SELECT email, profile_img, nickname, fcm_token, push_state FROM users WHERE user_id = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
