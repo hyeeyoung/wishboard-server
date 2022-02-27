@@ -58,19 +58,16 @@ module.exports = {
     }
   },
   updateUserFCMToken: async function (req, res, next) {
-    try {
-      if (!req.body.fcm_token) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
-      }
-      await User.updateFCM(req).then(() => {
+    await User.updateFCM(req)
+      .then(() => {
         res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.userFcmTokenUpdate,
         });
+      })
+      .catch((err) => {
+        next(err);
       });
-    } catch (err) {
-      next(err);
-    }
   },
   selectUserInfo: async function (req, res, next) {
     await User.selectInfo(req)
