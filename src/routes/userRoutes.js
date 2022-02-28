@@ -6,7 +6,6 @@ const router = new express.Router();
 router.delete('/', verifyToken, userController.deleteUserOne);
 router.put('/', verifyToken, userController.updateUserInfo);
 router.put('/fcm', verifyToken, userController.updateUserFCMToken);
-router.put('/password', userController.updateUserPassword);
 router.get('/', verifyToken, userController.selectUserInfo);
 
 module.exports = router;

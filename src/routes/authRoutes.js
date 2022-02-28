@@ -4,6 +4,7 @@ const router = new express.Router();
 
 router.post('/signin', authController.signIn);
 router.post('/signup', authController.signUp);
-router.post('/mail', authController.sendMail);
+router.post('/password-mail', authController.sendMail);
+router.post('/re-signin', authController.restartSignIn);
 
 module.exports = router;

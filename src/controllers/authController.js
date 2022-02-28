@@ -10,9 +10,23 @@ const {
 } = require('../utils/response');
 const { NotFound, BadRequest, Conflict } = require('../utils/errors');
 const transport = require('../middleware/mailTransport');
+const crypto = require('crypto'); // npm built-in module
 const { generateMessage } = require('../utils/sendMailMessage');
 
 const TAG = 'authController  ';
+
+function sendMailForCertified(email) {
+  const randomNumber = crypto.randomBytes(3).toString('hex');
+  const mailMessage = generateMessage(email, randomNumber);
+
+  try {
+    transport.sendMail(mailMessage);
+    return randomNumber;
+  } catch (err) {
+    logger.error(err);
+    throw new NotFound(ErrorMessage.sendMailFailed);
+  }
+}
 
 module.exports = {
   signUp: async function (req, res, next) {
@@ -99,22 +113,48 @@ module.exports = {
 
       const isVaildate = await User.validateEmail(req);
       if (isVaildate) {
-        const mailMessage = generateMessage(req.body.email);
-        transport
-          .sendMail(mailMessage)
-          .then(() => {
-            logger.info(SuccessMessage.sendMailForDynamicLink);
-            res.status(StatusCode.OK).json({
-              success: true,
-              message: SuccessMessage.sendMailForDynamicLink,
-            });
-          })
-          .catch((err) => {
-            logger.error(err);
-            throw new NotFound(ErrorMessage.sendMailFailed);
-          });
+        const randomNumber = sendMailForCertified(req.body.email);
+        logger.info(SuccessMessage.sendMailForCertifiedNumber);
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.sendMailForCertifiedNumber,
+          data: { randomNumber },
+        });
       } else {
         throw new NotFound(ErrorMessage.unvalidateUser);
+      }
+    } catch (err) {
+      next(err);
+    }
+  },
+  restartSignIn: async function (req, res, next) {
+    try {
+      if (!req.body.verify && !req.body.email) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      const verify = req.body.verify;
+      if (verify) {
+        await User.signIn(req).then((result) => {
+          const token = jwt.sign(result[0].user_id, process.env.JWT_SECRET_KEY);
+          const pushState = result[0].push_state;
+          return res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.loginSuccess,
+            data: {
+              token,
+              pushState,
+            },
+          });
+        });
+      } else {
+        // 메일 재전송
+        const randomNumber = sendMailForCertified(req.body.email);
+        logger.info(SuccessMessage.sendMailForCertifiedNumber);
+        return res.status(StatusCode.UNAUTHORIZED).json({
+          success: false,
+          message: SuccessMessage.unvalidateNumberAndSendMail,
+          data: { randomNumber },
+        });
       }
     } catch (err) {
       next(err);
