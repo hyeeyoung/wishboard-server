@@ -20,7 +20,21 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+    return Object.setPrototypeOf(rows, []);
+  },
+  signIn: async function (req) {
+    const email = req.body.email;
+    const sqlSelect =
+      'SELECT user_id, email, push_state FROM users WHERE email = ?';
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, email);
+    connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.unvalidateUser);
+    }
+
+    return Object.setPrototypeOf(rows, []);
   },
   validateEmail: async function (req) {
     const email = req.body.email;

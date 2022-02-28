@@ -57,9 +57,6 @@ module.exports = {
       'process.env.WISHBOARD_NAVER_PW': JSON.stringify(
         process.env.WISHBOARD_NAVER_PW,
       ),
-      'process.env.FIREBASE_LINK_TO_ANDROID': JSON.stringify(
-        process.env.FIREBASE_LINK_TO_ANDROID,
-      ),
     }),
   ],
   stats: {

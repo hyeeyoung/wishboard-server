@@ -1,23 +1,36 @@
-require('dotenv').config({ path: '../.env' });
-
 const fromEmail = process.env.WISHBOARD_NAVER_ID;
-const links = process.env.FIREBASE_LINK_TO_ANDROID;
-
 const message = {
   from: `WishBoard ${fromEmail}`,
   to: '',
-  subject: '[WishBoard] 비밀번호 찾기를 위한 링크가 도착했습니다.',
-  html: `
-        <h3> 안녕하세요. Wishboard 입니다. </h3>
-        <h3> 아래 링크를 클릭하여 앱으로 돌아가 새 비밀번호로 재설정 해주세요. </h3>
-        <h3> 감사합니다. </h3>
-    `,
+  subject: '[Wishboard] 이메일 로그인을 위한 인증번호를 보내드려요.',
+  html: '',
+  certificationNumber: '',
 };
 
-function generateMessage(toEmail) {
+function generateMessage(toEmail, randomNumber) {
   message.to = toEmail;
-  message.html += `<a href="${links}"> ${links} </h3>`;
+  message.certificationNumber = randomNumber;
+  message.html = generateHTML(randomNumber);
   return message;
 }
 
-module.exports = { generateMessage };
+function generateHTML(randomNumber) {
+  return (
+    `
+    <p>로그인 화면에서 아래의 인증번호를 입력하고 로그인을 완료해주세요. 인증코드는 5분 동안 유효합니다.</p>
+    <br />
+    <h3>` +
+    randomNumber +
+    `</h3>
+    <br />
+    <p>혹시 요청하지 않은 인증 메일을 받으셨나요? 걱정하지 마세요. </p>
+    <p>고객님의 이메일 주소가 실수로 입력된 것일 수 있어요. 직접 요청한 인증 메일이 아닌 경우 무시해주세요.</p>
+    <br />
+    <p>멋진 하루 보내세요!</p>
+    <br />
+    <p>Wishboard 팀 드림</p>
+    `
+  );
+}
+
+module.exports = { generateMessage, generateHTML };
