@@ -7,20 +7,20 @@ const message = {
   certificationNumber: '',
 };
 
-function generateMessage(toEmail, randomNumber) {
+function generateMessage(toEmail, verificationCode) {
   message.to = toEmail;
-  message.certificationNumber = randomNumber;
-  message.html = generateHTML(randomNumber);
+  message.certificationNumber = verificationCode;
+  message.html = generateHTML(verificationCode);
   return message;
 }
 
-function generateHTML(randomNumber) {
+function generateHTML(verificationCode) {
   return (
     `
     <p>로그인 화면에서 아래의 인증번호를 입력하고 로그인을 완료해주세요. 인증코드는 5분 동안 유효합니다.</p>
     <br />
     <h3>` +
-    randomNumber +
+    verificationCode +
     `</h3>
     <br />
     <p>혹시 요청하지 않은 인증 메일을 받으셨나요? 걱정하지 마세요. </p>

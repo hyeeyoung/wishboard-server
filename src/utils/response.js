@@ -100,7 +100,7 @@ const ErrorMessage = {
   unvalidateToken: 'token이 유효하지 않음',
   requestTokenAgain: 'token 없음. 요청 token 확인',
   sendMailFailed: '새 비밀번호 지정을 위한 메일 전송 실패',
-  unvalidateNumberAndSendMail: '유효하지 않은 인증번호. 메일 재전송',
+  unvalidateNumber: '유효하지 않은 인증번호.',
 
   /* 공통*/
   BadRequestMeg: '잘못된 요청',

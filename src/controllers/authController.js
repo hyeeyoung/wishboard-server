@@ -16,12 +16,12 @@ const { generateMessage } = require('../utils/sendMailMessage');
 const TAG = 'authController  ';
 
 function sendMailForCertified(email) {
-  const randomNumber = crypto.randomBytes(3).toString('hex');
-  const mailMessage = generateMessage(email, randomNumber);
+  const verificationCode = crypto.randomBytes(3).toString('hex');
+  const mailMessage = generateMessage(email, verificationCode);
 
   try {
     transport.sendMail(mailMessage);
-    return randomNumber;
+    return verificationCode;
   } catch (err) {
     logger.error(err);
     throw new NotFound(ErrorMessage.sendMailFailed);
@@ -113,12 +113,12 @@ module.exports = {
 
       const isVaildate = await User.validateEmail(req);
       if (isVaildate) {
-        const randomNumber = sendMailForCertified(req.body.email);
+        const verificationCode = sendMailForCertified(req.body.email);
         logger.info(SuccessMessage.sendMailForCertifiedNumber);
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.sendMailForCertifiedNumber,
-          data: { randomNumber },
+          data: { verificationCode },
         });
       } else {
         throw new NotFound(ErrorMessage.unvalidateUser);
@@ -147,14 +147,7 @@ module.exports = {
           });
         });
       } else {
-        // 메일 재전송
-        const randomNumber = sendMailForCertified(req.body.email);
-        logger.info(SuccessMessage.sendMailForCertifiedNumber);
-        return res.status(StatusCode.UNAUTHORIZED).json({
-          success: false,
-          message: SuccessMessage.unvalidateNumberAndSendMail,
-          data: { randomNumber },
-        });
+        throw new NotFound(ErrorMessage.unvalidateNumber);
       }
     } catch (err) {
       next(err);
