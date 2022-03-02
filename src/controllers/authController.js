@@ -29,6 +29,25 @@ function sendMailForCertified(email) {
 }
 
 module.exports = {
+  checkEmail: async function (req, res, next) {
+    try {
+      if (!req.body.email) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await User.validateEmail(req).then((isValidate) => {
+        if (!isValidate) {
+          return res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.unvalidateEmail,
+          });
+        } else {
+          throw new Conflict(ErrorMessage.validateEmail);
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
   signUp: async function (req, res, next) {
     try {
       // TODO DTO 만들어서 req.body로 넘기지 않도록 수정하기 (전체적으로)
@@ -36,43 +55,28 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
-      const isVaildate = await User.validateEmail(req);
-
-      if (!isVaildate) {
-        // 회원가입 후 바로 로그인 수행하여 토큰 발급
-        await User.signUp(req)
-          .then(() => {
-            passport.authenticate('local', { session: false }, (err, user) => {
-              if (err || !user) {
-                logger.info(TAG + err || !user);
-                return res.status(StatusCode.CREATED).json({
-                  success: false,
-                  message: SuccessMessage.loginfailedAfterSuccessSignUp,
-                });
-              }
-              req.login(user, { session: false }, (err) => {
-                if (err) {
-                  next(err);
-                }
-                const token = jwt.sign(
-                  user[0].user_id,
-                  process.env.JWT_SECRET_KEY,
-                );
-                return res.status(StatusCode.CREATED).json({
-                  success: true,
-                  message: SuccessMessage.loginSuccessAfterSuccessSignUp,
-                  data: { token },
-                });
-              });
-            })(req, res);
-          })
-          .catch((err) => {
-            logger.error(TAG + err);
-            throw new NotFound(ErrorMessage.signUpFailed);
+      await User.signUp(req).then(() => {
+        passport.authenticate('local', { session: false }, (err, user) => {
+          if (err || !user) {
+            logger.info(TAG + err || !user);
+            return res.status(StatusCode.CREATED).json({
+              success: false,
+              message: SuccessMessage.loginfailedAfterSuccessSignUp,
+            });
+          }
+          req.login(user, { session: false }, (err) => {
+            if (err) {
+              next(err);
+            }
+            const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
+            return res.status(StatusCode.CREATED).json({
+              success: true,
+              message: SuccessMessage.loginSuccessAfterSuccessSignUp,
+              data: { token },
+            });
           });
-      } else {
-        throw new Conflict(ErrorMessage.validateEmail);
-      }
+        })(req, res);
+      });
     } catch (err) {
       next(err);
     }
@@ -132,8 +136,8 @@ module.exports = {
       if (!req.body.verify && !req.body.email) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      const verify = req.body.verify;
-      if (verify) {
+      const isVerify = req.body.verify;
+      if (isVerify) {
         await User.signIn(req).then((result) => {
           const token = jwt.sign(result[0].user_id, process.env.JWT_SECRET_KEY);
           const pushState = result[0].push_state;
@@ -147,7 +151,7 @@ module.exports = {
           });
         });
       } else {
-        throw new NotFound(ErrorMessage.unvalidateNumber);
+        throw new NotFound(ErrorMessage.unvalidateVerificationCode);
       }
     } catch (err) {
       next(err);

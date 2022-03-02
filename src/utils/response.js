@@ -48,6 +48,7 @@ const SuccessMessage = {
   loginfailedAfterSuccessSignUp: 'wishboard 회원가입 성공 후 로그인 실패',
   loginSuccess: 'wishboard 앱 로그인 성공',
   sendMailForCertifiedNumber: '비밀번호 찾기를 위한 인증번호 메일 전송 성공',
+  unvalidateEmail: '회원가입이 가능한 이메일주소',
 };
 
 const ErrorMessage = {
@@ -94,13 +95,13 @@ const ErrorMessage = {
   userPasswordUpdateNotFound: '수정된 사용자 비밀번호 없음',
 
   signUpFailed: 'wishboard 앱 회원가입 실패',
-  validateEmail: '이미 존재하는 아이디',
+  validateEmail: '이미 존재하는 이메일 주소',
   unvalidateUser: '존재하지 않는 유저',
-  checkIDPasswordAgain: '아이디 혹은 비밀번호를 다시 확인',
+  checkIDPasswordAgain: '이메일 주소 혹은 비밀번호를 다시 확인',
   unvalidateToken: 'token이 유효하지 않음',
   requestTokenAgain: 'token 없음. 요청 token 확인',
   sendMailFailed: '새 비밀번호 지정을 위한 메일 전송 실패',
-  unvalidateNumber: '유효하지 않은 인증번호.',
+  unvalidateVerificationCode: '유효하지 않은 인증번호.',
 
   /* 공통*/
   BadRequestMeg: '잘못된 요청',

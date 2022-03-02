@@ -10,7 +10,8 @@ module.exports = {
 
     const hashPassword = bcrypt.hashSync(password, 10);
 
-    const sqlInsert = 'INSERT INTO users (email, password) VALUES (?, ?)';
+    const sqlInsert =
+      'INSERT IGNORE INTO users (email, password) VALUES (?, ?)';
     const params = [email, hashPassword];
 
     const connection = await pool.connection(async (conn) => conn);
@@ -20,6 +21,11 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.validateEmail);
+    }
+
     return Object.setPrototypeOf(rows, []);
   },
   signIn: async function (req) {
