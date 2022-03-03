@@ -51,11 +51,11 @@ module.exports = {
       'process.env.FIREBASE_CLIENT_X509_CERT_URI': JSON.stringify(
         process.env.FIREBASE_CLIENT_X509_CERT_URI,
       ),
-      'process.env.WISHBOARD_NAVER_ID': JSON.stringify(
-        process.env.WISHBOARD_NAVER_ID,
+      'process.env.WISHBOARD_GMAIL_ID': JSON.stringify(
+        process.env.WISHBOARD_GMAIL_ID,
       ),
-      'process.env.WISHBOARD_NAVER_PW': JSON.stringify(
-        process.env.WISHBOARD_NAVER_PW,
+      'process.env.WISHBOARD_GMAIL_PW': JSON.stringify(
+        process.env.WISHBOARD_GMAIL_PW,
       ),
     }),
   ],
