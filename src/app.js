@@ -18,12 +18,12 @@ const { ErrorMessage } = require('./utils/response');
 
 /** 기본 설정 */
 // 서버 환경에 따라 다르게 설정 (배포/개발)
+app.use(helmet());
+app.use(hpp());
 if (nodeEnv === 'production') {
   morganFormat = 'combined'; // Apache 표준
-  app.use(helmet());
-  app.use(hpp());
 } else {
-  app.disable('x-powered-by'); // 서버 관련 소프트웨어 정보 disable 하도록 설정
+  // app.disable('x-powered-by'); // 서버 관련 소프트웨어 정보 disable 하도록 설정
   morganFormat = 'dev';
 }
 app.use(morgan(morganFormat, { stream: logger.stream }));
