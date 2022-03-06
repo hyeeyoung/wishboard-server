@@ -51,6 +51,7 @@ module.exports = {
       'process.env.FIREBASE_CLIENT_X509_CERT_URI': JSON.stringify(
         process.env.FIREBASE_CLIENT_X509_CERT_URI,
       ),
+      'process.env.JWT_SECRET_KEY': JSON.stringify(process.env.JWT_SECRET_KEY),
       'process.env.WISHBOARD_GMAIL_ID': JSON.stringify(
         process.env.WISHBOARD_GMAIL_ID,
       ),
