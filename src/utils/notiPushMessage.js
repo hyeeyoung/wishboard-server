@@ -25,7 +25,7 @@ function dataMessage(itemNotiType, itemId, deviceFcmToken) {
 
 function dataMessageWithCount(itemNotiType, itemId, notiCount, deviceFcmToken) {
   message.notification.body =
-    `${notiCount}개의 ` + Strings.notiMessageDescription;
+    `알림 ${notiCount}개의 ` + Strings.notiMessageDescription;
   message.data.notiType = itemNotiType;
   message.data.itemId = String(itemId);
   message.token = deviceFcmToken;
