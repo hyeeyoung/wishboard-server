@@ -7,12 +7,12 @@ const {
 } = require('../utils/response');
 
 module.exports = {
-  deleteUserOne: async function (req, res, next) {
+  unActiveUserOne: async function (req, res, next) {
     try {
-      await User.deleteUser(req).then(() => {
+      await User.unActiveUserOne(req).then(() => {
         res.status(StatusCode.OK).json({
           success: true,
-          message: SuccessMessage.userDelete,
+          message: SuccessMessage.userActiveUpdate,
         });
       });
     } catch (err) {
