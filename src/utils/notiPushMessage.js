@@ -2,7 +2,6 @@ const { Strings } = require('./strings');
 
 require('dotenv').config({ path: '../.env' });
 
-// 프론트에서 NotiType 변경 시 key, value 값 통일해야함
 const notiType = {
   RESTOCK: '재입고',
   OPEN_DAY: '오픈일',
