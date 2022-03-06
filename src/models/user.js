@@ -53,24 +53,43 @@ module.exports = {
 
     return row[0].length >= 1 ? true : false;
   },
-  deleteUser: async function (req) {
+  unActiveUserOne: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
+    // const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
+    const sqlUpdate = 'UPDATE users SET is_active = false WHERE user_id = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection
-      .query(sqlDelete, userId)
+      .query(sqlUpdate, userId)
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.userDeleteError);
+      throw new NotFound(ErrorMessage.userActiveUpdateNotFound);
     }
     return true;
   },
+  // deleteUsers: async function (req) { //TODO 추후 유저 삭제 배치 작업 시 사용
+  //   const userId = Number(req.decoded);
+
+  //   const sqlDelete = 'DELETE FROM users WHERE is_active = false';
+
+  //   const connection = await pool.connection(async (conn) => conn);
+  //   await connection.beginTransaction();
+  //   const [rows] = await connection
+  //     .query(sqlDelete, userId)
+  //     .then(await connection.commit())
+  //     .catch(await connection.rollback());
+  //   connection.release();
+
+  //   if (rows.affectedRows < 1) {
+  //     throw new NotFound(ErrorMessage.userDeleteError);
+  //   }
+  //   return true;
+  // },
   validateNickname: async function (req) {
     if (!req.body.nickname) {
       return true;
