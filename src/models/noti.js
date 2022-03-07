@@ -32,7 +32,7 @@ module.exports = {
         CAST(n.item_notification_date AS CHAR(19)) item_notification_date, n.read_state 
         FROM notifications n JOIN items i 
         ON n.item_id = i.item_id 
-        WHERE n.user_id = ? and n.item_notification_date <= MINUTE(DATE_ADD(NOW(), INTERVAL 30 MINUTE))
+        WHERE n.user_id = ? and n.item_notification_date <= DATE_ADD(NOW(), INTERVAL 30 MINUTE)
         ORDER BY n.item_notification_date DESC`;
 
     const connection = await pool.connection(async (conn) => conn);
