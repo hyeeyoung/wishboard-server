@@ -52,7 +52,7 @@ module.exports = {
           logger.error(ErrorMessage.notiSendFailed);
           return res.status(StatusCode.NOTFOUND).json({
             success: false,
-            message: SuccessMessage.notiPushServiceExit,
+            message: SuccessMessage.notiFCMSendError,
           });
         });
       })
