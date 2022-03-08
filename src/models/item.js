@@ -76,8 +76,8 @@ module.exports = {
       'UPDATE items SET item_name = ?, item_price = ?, item_url = ?, item_memo = ?';
     const params = [itemName, itemPrice, itemUrl, itemMemo];
 
-    // 아이템이미지 null 경우에만 동작
-    if (!itemImg) {
+    // 아이템이미지 있을 경우에만 동작
+    if (itemImg) {
       sqlUpdate += ', item_img = ?';
       params.push(itemImg);
     }
