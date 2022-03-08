@@ -84,7 +84,7 @@
 ## :point_right: [API 문서 바로가기](https://www.notion.so/84c305675a7e43308bc8c90e94afeb9c?v=6593c15e7edf4f6188f4a3e9c370c8d6&p=a48acc4185544784a0c78100fdc6ff45)
 
 ## :wrench: ERD
-![image](https://user-images.githubusercontent.com/68772751/157175406-aea15d13-d8c2-4a5a-be36-b6135bffe274.png)
+![image](https://user-images.githubusercontent.com/68772751/157206413-62111af6-dc6e-4865-8ae5-7f9cd542f272.png)
 
 ## :bank: Architecture
 ![image](https://user-images.githubusercontent.com/68772751/157170506-ac498a6a-afb0-44cd-a865-aa1ca5daed23.png)
@@ -171,61 +171,6 @@
     "webpack-cli": "^4.9.1"
   }
 ```
-## :point_right: [Git convention 문서 바로가기](https://www.notion.so/84c305675a7e43308bc8c90e94afeb9c?v=6593c15e7edf4f6188f4a3e9c370c8d6&p=37031c99b0d84cd5b03aa2e9197b4e96)
+## :point_right: [Git convention 문서 바로가기](https://www.notion.so/Server-Code-46541ebbcab74b149673b5eefe6c753e)
 
-## :point_down: Code convention
-**1. 변수명 정의**
-- `camelCase`를 적용할 것
-- boolean 변수는 is 접두사 사용
-- DB 변수명의 경우, `snake_case`사용 할 것
-
-**2. 함수명 정의**
-- 동사 + 명사 의 순서로 작성해서 무슨 기능을 하는 함수인지 명확히 알아볼 수 있도록 작성
-- 대소문자 혼용할 수 있지만 반드시 소문자로 시작
-   - `cameCase`를 적용할 것
-
-**3. 클래스 정의**
-- `PascalCase`를 이용
-- 기능을 알 수 있도록 정의
-
-**4. DB 및 그 외 모듈 정의**
-- 기능에 해당하는 DB 모듈을 import 할 때 구분을 위해 `PascalCase`를 이용
-- enum 처럼 사용되는 모듈의 경우, `PascalCase` 적용
-
-**5. ESLint**
-- `Google JavaScript Style Guide` 적용
-```json
-{
-    "env": {
-        "node": true,
-        "commonjs": true,
-        "es2021": true
-    },
-    "extends": [
-        "google",
-        "plugin:prettier/recommended"
-    ],
-    "parserOptions": {
-        "ecmaVersion": 12,
-        "sourceType": "module"
-    },
-    "rules": {
-        "camelCase" : "off",
-        "prettier/prettier": "error",
-        "no-unused-vars": "warn",
-        "no-bitwise": "off",
-        "require-jsdoc":[ "error", {
-            "require": {
-                "FunctionDeclaration": false,
-                "MethodDefinition": false,
-                "ClassDeclaration": false,
-                "ArrowFunctionExpression": false,
-                "FunctionExpression": false
-            }
-        }]
-    },
-    "ignorePatterns": [
-        "node_modules/"
-    ]
-}
-```
+## :point_down: [Code convention 문서 바로가기](https://www.notion.so/Server-Code-46541ebbcab74b149673b5eefe6c753e)
