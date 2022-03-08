@@ -49,7 +49,7 @@ module.exports = {
   updateItemInfo: async function (req, res, next) {
     try {
       if (!req.body.item_name) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
+        throw new BadRequest(ErrorMessage.itemNameMiss);
       }
 
       await Items.updateItem(req).then(() => {
