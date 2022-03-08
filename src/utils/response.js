@@ -32,7 +32,6 @@ const SuccessMessage = {
   /* 폴더*/
   folderInsert: '폴더 추가 성공',
   folderNameUpdate: '폴더명 수정 성공',
-  folderImageUpdate: '폴더이미지 수정 성공',
   folderDelete: '폴더 삭제 성공',
 
   /* 사용자*/
@@ -72,7 +71,6 @@ const ErrorMessage = {
   folderListNotFound: '폴더리스트 정보 없음',
   folderInItemNotFound: '폴더 내 아이템 정보 없음',
   folderNameUpdateError: '수정된 폴더명 없음',
-  folderThumbnailUpdateError: '수정된 폴더 썸네일 없음',
   folderInsertError: '추가된 폴더 없음',
   folderDeleteError: '삭제된 폴더 없음',
 
