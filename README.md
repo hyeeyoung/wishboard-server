@@ -5,7 +5,7 @@
 
 __위시리스트 통합관리 앱, 위시보드(Wishboard)__
 
-Timeline: 21.9.1 - 22.3.8 (+ iOS 개발 예정)
+Timeline: 21.9.26 - 22.3.8 (+ iOS 개발 예정)
 
 TEAM: Hyeeyoung   
 
@@ -73,7 +73,7 @@ TEAM: Hyeeyoung
 
 | <img src="https://user-images.githubusercontent.com/48701368/157186833-1f852f89-1094-4d92-ba3c-de5a706ed7e1.jpg" width="60%" /> | <img src="https://user-images.githubusercontent.com/68772751/139533613-e4695172-50b5-4f12-8d39-0dd93de7b774.png" width="60%" /> |
 | --- | --- |
-| [최영진](https://github.com/youngjinc) / Android & Design | [김혜정](https://github.com/hyejungg) / Server |
+| [김혜정](https://github.com/hyejungg) / Server | [최영진](https://github.com/youngjinc) / Android & Design |
 
 ## Develop Environment
 - Develop
