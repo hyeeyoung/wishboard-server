@@ -32,7 +32,6 @@ const SuccessMessage = {
   /* 폴더*/
   folderInsert: '폴더 추가 성공',
   folderNameUpdate: '폴더명 수정 성공',
-  folderImageUpdate: '폴더이미지 수정 성공',
   folderDelete: '폴더 삭제 성공',
 
   /* 사용자*/
@@ -72,7 +71,6 @@ const ErrorMessage = {
   folderListNotFound: '폴더리스트 정보 없음',
   folderInItemNotFound: '폴더 내 아이템 정보 없음',
   folderNameUpdateError: '수정된 폴더명 없음',
-  folderThumbnailUpdateError: '수정된 폴더 썸네일 없음',
   folderInsertError: '추가된 폴더 없음',
   folderDeleteError: '삭제된 폴더 없음',
 
@@ -81,6 +79,7 @@ const ErrorMessage = {
   notiTodayNotFound: '오늘 날짜 기준, 예정된 알림 정보 없음',
   notiReadStateUpdateError: '수정된 알림 읽음 상태 없음',
   notiFCMSendError: 'FCM 토큰 에러. 토큰이 없거나 잘못된 경우',
+  notiInsertError: '추가된 알림 없음',
   notiUpsertError: '추가되거나 수정된 알림 없음',
   notiSendFailed: 'Firebase FCM server로 전송 실패',
 
