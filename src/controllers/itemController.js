@@ -46,6 +46,15 @@ module.exports = {
         next(err);
       });
   },
+  selectItemLatest: async function (req, res, next) {
+    await Items.selectItemOneLatest(req)
+      .then((result) => {
+        res.status(StatusCode.OK).json(result);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  },
   updateItemInfo: async function (req, res, next) {
     try {
       if (!req.body.item_name) {

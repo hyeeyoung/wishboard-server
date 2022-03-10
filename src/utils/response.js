@@ -58,6 +58,7 @@ const ErrorMessage = {
   itemInsertError: '추가된 아이템 없음',
   itemDeleteError: '삭제된 아이템 없음',
   itemNotFound: '아이템 정보 없음',
+  itemLatestNotFound: '최근 추가한 아이템 정보 없음',
 
   /* 장바구니*/
   cartNotFound: '장바구니 정보 없음',

@@ -44,6 +44,7 @@ module.exports = {
   },
   selectItems: async function (req) {
     const userId = Number(req.decoded);
+
     const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
     CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
     FROM items i LEFT OUTER JOIN notifications n 
@@ -53,12 +54,35 @@ module.exports = {
     LEFT OUTER JOIN cart c
     on i.item_id = c.item_id 
     WHERE i.user_id = ? ORDER BY i.create_at DESC`;
+
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, [userId]);
     connection.release();
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.itemNotFound);
+    }
+    return Object.setPrototypeOf(rows, []);
+  },
+  selectItemOneLatest: async function (req) {
+    const userId = Number(req.decoded);
+
+    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
+    FROM items i LEFT OUTER JOIN notifications n 
+    ON i.item_id = n.item_id  
+    LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
+    ON i.folder_id = f.folder_id 
+    LEFT OUTER JOIN cart c
+    on i.item_id = c.item_id 
+    WHERE i.user_id = ? ORDER BY i.create_at DESC LIMIT 1`;
+
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, [userId]);
+    connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.itemLatestNotFound);
     }
     return Object.setPrototypeOf(rows, []);
   },

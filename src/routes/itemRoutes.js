@@ -5,6 +5,7 @@ const router = new express.Router();
 
 router.post('/', verifyToken, itemController.insertItemInfo);
 router.get('/', verifyToken, itemController.selectItemInfo);
+router.get('/latest', verifyToken, itemController.selectItemLatest);
 router.put('/:item_id', verifyToken, itemController.updateItemInfo);
 router.delete('/:item_id', verifyToken, itemController.deleteItemInfo);
 
