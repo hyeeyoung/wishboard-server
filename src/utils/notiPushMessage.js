@@ -15,14 +15,14 @@ const message = {
 };
 
 function dataMessage(itemNotiType, itemId, deviceFcmToken) {
-  message.notification.body = `${NotiType.itemNotiType} ${Strings.notiMessageDescription}`;
+  message.notification.body = `${NotiType[itemNotiType]} ${Strings.notiMessageDescription}`;
   message.data.itemId = String(itemId);
   message.token = deviceFcmToken;
   return message;
 }
 
 function dataMessageWithCount(itemNotiType, itemId, notiCount, deviceFcmToken) {
-  message.notification.body = `${NotiType.itemNotiType} 알림 외 ${notiCount}개의 ${Strings.notiMessageDescription}`;
+  message.notification.body = `${NotiType[itemNotiType]} 알림 외 ${notiCount}개의 ${Strings.notiMessageDescription}`;
   message.data.itemId = String(itemId);
   message.token = deviceFcmToken;
   return message;
