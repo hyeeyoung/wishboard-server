@@ -1,4 +1,4 @@
-const notiType = {
+const NotiType = {
   RESTOCK: '재입고',
   OPEN_DAY: '오픈일',
   PREORDER_CLOSE: '프리오더 마감',
@@ -7,5 +7,5 @@ const notiType = {
 };
 
 module.exports = {
-  notiType,
+  NotiType,
 };
