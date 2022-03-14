@@ -36,6 +36,36 @@ jobs:
         #lint 통과 확인
       - name: check ESLint
         run: npm run lint
+      
+        # .env 파일 생성
+      - name : Create .env file
+        run : |
+          touch .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_USER=${{ secrets.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          
+          echo FIREBASE_TYPE=${{ secrets.FIREBASE_TYPE }} >> .env
+          echo FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} >> .env
+          echo FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }} >> .env
+          echo FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }} >> .env
+          echo FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }} >> .env
+          echo FIREBASE_CLIENT_ID=${{ secrets.FIREBASE_CLIENT_ID }} >> .env
+          echo FIREBASE_AUTH_URI=${{ secrets.FIREBASE_AUTH_URI }} >> .env
+          echo FIREBASE_TOKEN_URI=${{ secrets.FIREBASE_TOKEN_URI }} >> .env
+          echo FIREBASE_AUTH_PROVIDER_X509_CERT_URI=${{ secrets.FIREBASE_AUTH_PROVIDER_X509_CERT_URI }} >> .env
+          echo FIREBASE_CLIENT_X509_CERT_URI=${{ secrets.FIREBASE_CLIENT_X509_CERT_URI }} >> .env
+          
+          echo WISHBOARD_GMAIL_ID=${{ secrets.WISHBOARD_GMAIL_ID }} >> .env
+          echo WISHBOARD_GMAIL_PW=${{ secrets.WISHBOARD_GMAIL_PW }} >> .env
+          
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+
+          cat .env
+          pwd
         
         # CI 통과 시 build하여 server.js 파일 생성
       - name: run build (main <- dev)
