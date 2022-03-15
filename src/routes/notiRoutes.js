@@ -9,6 +9,4 @@ router.put(
   verifyToken,
   notiController.updateNotiReadStateInfo,
 );
-router.get('/schedule', verifyToken, notiController.scheduleSettings); // /noti/schedule?push=true/false
-
 module.exports = router;

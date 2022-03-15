@@ -23,6 +23,8 @@ const SuccessMessage = {
 
   notiPushServiceStart: '푸쉬 알림 서비스 시작',
   notiPushServiceExit: '푸쉬 알림 서비스 종료',
+  notiSchedulerStart: '푸쉬 알림 스케줄러 동작',
+  notiSchedulerExit: '푸쉬 알림 스케줄러 종료',
 
   /* 장바구니*/
   cartInsert: '장바구니 추가 성공',
@@ -77,12 +79,13 @@ const ErrorMessage = {
 
   /* 알림*/
   notiNotFound: '알림 정보 없음',
-  notiTodayNotFound: '오늘 날짜 기준, 예정된 알림 정보 없음',
+  notiTodayNotFound: '오늘 날짜 기준, 15분 후 예정된 알림 정보 없음',
   notiReadStateUpdateError: '수정된 알림 읽음 상태 없음',
   notiFCMSendError: 'FCM 토큰 에러. 토큰이 없거나 잘못된 경우',
   notiInsertError: '추가된 알림 없음',
   notiUpsertError: '추가되거나 수정된 알림 없음',
   notiSendFailed: 'Firebase FCM server로 전송 실패',
+  notiSchedulerERROR: '푸쉬 알림 스케줄러 동작 실패',
 
   /* 사용자*/
   validateNickname: '이미 존재하는 닉네임',

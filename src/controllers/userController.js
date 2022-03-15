@@ -93,4 +93,24 @@ module.exports = {
       next(err);
     }
   },
+  updateUserPushState: async function (req, res, next) {
+    const pushState = req.params.push === 'true' ? true : false;
+    await User.updatePushState(req, pushState)
+      .then(() => {
+        if (pushState) {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.notiPushServiceStart,
+          });
+        } else {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.notiPushServiceExit,
+          });
+        }
+      })
+      .catch((err) => {
+        next(err);
+      });
+  },
 };
