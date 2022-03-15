@@ -23,7 +23,6 @@ app.use(hpp());
 if (nodeEnv === 'production') {
   morganFormat = 'combined'; // Apache 표준
 } else {
-  // app.disable('x-powered-by'); // 서버 관련 소프트웨어 정보 disable 하도록 설정
   morganFormat = 'dev';
 }
 app.use(morgan(morganFormat, { stream: logger.stream }));
