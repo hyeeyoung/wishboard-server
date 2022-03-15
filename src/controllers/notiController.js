@@ -1,17 +1,5 @@
 const Noti = require('../models/noti');
-const User = require('../models/user');
-const logger = require('../config/winston');
-const {
-  StatusCode,
-  SuccessMessage,
-  ErrorMessage,
-} = require('../utils/response');
-const { BadRequest } = require('../utils/errors');
-const schedule = require('node-schedule');
-const { Strings } = require('../utils/strings');
-const { sendSchduledService } = require('../middleware/notiScheduler');
-
-const task = schedule;
+const { StatusCode, SuccessMessage } = require('../utils/response');
 
 module.exports = {
   selectNotiInfo: async function (req, res, next) {
@@ -34,39 +22,5 @@ module.exports = {
       .catch((err) => {
         next(err);
       });
-  },
-  scheduleSettings: async function (req, res, next) {
-    try {
-      if (!req.query.push) {
-        throw new BadRequest(ErrorMessage.BadRequestMeg);
-      }
-      const pushService = req.query.push === 'true' ? true : false;
-
-      if (pushService) {
-        await User.updatePushState(req, pushService).then(() => {
-          logger.info(Strings.pushNotiSchedulerStart);
-          task.scheduleJob('0/30 * * * *', function () {
-            sendSchduledService(req);
-          });
-          return res.status(StatusCode.OK).json({
-            success: true,
-            message: SuccessMessage.notiPushServiceStart,
-          });
-        });
-      } else {
-        if (task != null) {
-          await User.updatePushState(req, pushService).then(() => {
-            logger.info(Strings.pushNotiSchedulerEnd);
-            task.gracefulShutdown();
-          });
-        }
-        return res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.notiPushServiceExit,
-        });
-      }
-    } catch (err) {
-      next(err);
-    }
   },
 };
