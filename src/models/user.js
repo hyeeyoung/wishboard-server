@@ -30,8 +30,7 @@ module.exports = {
   },
   signIn: async function (req) {
     const email = req.body.email;
-    const sqlSelect =
-      'SELECT user_id, email, push_state FROM users WHERE email = ?';
+    const sqlSelect = 'SELECT user_id, email FROM users WHERE email = ?';
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, email);
     connection.release();
@@ -240,7 +239,7 @@ module.exports = {
     const userId = Number(req.decoded);
 
     const sqlSelect =
-      'SELECT email, profile_img, nickname, fcm_token, push_state FROM users WHERE user_id = ?';
+      'SELECT email, profile_img, nickname, push_state FROM users WHERE user_id = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
