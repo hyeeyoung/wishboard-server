@@ -1,31 +1,12 @@
 const { Strings } = require('./strings');
-const { NotiType } = require('./notiType');
-require('dotenv').config({ path: '../.env' });
 
+// multicast 방식
 const message = {
   notification: {
     title: Strings.notiMessageTitle,
-    body: '',
+    body: Strings.notiMessageDescription,
   },
-  data: {
-    itemId: '',
-    pushType: Strings.NOTI_SCREEN,
-  },
-  token: '',
+  tokens: '',
 };
 
-function dataMessage(itemNotiType, itemId, deviceFcmToken) {
-  message.notification.body = `${NotiType[itemNotiType]} ${Strings.notiMessageDescription}`;
-  message.data.itemId = String(itemId);
-  message.token = deviceFcmToken;
-  return message;
-}
-
-function dataMessageWithCount(itemNotiType, itemId, notiCount, deviceFcmToken) {
-  message.notification.body = `${NotiType[itemNotiType]} 알림 외 ${notiCount}개의 ${Strings.notiMessageDescription}`;
-  message.data.itemId = String(itemId);
-  message.token = deviceFcmToken;
-  return message;
-}
-
-module.exports = { dataMessage, dataMessageWithCount };
+module.exports = { message };

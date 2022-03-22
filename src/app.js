@@ -9,6 +9,8 @@ require('dotenv').config({ path: '../.env' });
 const port = process.env.PORT;
 const nodeEnv = process.env.NODE_ENV;
 
+const schedule = require('node-schedule');
+const schduleService = require('./middleware/notiScheduler');
 const passport = require('passport');
 const passportConfig = require('./config/passport');
 
@@ -23,14 +25,22 @@ app.use(hpp());
 if (nodeEnv === 'production') {
   morganFormat = 'combined'; // Apache 표준
 } else {
-  // app.disable('x-powered-by'); // 서버 관련 소프트웨어 정보 disable 하도록 설정
   morganFormat = 'dev';
 }
 app.use(morgan(morganFormat, { stream: logger.stream }));
 
-app.listen(port, () =>
-  logger.info(`Server start listening on port ${port} | ${nodeEnv}`),
-);
+app.listen(port, () => {
+  logger.info(`Server start listening on port ${port} | ${nodeEnv}`);
+  /** node 앱 실행과 동시에 푸쉬알림 스케줄러 실행 */
+  schedule.scheduleJob('0/30 * * * *', function () {
+    try {
+      schduleService.sendPushNotification();
+    } catch (err) {
+      schedule.gracefulShutdown();
+    }
+  });
+});
+
 app.get('/', (req, res) => res.send('Welcome to WishBoard!!'));
 app.set('port', port);
 
