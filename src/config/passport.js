@@ -23,7 +23,7 @@ async function localVerify(email, password, done) {
   let user;
   try {
     const sqlSelect =
-      'SELECT user_id, email, password, push_state FROM users WHERE email = ?';
+      'SELECT user_id, email, password FROM users WHERE email = ?';
 
     const connection = await pool.connection(async (conn) => conn);
     await connection

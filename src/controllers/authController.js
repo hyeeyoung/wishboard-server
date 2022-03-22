@@ -95,14 +95,10 @@ module.exports = {
           });
         }
         const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-        const pushState = user[0].push_state;
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
-          data: {
-            token,
-            pushState,
-          },
+          data: { token },
         });
       })(req, res, next);
     } catch (err) {
@@ -140,14 +136,10 @@ module.exports = {
       if (isVerify) {
         await User.signIn(req).then((result) => {
           const token = jwt.sign(result[0].user_id, process.env.JWT_SECRET_KEY);
-          const pushState = result[0].push_state;
           return res.status(StatusCode.OK).json({
             success: true,
             message: SuccessMessage.loginSuccess,
-            data: {
-              token,
-              pushState,
-            },
+            data: { token },
           });
         });
       } else {
