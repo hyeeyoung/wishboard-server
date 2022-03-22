@@ -116,22 +116,27 @@ module.exports = {
 
     return rows.affectedRows < 1 ? false : true;
   },
-  selectNotiFrom30minAgo: async function (req) {
-    const userId = Number(req.decoded);
-
-    const sqlSelect = `SELECT n.item_notification_type, n.item_notification_date, n.item_id, n.user_id, u.fcm_token FROM notifications n 
+  selectNotiFrom30minAgo: async function () {
+    // 중복 없이 30분 전에 알림이 있는 토큰만 찾아 return (multicast 형식)
+    const sqlSelect = `SELECT u.fcm_token FROM notifications n
     INNER JOIN users u ON n.user_id = u.user_id
-    WHERE MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 30 MINUTE)) AND n.user_id = ? AND u.push_state = true
-    ORDER BY n.item_notification_date ASC`;
+    WHERE DATE(n.item_notification_date) = DATE(NOW())
+    AND MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 30 MINUTE))
+    AND u.push_state = true
+    GROUP BY u.fcm_token`;
 
     const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, userId);
+    const [rows] = await connection.query(sqlSelect);
     connection.release();
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.notiTodayNotFound);
     }
 
-    return Object.setPrototypeOf(rows, []);
+    // multicast 방식
+    const result = [];
+    rows.forEach((row) => result.push(row.fcm_token));
+
+    return result;
   },
 };

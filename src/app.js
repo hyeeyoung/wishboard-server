@@ -9,6 +9,8 @@ require('dotenv').config({ path: '../.env' });
 const port = process.env.PORT;
 const nodeEnv = process.env.NODE_ENV;
 
+const schedule = require('node-schedule');
+const schduleService = require('./middleware/notiScheduler');
 const passport = require('passport');
 const passportConfig = require('./config/passport');
 
@@ -27,9 +29,18 @@ if (nodeEnv === 'production') {
 }
 app.use(morgan(morganFormat, { stream: logger.stream }));
 
-app.listen(port, () =>
-  logger.info(`Server start listening on port ${port} | ${nodeEnv}`),
-);
+app.listen(port, () => {
+  logger.info(`Server start listening on port ${port} | ${nodeEnv}`);
+  /** node 앱 실행과 동시에 푸쉬알림 스케줄러 실행 */
+  schedule.scheduleJob('0/30 * * * *', function () {
+    try {
+      schduleService.sendPushNotification();
+    } catch (err) {
+      schedule.gracefulShutdown();
+    }
+  });
+});
+
 app.get('/', (req, res) => res.send('Welcome to WishBoard!!'));
 app.set('port', port);
 
