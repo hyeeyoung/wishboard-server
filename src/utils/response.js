@@ -99,6 +99,7 @@ const ErrorMessage = {
   userPushStateUpdateNotFound: '수정된 사용자 푸쉬 알림 여부 없음',
   userPasswordUpdateNotFound: '수정된 사용자 비밀번호 없음',
 
+  unActiveUser: '탈퇴 처리된 유저',
   signUpFailed: 'wishboard 앱 회원가입 실패',
   validateEmail: '이미 존재하는 이메일 주소',
   unvalidateUser: '존재하지 않는 유저',

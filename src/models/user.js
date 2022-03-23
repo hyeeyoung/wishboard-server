@@ -30,7 +30,8 @@ module.exports = {
   },
   signIn: async function (req) {
     const email = req.body.email;
-    const sqlSelect = 'SELECT user_id, email FROM users WHERE email = ?';
+    const sqlSelect =
+      'SELECT user_id, email FROM users WHERE email = ? AND is_active = true';
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, email);
     connection.release();

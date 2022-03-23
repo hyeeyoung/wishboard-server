@@ -86,9 +86,15 @@ module.exports = {
       if (!req.body.email || !req.body.password) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      passport.authenticate('local', { session: false }, (err, user) => {
+      passport.authenticate('local', { session: false }, (err, user, msg) => {
         if (err || !user) {
           logger.info(TAG + err || !user);
+          if (msg) {
+            return res.status(StatusCode.BADREQUEST).json({
+              success: false,
+              message: msg,
+            });
+          }
           return res.status(StatusCode.BADREQUEST).json({
             success: false,
             message: ErrorMessage.checkIDPasswordAgain,
