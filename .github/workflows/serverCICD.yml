@@ -117,4 +117,6 @@ jobs:
             pwd
             cd ./wishboard-server-product
             aws s3 cp s3://wishboard-server-build ./dist --recursive 
-        # ** pm2로 실행 시키는 부분 추가 **
+            cd dist
+            pm2 reload ecosystem.config.js
+        
