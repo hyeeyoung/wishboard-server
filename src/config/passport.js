@@ -33,7 +33,7 @@ async function localVerify(email, password, done) {
         user = rows[0];
 
         const checkPassword = bcrypt.compareSync(password, user[0].password);
-        logger.info(TAG + localVerify.name + '() : ' + checkPassword);
+        logger.info(TAG + checkPassword);
         if (!checkPassword) return done(null, false);
 
         return done(null, user);
