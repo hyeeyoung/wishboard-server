@@ -29,15 +29,31 @@ if (nodeEnv === 'production') {
 }
 app.use(morgan(morganFormat, { stream: logger.stream }));
 
+const isDisableKeepAlive = false;
+app.use(function (req, res, next) {
+  if (isDisableKeepAlive) {
+    res.set('Connection', 'close');
+  }
+  next();
+});
+
 app.listen(port, () => {
+  process.send('ready');
   logger.info(`Server start listening on port ${port} | ${nodeEnv}`);
-  /** node 앱 실행과 동시에 푸쉬알림 스케줄러 실행 */
-  schedule.scheduleJob('0/30 * * * *', function () {
-    try {
+
+  /** 앱 시작과 동시에 푸쉬알림 스케줄러 실행 */
+  if (process.env.name == 'push-scheduler') {
+    schedule.scheduleJob('0/30 * * * *', function () {
       schduleService.sendPushNotification();
-    } catch (err) {
-      schedule.gracefulShutdown();
-    }
+    });
+  }
+});
+
+process.on('SIGINT', function () {
+  isDisableKeepAlive = true;
+  app.close(function () {
+    console.log('pm2 process closed');
+    schedule.gracefulShutdown().then(() => process.exit(0));
   });
 });
 
