@@ -31,7 +31,7 @@ module.exports = {
         process.env.FIREBASE_PROJECT_ID,
       ),
       'process.env.FIREBASE_PRIVATE_KEY': JSON.stringify(
-        process.env.FIREBASE_PRIVATE_KEY,
+        process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       ),
       'process.env.FIREBASE_CLIENT_EMAIL': JSON.stringify(
         process.env.FIREBASE_CLIENT_EMAIL,
