@@ -77,8 +77,6 @@ jobs:
       - name: Copy ecosystem.config.js
         run: |
           cp ./ecosystem.config.js ./dist
-          ls 
-          ls ./dist
 
       - name: Sharing files between jobs.
         uses: actions/upload-artifact@v1
@@ -106,17 +104,19 @@ jobs:
             --recursive \
             --region ap-northeast-2 \
             dist s3://wishboard-server-build
-      # aws ec2에 접속
-      - name : Connect and Build file download to EC2 and PM2 script
-        uses: appleboy/ssh-action@master
-        with:
-          key: ${{ secrets.AWS_EC2_SSH_KEY }}
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USRENAME }}
-          script: |
-            pwd
-            cd ./wishboard-server-product
-            aws s3 cp s3://wishboard-server-build ./dist --recursive 
-            cd dist
-            pm2 reload ecosystem.config.js
+        # ** time out 문제로 우선 주석처리 후 직접 진행으로 변경    
+      # # aws ec2에 접속
+      # - name : Connect and Build file download to EC2 and PM2 script
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     key: ${{ secrets.AWS_EC2_SSH_KEY }}
+      #     host: ${{ secrets.AWS_HOST }}
+      #     username: ${{ secrets.AWS_USRENAME }}
+      #     script: |
+      #       pwd
+      #       cd ./wishboard-server-product
+      #       aws s3 cp s3://wishboard-server-build ./dist --recursive 
+      #       cd dist
+      #       pm2 reload ecosystem.config.js
+      #       exit 
         
