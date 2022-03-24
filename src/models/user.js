@@ -45,13 +45,15 @@ module.exports = {
   validateEmail: async function (req) {
     const email = req.body.email;
 
-    const sqlSelect = 'SELECT email FROM users WHERE email = ?';
+    const sqlSelect = 'SELECT email, is_active FROM users WHERE email = ?';
 
     const connection = await pool.connection(async (conn) => conn);
-    const row = await connection.query(sqlSelect, email);
+    const [row] = await connection.query(sqlSelect, email);
     connection.release();
 
-    return row[0].length >= 1 ? true : false;
+    return row.length >= 1
+      ? { success: true, isActive: row[0].is_active }
+      : false;
   },
   unActiveUserOne: async function (req) {
     const userId = Number(req.decoded);
