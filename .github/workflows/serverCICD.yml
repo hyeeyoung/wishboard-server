@@ -115,8 +115,5 @@ jobs:
       #     script: |
       #       pwd
       #       cd ./wishboard-server-product
-      #       aws s3 cp s3://wishboard-server-build ./dist --recursive 
-      #       cd dist
-      #       pm2 reload ecosystem.config.js
-      #       exit 
+      #       ./pm2-deploy.sh
         
