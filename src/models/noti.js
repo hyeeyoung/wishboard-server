@@ -40,7 +40,27 @@ module.exports = {
     connection.release();
 
     if (Array.isArray(rows) && !rows.length) {
-      throw new NotFound(ErrorMessage.notiNotFound);
+      throw new NotFound(ErrorMessage.notiTabNotFound);
+    }
+
+    return Object.setPrototypeOf(rows, []);
+  },
+  selectCalendar: async function (req) {
+    const userId = Number(req.decoded);
+    // const month = req.query.month;
+
+    const sqlSelect = `SELECT i.item_id, i.item_img, i.item_name, i.item_url, n.item_notification_type, 
+    CAST(n.item_notification_date AS CHAR(19)) item_notification_date, n.read_state 
+    FROM notifications n JOIN items i 
+    ON n.item_id = i.item_id WHERE n.user_id = ? 
+    ORDER BY n.item_notification_date ASC`;
+
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlSelect, userId);
+    connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.notiCalendarNotFound);
     }
 
     return Object.setPrototypeOf(rows, []);

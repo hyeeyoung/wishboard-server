@@ -79,7 +79,8 @@ const ErrorMessage = {
   folderDeleteError: '삭제된 폴더 없음',
 
   /* 알림*/
-  notiNotFound: '알림 정보 없음',
+  notiTabNotFound: '알림탭 정보 없음',
+  notiCalendarNotFound: '알림캘린더 정보 없음',
   notiTodayNotFound: '오늘 날짜 기준, 30분 후 예정된 알림 정보 없음',
   notiReadStateUpdateError: '수정된 알림 읽음 상태 없음',
   notiFCMSendError: 'FCM 토큰 에러. 토큰이 없거나 잘못된 경우',

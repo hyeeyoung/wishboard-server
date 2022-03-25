@@ -11,6 +11,15 @@ module.exports = {
         next(err);
       });
   },
+  selectCalendar: async function (req, res, next) {
+    await Noti.selectCalendar(req)
+      .then((result) => {
+        res.status(StatusCode.OK).json(result);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  },
   updateNotiReadStateInfo: async function (req, res, next) {
     await Noti.updateNotiReadState(req)
       .then(() => {
