@@ -117,9 +117,6 @@ module.exports = {
     const sqlUpdate = 'UPDATE users SET profile_img = ? WHERE user_id = ?';
     const params = [profileImg, userId];
 
-    console.log(sqlUpdate);
-    console.log(params);
-
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection

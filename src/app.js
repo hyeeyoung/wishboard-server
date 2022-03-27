@@ -52,7 +52,7 @@ app.listen(port, () => {
 process.on('SIGINT', function () {
   isDisableKeepAlive = true;
   app.close(function () {
-    console.log('pm2 process closed');
+    logger.info('pm2 process closed');
     schedule.gracefulShutdown().then(() => process.exit(0));
   });
 });
