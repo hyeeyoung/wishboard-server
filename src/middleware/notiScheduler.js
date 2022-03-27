@@ -19,9 +19,9 @@ async function sendFcmTokenToFirebase(message) {
         }
       });
       // 실패 토큰에 한하여 재전송
-      const response = await firebaseAdmin.messaging().sendAll(failedTokens);
-      logger.info(`${SuccessMessage.notiFCMSend}: ${response}`);
-      logger.info(response); //* 추후 삭제
+      const reResponse = await firebaseAdmin.messaging().sendAll(failedTokens);
+      logger.info(`${SuccessMessage.notiFCMSend}: ${reResponse}`);
+      logger.info(reResponse); //* 추후 삭제
     }
     return true;
   } catch (e) {
@@ -44,6 +44,7 @@ module.exports = {
   sendPushNotification: async function () {
     await Noti.selectNotiFrom30minAgo()
       .then((notiList) => {
+        console.log(notiList);
         const messages = [];
         Object.keys(notiList).forEach((token) => {
           const numOfNotiItems = notiList[token].length;
@@ -66,6 +67,7 @@ module.exports = {
           message.token = token;
           messages.push(message);
         });
+        console.log(messages);
         sendFcmTokenToFirebase(messages).catch(() => {
           logger.error(ErrorMessage.notiSendFailed);
         });
