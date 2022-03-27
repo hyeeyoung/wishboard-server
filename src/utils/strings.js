@@ -1,8 +1,7 @@
 const Strings = {
   /* 알림 */
   notiMessageTitle: '상품일정알림',
-  notiMessageDescription:
-    '알림 설정한 상품이 있습니다. WishBoard에서 확인하세요!', // multicast 방식
+  notiMessageDescription: '알림이 있습니다.',
 
   INSERT: 'INSERT',
   UPSERT: 'UPSERT',

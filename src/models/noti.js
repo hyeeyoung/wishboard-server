@@ -1,6 +1,7 @@
 const pool = require('../config/db');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
+const { generateNotiItem } = require('../dto/notiResponse');
 const { Strings } = require('../utils/strings');
 
 module.exports = {
@@ -137,13 +138,11 @@ module.exports = {
     return rows.affectedRows < 1 ? false : true;
   },
   selectNotiFrom30minAgo: async function () {
-    // 중복 없이 30분 전에 알림이 있는 토큰만 찾아 return (multicast 형식)
-    const sqlSelect = `SELECT u.fcm_token FROM notifications n
+    const sqlSelect = `SELECT n.item_notification_type, n.user_id, u.fcm_token FROM notifications n
     INNER JOIN users u ON n.user_id = u.user_id
     WHERE DATE(n.item_notification_date) = DATE(NOW())
     AND MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 30 MINUTE))
-    AND u.push_state = true
-    GROUP BY u.fcm_token`;
+    AND u.push_state = true`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect);
@@ -153,10 +152,7 @@ module.exports = {
       throw new NotFound(ErrorMessage.notiTodayNotFound);
     }
 
-    // multicast 방식
-    const result = [];
-    rows.forEach((row) => result.push(row.fcm_token));
-
-    return result;
+    const notiList = generateNotiItem(rows);
+    return notiList;
   },
 };

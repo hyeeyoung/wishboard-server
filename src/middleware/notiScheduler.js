@@ -1,12 +1,13 @@
 const { firebaseAdmin } = require('../config/firebaseAdmin');
 const Noti = require('../models/noti');
-const { message } = require('../utils/notiPushMessage');
 const logger = require('../config/winston');
 const { SuccessMessage, ErrorMessage } = require('../utils/response');
+const { Strings } = require('../utils/strings');
+const { NotiType } = require('../utils/notiType');
 
 async function sendFcmTokenToFirebase(message) {
   try {
-    const response = await firebaseAdmin.messaging().sendMulticast(message); // 멀티캐스팅
+    const response = await firebaseAdmin.messaging().sendAll(message);
     logger.info(SuccessMessage.notiFCMSend);
     logger.info(response); //* 추후 삭제
     // failureCount 존재 시 예외처리
@@ -14,19 +15,18 @@ async function sendFcmTokenToFirebase(message) {
       const failedTokens = [];
       response.responses.forEach((resp, idx) => {
         if (!resp.success) {
-          failedTokens.push(registrationTokens[idx]);
+          failedTokens.push(message[idx]);
         }
       });
-      message.tokens = failedTokens; // 실패 토큰으로 메세지 재정의
       // 실패 토큰에 한하여 재전송
-      const response = await firebaseAdmin.messaging().sendMulticast(message);
+      const response = await firebaseAdmin.messaging().sendAll(failedTokens);
       logger.info(`${SuccessMessage.notiFCMSend}: ${response}`);
+      logger.info(response); //* 추후 삭제
     }
     return true;
   } catch (e) {
     const firebaseError = { err: e };
     if (firebaseError.err.code == 'messaging/invalid-payload') {
-      console.log(e);
       logger.error(ErrorMessage.notiFCMSendError);
     } else {
       logger.error(e);
@@ -43,10 +43,29 @@ module.exports = {
    */
   sendPushNotification: async function () {
     await Noti.selectNotiFrom30minAgo()
-      .then((notiTokens) => {
-        // multicast 형식
-        message.tokens = notiTokens;
-        sendFcmTokenToFirebase(message).catch(() => {
+      .then((notiList) => {
+        const messages = [];
+        Object.keys(notiList).forEach((token) => {
+          const numOfNotiItems = notiList[token].length;
+          const message = {
+            notification: {
+              title: Strings.notiMessageTitle,
+              body: '',
+            },
+            token: '',
+          };
+          if (numOfNotiItems === 1) {
+            message.notification.body = `${
+              NotiType[notiList[token][0].notiType]
+            } ${Strings.notiMessageDescription}`;
+          } else {
+            message.notification.body = `${
+              NotiType[notiList[token][0].notiType]
+            } 알림 외 ${numOfNotiItems}개의 ${Strings.notiMessageDescription}`;
+          }
+          message.token = token;
+        });
+        sendFcmTokenToFirebase(messages).catch(() => {
           logger.error(ErrorMessage.notiSendFailed);
         });
       })
