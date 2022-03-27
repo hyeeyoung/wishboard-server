@@ -64,6 +64,7 @@ module.exports = {
             } 알림 외 ${numOfNotiItems}개의 ${Strings.notiMessageDescription}`;
           }
           message.token = token;
+          messages.push(message);
         });
         sendFcmTokenToFirebase(messages).catch(() => {
           logger.error(ErrorMessage.notiSendFailed);
