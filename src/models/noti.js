@@ -140,8 +140,7 @@ module.exports = {
   selectNotiFrom30minAgo: async function () {
     const sqlSelect = `SELECT n.item_notification_type, n.user_id, u.fcm_token FROM notifications n
     INNER JOIN users u ON n.user_id = u.user_id
-    WHERE DATE(n.item_notification_date) = DATE(NOW())
-    AND MINUTE(n.item_notification_date) = MINUTE(DATE_ADD(NOW(), INTERVAL 30 MINUTE))
+    WHERE TO_SECONDS(n.item_notification_date) = (TO_SECONDS(NOW()) + 1800)
     AND u.push_state = true`;
 
     const connection = await pool.connection(async (conn) => conn);
