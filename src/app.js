@@ -15,7 +15,7 @@ const passportConfig = require('./config/passport');
 
 const handleErrors = require('./middleware/handleError');
 const { NotFound } = require('./utils/errors');
-const { ErrorMessage } = require('./utils/response');
+const { ErrorMessage, SuccessMessage } = require('./utils/response');
 
 /** 기본 설정 */
 // 서버 환경에 따라 다르게 설정 (배포/개발)
@@ -42,6 +42,7 @@ app.listen(port, () => {
 
   /** 앱 시작과 동시에 푸쉬알림 스케줄러 실행 */
   if (process.env.name == 'push-scheduler') {
+    logger.info(SuccessMessage.notiSchedulerStart);
     schedule.scheduleJob('0/30 * * * *', function () {
       schduleService.sendPushNotification();
     });
@@ -53,6 +54,7 @@ process.on('SIGINT', function () {
   app.close(function () {
     logger.info('pm2 process closed');
     schedule.gracefulShutdown().then(() => process.exit(0));
+    logger.info(SuccessMessage.notiSchedulerExit);
   });
 });
 
