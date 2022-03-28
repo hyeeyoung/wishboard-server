@@ -4,7 +4,6 @@ const helmet = require('helmet');
 const hpp = require('hpp');
 const morgan = require('morgan');
 const logger = require('./config/winston');
-const bodyParser = require('body-parser');
 require('dotenv').config({ path: '../.env' });
 const port = process.env.PORT;
 const nodeEnv = process.env.NODE_ENV;
@@ -57,23 +56,15 @@ process.on('SIGINT', function () {
   });
 });
 
-app.get('/', (req, res) => res.send('Welcome to WishBoard!!'));
-app.set('port', port);
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 /** passport 설정 */
 app.use(passport.initialize());
 passportConfig();
 
 /** router 설정 */
-app.use('/auth', require('./routes/authRoutes'));
-app.use('/user', require('./routes/userRoutes'));
-app.use('/item', require('./routes/itemRoutes'));
-app.use('/cart', require('./routes/cartRoutes'));
-app.use('/folder', require('./routes/folderRoutes'));
-app.use('/noti', require('./routes/notiRoutes'));
+app.use(require('./routes/index'));
 
 /** 에러페이지 설정 */
 app.use((req, res, next) => {
