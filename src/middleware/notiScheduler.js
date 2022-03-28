@@ -44,7 +44,6 @@ module.exports = {
   sendPushNotification: async function () {
     await Noti.selectNotiFrom30minAgo()
       .then((notiList) => {
-        console.log(notiList);
         const messages = [];
         Object.keys(notiList).forEach((token) => {
           const numOfNotiItems = notiList[token].length;
@@ -67,7 +66,6 @@ module.exports = {
           message.token = token;
           messages.push(message);
         });
-        console.log(messages);
         sendFcmTokenToFirebase(messages).catch(() => {
           logger.error(ErrorMessage.notiSendFailed);
         });
