@@ -26,7 +26,7 @@ if (nodeEnv === 'production') {
 }
 app.use(morgan(morganFormat, { stream: logger.stream }));
 
-const isDisableKeepAlive = false;
+let isDisableKeepAlive = false;
 app.use(function (req, res, next) {
   if (isDisableKeepAlive) {
     res.set('Connection', 'close');
