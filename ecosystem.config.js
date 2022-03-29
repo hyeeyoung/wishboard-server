@@ -7,7 +7,7 @@ module.exports = {
     {
       name: 'api-server',
       script: './server.js',
-      namespace: 'wishboard-server',
+      namespace: 'API-server',
       instance_var: 'INSTANCE_ID',
       version: '1.0.0',
       instances: 4,
@@ -20,8 +20,8 @@ module.exports = {
     },
     {
       name: 'push-scheduler',
-      script: './server.js',
-      namespace: 'wishboard-server',
+      script: './pushScheduler.js',
+      namespace: 'push-server',
       instance_var: 'INSTANCE_ID',
       version: '1.0.0',
       instances: 1,

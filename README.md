@@ -106,18 +106,15 @@ TEAM: Hyeeyoung
 - `passport`, `passport-local`, `passport-jwt`, `jsonwebtoken` : 회원가입 및 로그인 서비스 이용과 jwt 생성을 하여 클라이언트와 작업 시 사용
 - `dotenv` : 중요 비밀 정보 파일 저장을 위해 사용
 - `morgan`, `winston`, `winston-daily-rotate-file` : http 요청에 따른 log 파일 저장을 위해 사용
-- `firebase-admin` : 푸쉬 알림 서비스를 위해 firebase FCM cloud messaging 서비스 이용을 위해 사용
-- `node-schedule` : 푸쉬 알림 배치 작업을 위해 사용. _추후 회원 정보 탈퇴 배치 시에도 사용 될 예정_
+- `node-schedule` : 회원 정보 탈퇴 배치 시에도 사용 될 예정
 - `node-mailer` : 비밀번호 없이 로그인 시 이메일 인증을 위해 사용
 - `webpack` : build 파일 압축을 위해 사용
 ```json
 "dependencies": {
     "app-root-path": "^3.0.0",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.19.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "firebase-admin": "^10.0.2",
     "helmet": "^5.0.2",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
@@ -147,7 +144,6 @@ TEAM: Hyeeyoung
 📦src
 ┣ 📂config
 ┃ ┣ 📜db.js
-┃ ┣ 📜firebaseAdmin.js
 ┃ ┣ 📜passport.js
 ┃ ┣ 📜winston.js
 ┣ 📂controllers
@@ -163,7 +159,6 @@ TEAM: Hyeeyoung
 ┃ ┣ 📜auth.js
 ┃ ┣ 📜handleError.js
 ┃ ┣ 📜mailTransport.js
-┃ ┣ 📜notiScheduler.js
 ┣ 📂models
 ┃ ┣ 📜cart.js
 ┃ ┣ 📜folder.js
@@ -171,6 +166,7 @@ TEAM: Hyeeyoung
 ┃ ┣ 📜noti.js
 ┃ ┣ 📜user.js
 ┣ 📂routes
+┃ ┣ 📜index.js
 ┃ ┣ 📜authRoutes.js
 ┃ ┣ 📜cartRoutes.js
 ┃ ┣ 📜folderRoutes.js
@@ -179,8 +175,6 @@ TEAM: Hyeeyoung
 ┃ ┣ 📜userRoutes.js
 ┣ 📂utils
 ┃ ┣ 📜errors.js
-┃ ┣ 📜notiPushMessage.js
-┃ ┣ 📜notiType.js
 ┃ ┣ 📜response.js
 ┃ ┣ 📜sendMailMessage.js
 ┃ ┣ 📜strings.js
@@ -190,6 +184,7 @@ TEAM: Hyeeyoung
 ┃ 📜pacakge.json
 ┃ 📜pacakge-lock.json
 ┃ 📜webpack.config.js
+┃ 📜ecosystem.config.js
 ```
 
 <br>

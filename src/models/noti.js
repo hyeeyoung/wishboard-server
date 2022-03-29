@@ -1,7 +1,6 @@
 const pool = require('../config/db');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
-const { generateNotiItem } = require('../dto/notiResponse');
 const { Strings } = require('../utils/strings');
 
 module.exports = {
@@ -136,22 +135,5 @@ module.exports = {
     connection.release();
 
     return rows.affectedRows < 1 ? false : true;
-  },
-  selectNotiFrom30minAgo: async function () {
-    const sqlSelect = `SELECT n.item_notification_type, n.user_id, u.fcm_token FROM notifications n
-    INNER JOIN users u ON n.user_id = u.user_id
-    WHERE TO_SECONDS(n.item_notification_date) = (TO_SECONDS(NOW()) + 1800)
-    AND u.push_state = true`;
-
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect);
-    connection.release();
-
-    if (Array.isArray(rows) && !rows.length) {
-      throw new NotFound(ErrorMessage.notiTodayNotFound);
-    }
-
-    const notiList = generateNotiItem(rows);
-    return notiList;
   },
 };
