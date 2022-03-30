@@ -34,14 +34,14 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   process.send('ready');
   logger.info(`[API Server] on port ${port} | ${nodeEnv}`);
 });
 
 process.on('SIGINT', function () {
   isDisableKeepAlive = true;
-  app.close(function () {
+  server.close(function () {
     logger.info('pm2 process closed');
     process.exit(0);
   });
