@@ -52,6 +52,8 @@ jobs:
           echo WISHBOARD_GMAIL_PW=${{ secrets.WISHBOARD_GMAIL_PW }} >> .env
           
           echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+
+          echo SLACK_API_TOKEN=${{ secrets.SLACK_API_TOKEN }} >> .env
         
         # CI 통과 시 build하여 server.js 파일 생성
       - name: Run build (main <- dev)
