@@ -33,6 +33,9 @@ module.exports = {
       'process.env.WISHBOARD_GMAIL_PW': JSON.stringify(
         process.env.WISHBOARD_GMAIL_PW,
       ),
+      'process.env.SLACK_API_TOKEN': JSON.stringify(
+        process.env.SLACK_API_TOKEN,
+      ),
     }),
   ],
   stats: {
