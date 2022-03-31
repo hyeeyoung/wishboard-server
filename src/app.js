@@ -1,52 +1,66 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const bodyParser = require("body-parser"); // @brief bodyParse : 요청의 본문에 있는 데이터를 해석해서 req.body 객체로 만들어주는 미들웨어
-const path = require("path");
-const port = 3000;
+const helmet = require('helmet');
+const hpp = require('hpp');
+const morgan = require('morgan');
+const logger = require('./config/winston');
+require('dotenv').config({ path: '../.env' });
+const port = process.env.PORT;
+const nodeEnv = process.env.NODE_ENV;
 
-//기본 설정
-app.listen(port, () =>
-  console.log(`Example app listening at http://localhost:${port}`)
-);
+const passport = require('passport');
+const passportConfig = require('./config/passport');
 
-app.get("/", (req, res) => res.send("Welcome to WishBoard!!"));
+const handleErrors = require('./middleware/handleError');
+const { NotFound } = require('./utils/errors');
+const { ErrorMessage } = require('./utils/response');
 
-app.set("port", port || 3000);
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
+/** 기본 설정 */
+// 서버 환경에 따라 다르게 설정 (배포/개발)
+app.use(helmet());
+app.use(hpp());
+if (nodeEnv === 'production') {
+  morganFormat = 'combined'; // Apache 표준
+} else {
+  morganFormat = 'dev';
+}
+app.use(morgan(morganFormat, { stream: logger.stream }));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-app.use(express.static(path.join(__dirname, "public")));
-
-//router 설정
-const userRouter = require("./routes/userRoutes");
-const itemRouter = require("./routes/itemRoutes");
-const cartRouter = require("./routes/cartRoutes");
-const folderRouter = require("./routes/folderRoutes");
-const notiRouter = require("./routes/notiRoutes");
-app.use("/user", userRouter);
-app.use("/item", itemRouter);
-app.use("/cart", cartRouter);
-app.use("/folder", folderRouter);
-app.use("/noti", notiRouter);
-
-//에러페이지 설정
+let isDisableKeepAlive = false;
 app.use(function (req, res, next) {
-  var err = new Error("Not Found");
-  err.status = 404;
-  next(err);
+  if (isDisableKeepAlive) {
+    res.set('Connection', 'close');
+  }
+  next();
 });
 
-app.use(function (err, req, res, next) {
-  // @brief set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // @brief render the error page
-  res.status(err.status || 500);
-  res.render("error");
+const server = app.listen(port, () => {
+  process.send('ready');
+  logger.info(`[API Server] on port ${port} | ${nodeEnv}`);
 });
+
+process.on('SIGINT', function () {
+  isDisableKeepAlive = true;
+  server.close(function () {
+    logger.info('pm2 process closed');
+    process.exit(0);
+  });
+});
+
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+/** passport 설정 */
+app.use(passport.initialize());
+passportConfig();
+
+/** router 설정 */
+app.use(require('./routes/index'));
+
+/** 에러페이지 설정 */
+app.use((req, res, next) => {
+  throw new NotFound(ErrorMessage.ApiUrlIsInvalid);
+});
+app.use(handleErrors);
 
 module.exports = app;

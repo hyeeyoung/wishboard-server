@@ -1,64 +1,116 @@
-const User = require("../models/user");
-const bcrypt = require("bcryptjs");
+const User = require('../models/user');
+const { BadRequest } = require('../utils/errors');
+const {
+  StatusCode,
+  SuccessMessage,
+  ErrorMessage,
+} = require('../utils/response');
 
 module.exports = {
-  userSignUp: async function (req, res) {
-    await User.signUp(req)
-      .then((result) => {
-        console.log(result);
-        res.status(200).json({
+  unActiveUserOne: async function (req, res, next) {
+    try {
+      await User.unActiveUserOne(req).then(() => {
+        res.status(StatusCode.OK).json({
           success: true,
-          message: "wishboard 회원가입을 성공했습니다.",
+          message: SuccessMessage.userActiveUpdate,
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  updateUserInfo: async function (req, res, next) {
+    try {
+      if (!req.body.nickname && !req.body.profile_img) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+
+      const isValidate = await User.validateNickname(req);
+
+      if (!isValidate) {
+        if (req.body.nickname && !req.body.profile_img) {
+          await User.updateNickname(req).then(() => {
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: SuccessMessage.userNickNameUpdate,
+            });
+          });
+        } else if (req.body.nickname && req.body.profile_img) {
+          await User.updateInfo(req).then(() => {
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: SuccessMessage.userInfoUpdate,
+            });
+          });
+        }
+      } else {
+        if (req.body.profile_img) {
+          await User.updateImage(req).then(() => {
+            res.status(StatusCode.OK).json({
+              success: true,
+              message: SuccessMessage.userProfileImgUpdate,
+            });
+          });
+        }
+      }
+    } catch (err) {
+      next(err);
+    }
+  },
+  updateUserFCMToken: async function (req, res, next) {
+    await User.updateFCM(req)
+      .then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.userFcmTokenUpdate,
         });
       })
       .catch((err) => {
-        if (err.code == "ER_DUP_ENTRY") {
-          res.status(400).json({
-            success: false,
-            message: "이미 존재하는 아이디 입니다.",
-          });
-        } else {
-          res.status(404).json({
-            success: false,
-            message: "wish board 앱 회원가입 실패",
-          });
-        }
+        next(err);
       });
   },
-
-  userSignIn: async function (req, res) {
-    await User.signIn(req)
+  selectUserInfo: async function (req, res, next) {
+    await User.selectInfo(req)
       .then((result) => {
-        console.log(result);
-        if (result.length === 0)
-          res.status(404).json({
-            success: false,
-            message: "존재하지 않는 이메일입니다.",
+        res.status(StatusCode.OK).json(result);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  },
+  updateUserPassword: async function (req, res, next) {
+    try {
+      if (!req.body.email || !req.body.password) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await User.updatePasswrod(req).then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.userPasswordUpdate,
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  updateUserPushState: async function (req, res, next) {
+    const pushState = req.params.push === 'true' ? true : false;
+    await User.updatePushState(req, pushState)
+      .then(() => {
+        if (pushState) {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.notiPushServiceStart,
           });
-        else {
-          if (!bcrypt.compareSync(req.body.password, result[0].password))
-            res.status(404).json({
-              success: false,
-              message: "비밀번호가 일치하지 않습니다.",
-            });
-          else
-            res.status(200).json({
-              success: true,
-              message: "wish board 앱 로그인 성공",
-              data: {
-                user_id: result[0].user_id,
-                email: result[0].email,
-              },
-            });
+        } else {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.notiPushServiceExit,
+          });
         }
       })
       .catch((err) => {
-        res.status(500).json({
-          success: false,
-          message: "wishboard 서버 에러",
-        });
-        console.log(err);
-        throw err;
+        next(err);
       });
   },
 };

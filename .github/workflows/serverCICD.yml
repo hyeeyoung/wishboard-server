@@ -1,0 +1,112 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: ServerCICD
+on:
+  push:
+  pull_request:
+    branches: 
+      - main
+      - dev
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.13.2] # 개발환경과 동일하게 맞춤
+        
+    steps:
+      # 브랜치에 checkout해 코드를 가져온다
+      - name: Checkout source code. 
+        uses: actions/checkout@v2
+        
+      # node 설치 및 버전 확인한다.
+      - name: Node.js ${{ matrix.node-version }} install
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Check Npm -v
+        run: npm -v 
+
+        # npm ci를 통해 npm install 진행
+      - name: Npm CI
+        run: npm ci
+        
+        #lint 통과 확인
+      - name: Check ESLint
+        run: npm run lint
+      
+        # .env 파일 생성
+      - name : Create .env file
+        run : |
+          touch .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_USER=${{ secrets.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo DB_NAME=${{ secrets.DB_NAME }} >> .env
+          
+          echo WISHBOARD_GMAIL_ID=${{ secrets.WISHBOARD_GMAIL_ID }} >> .env
+          echo WISHBOARD_GMAIL_PW=${{ secrets.WISHBOARD_GMAIL_PW }} >> .env
+          
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+
+          echo SLACK_API_TOKEN=${{ secrets.SLACK_API_TOKEN }} >> .env
+        
+        # CI 통과 시 build하여 server.js 파일 생성
+      - name: Run build (main <- dev)
+        if: ${{ github.ref == 'refs/heads/main' }} 
+        run: |
+          echo NODE_ENV="production" >> .env
+          npm run build:production --if-present
+        
+      - name: Run build (dev <- *)
+        run: |
+          echo NODE_ENV="development" >> .env
+          npm run build --if-present
+
+      - name: Copy ecosystem.config.js
+        run: |
+          cp ./ecosystem.config.js ./dist
+
+      - name: Sharing files between jobs.
+        uses: actions/upload-artifact@v1
+        with:
+          name: dist
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:  
+      # build job에서 빌드한 파일(./dist/server.js) 가져오기
+      - name: Sharing files between jobs.
+        uses: actions/download-artifact@v1
+        with:
+          name: dist
+      # aws s3에 빌드 파일 저장
+      # ** 파일 이름이 동일해서 알아서 덮임
+      - name : Build file upload to S3 and PM2 script
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 cp \
+            --recursive \
+            --region ap-northeast-2 \
+            dist s3://wishboard-server-build
+        # ** time out 문제로 우선 주석처리 후 직접 진행으로 변경    
+      # # aws ec2에 접속
+      # - name : Connect and Build file download to EC2 and PM2 script
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     key: ${{ secrets.AWS_EC2_SSH_KEY }}
+      #     host: ${{ secrets.AWS_HOST }}
+      #     username: ${{ secrets.AWS_USRENAME }}
+      #     script: |
+      #       pwd
+      #       cd ./wishboard-server-product
+      #       ./pm2-deploy.sh
+        

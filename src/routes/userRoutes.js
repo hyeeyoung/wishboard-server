@@ -1,8 +1,16 @@
-const userController = require("../controllers/userController");
-var router = require("express").Router();
+const userController = require('../controllers/userController');
+const { verifyToken } = require('../middleware/auth');
+const express = require('express');
+const router = new express.Router();
 
-router.post("/signup", userController.userSignUp);
-router.post("/signin", userController.userSignIn);
-//@todo : 유저 삭제에 대한 api 추가하긴
+router.put('/active', verifyToken, userController.unActiveUserOne);
+router.put('/', verifyToken, userController.updateUserInfo);
+router.put('/fcm', verifyToken, userController.updateUserFCMToken);
+router.put(
+  '/push-state/:push',
+  verifyToken,
+  userController.updateUserPushState,
+);
+router.get('/', verifyToken, userController.selectUserInfo);
 
 module.exports = router;

@@ -1,33 +1,33 @@
-const pool = require("../config/db");
+const { NotFound } = require('../utils/errors');
+const { ErrorMessage } = require('../utils/response');
+const pool = require('../config/db');
 
 module.exports = {
   insertItem: async function (req) {
-    var userId = Number(req.body.user_id);
-    var folderId = req.body.folder_id;
+    const userId = Number(req.decoded);
+    let folderId = req.body.folder_id;
 
     if (folderId != undefined) {
       folderId = Number(req.body.folder_id);
     }
-    var itemImage = req.body.item_image;
-    var itemName = req.body.item_name;
-    var itemPrice = req.body.item_price;
-    var itemUrl = req.body.item_url;
-    var itemMemo = req.body.item_memo;
+    const itemImg = req.body.item_img;
+    const itemName = req.body.item_name;
+    const itemPrice = !req.body.item_price ? 0 : req.body.item_price;
+    const itemUrl = req.body.item_url;
+    const itemMemo = req.body.item_memo;
 
-    var sqlInsert =
-      "INSERT INTO items (user_id, folder_id, item_image, item_name, item_price, item_url, item_memo) VALUES(?,?,?,?,?,?,?)";
+    const sqlInsert =
+      'INSERT INTO items (user_id, folder_id, item_img, item_name, item_price, item_url, item_memo) VALUES(?,?,?,?,?,?,?)';
 
-    var params = [
+    const params = [
       userId,
       folderId,
-      itemImage,
+      itemImg,
       itemName,
       itemPrice,
       itemUrl,
       itemMemo,
     ];
-
-    console.log("sqlInsert : " + sqlInsert);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -36,55 +36,83 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.itemInsertError);
+    }
+    return Number(rows.insertId);
   },
   selectItems: async function (req) {
-    var userId = Number(req.params.user_id);
-    var sqlSelect =
-      "SELECT i.item_id, i.user_id, i.folder_id, i.item_image, i.item_name, i.item_price, i.item_url, i.item_memo, b.item_id cart_item_id FROM items i left outer join cart b on i.item_id = b.item_id WHERE i.user_id = ? ORDER BY i.create_at DESC";
+    const userId = Number(req.decoded);
 
-    console.log("sqlSelect : " + sqlSelect + "\nuser_id : " + userId);
+    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
+    FROM items i LEFT OUTER JOIN notifications n 
+    ON i.item_id = n.item_id  
+    LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
+    ON i.folder_id = f.folder_id 
+    LEFT OUTER JOIN cart c
+    on i.item_id = c.item_id 
+    WHERE i.user_id = ? ORDER BY i.create_at DESC`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, [userId]);
     connection.release();
-    return rows;
-  },
-  selectItemsDetail: async function (req) {
-    var itemId = Number(req.params.item_id);
-    console.log("item_id : " + itemId);
 
-    //요청한 아이템 아이디로 서버에서 해당 item과 folder_name을 select
-    var sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_image, i.item_name, i.item_price, i.item_url, i.item_memo, CAST(i.create_at AS CHAR(10)) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date FROM items i LEFT OUTER JOIN notification n ON i.item_id = n.item_id  LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f ON i.folder_id = f.folder_id WHERE i.item_id = ?;`;
-    //var temp_sql_select = "SELECT i.folder_id, i.item_image, i.item_name, i.item_price, i.item_url, i.item_memo, CAST(i.create_at AS CHAR(10)) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date FROM items i LEFT OUTER JOIN notification n ON i.item_id = n.item_id WHERE i.item_id = ?";
-    console.log("sqlSelect : " + sqlSelect + "itemId : " + itemId);
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.itemNotFound);
+    }
+    return Object.setPrototypeOf(rows, []);
+  },
+  selectItemOneLatest: async function (req) {
+    const userId = Number(req.decoded);
+
+    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
+    FROM items i LEFT OUTER JOIN notifications n 
+    ON i.item_id = n.item_id  
+    LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
+    ON i.folder_id = f.folder_id 
+    LEFT OUTER JOIN cart c
+    on i.item_id = c.item_id 
+    WHERE i.user_id = ? ORDER BY i.create_at DESC LIMIT 1`;
 
     const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, [itemId]);
+    const [rows] = await connection.query(sqlSelect, [userId]);
     connection.release();
-    return rows;
-  },
-  updateItemsDetail: async function (req) {
-    var itemId = Number(req.params.item_id);
-    var folderId = Number(req.body.folder_id);
-    var itemName = req.body.item_name;
-    var itemImage = req.body.item_image;
-    var itemPrice = req.body.item_price;
-    var itemUrl = req.body.item_url;
-    var itemMemo = req.body.item_memo;
 
-    var sqlUpdate =
-      "UPDATE items SET folder_id = ?, item_name = ?, item_image = ?, item_price = ?, item_url = ?, item_memo = ? WHERE item_id = ?";
-    var params = [
-      folderId,
-      itemName,
-      itemImage,
-      itemPrice,
-      itemUrl,
-      itemMemo,
-      itemId,
-    ];
-    console.log("sqlUpdate : " + sqlUpdate + "\nitem_id : " + itemId);
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.itemLatestNotFound);
+    }
+    return Object.setPrototypeOf(rows, []);
+  },
+  updateItem: async function (req) {
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const itemName = req.body.item_name;
+    const itemImg = req.body.item_img;
+    const itemPrice = !req.body.item_price ? 0 : Number(req.body.item_price);
+    const itemUrl = req.body.item_url;
+    const itemMemo = req.body.item_memo;
+    const folderId = Number(req.body.folder_id);
+
+    let sqlUpdate =
+      'UPDATE items SET item_name = ?, item_price = ?, item_url = ?, item_memo = ?';
+    const params = [itemName, itemPrice, itemUrl, itemMemo];
+
+    // 아이템이미지 있을 경우에만 동작
+    if (itemImg) {
+      sqlUpdate += ', item_img = ?';
+      params.push(itemImg);
+    }
+    // 폴더id가 있을 경우에만 동작
+    if (folderId) {
+      sqlUpdate += ', folder_id = ?';
+      params.push(folderId);
+    }
+    sqlUpdate += ' WHERE item_id = ? AND user_id = ?';
+    params.push(itemId);
+    params.push(userId);
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -93,21 +121,29 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
-  },
-  deleteItems: async function (req) {
-    var itemId = Number(req.body.item_id);
-    var sqlDelete = "DELETE FROM items WHERE item_id = ?";
 
-    console.log("sql_delete : " + sqlDelete + "itemId : " + itemId);
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.itemUpdateError);
+    }
+    return true;
+  },
+  deleteItem: async function (req) {
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const sqlDelete = 'DELETE FROM items WHERE item_id = ? AND user_id = ?';
+    const params = [itemId, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
     const [rows] = await connection
-      .query(sqlDelete, [itemId])
+      .query(sqlDelete, params)
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.itemDeleteError);
+    }
+    return true;
   },
 };

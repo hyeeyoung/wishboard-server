@@ -1,0 +1,33 @@
+{
+    "env": {
+        "node": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "extends": [
+        "google",
+        "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "rules": {
+        "camelCase" : "off",
+        "prettier/prettier": "error",
+        "no-unused-vars": "warn",
+        "no-bitwise": "off",
+        "require-jsdoc":[ "error", {
+            "require": {
+                "FunctionDeclaration": false,
+                "MethodDefinition": false,
+                "ClassDeclaration": false,
+                "ArrowFunctionExpression": false,
+                "FunctionExpression": false
+            }
+        }]
+    },
+    "ignorePatterns": [
+        "node_modules/"
+    ]
+}

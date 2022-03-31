@@ -1,12 +1,17 @@
-const folderController = require("../controllers/folderController");
-var router = require("express").Router();
+const folderController = require('../controllers/folderController');
+const { verifyToken } = require('../middleware/auth');
+const express = require('express');
+const router = new express.Router();
 
-router.get("/:user_id", folderController.selectFolderInfo);
-router.get("/list/:user_id", folderController.selectFolderList);
-router.get("/item/:user_id/:folder_id", folderController.selectFolderItemInfo);
-router.post("/", folderController.insertFolder);
-router.put("/", folderController.updateFolder);
-router.put("/item/image", folderController.updateFolderImage);
-router.delete("/", folderController.deleteFolder);
+router.get('/', verifyToken, folderController.selectFolderInfo);
+router.get('/list', verifyToken, folderController.selectFolderList);
+router.get(
+  '/item/:folder_id',
+  verifyToken,
+  folderController.selectFolderItemInfo,
+);
+router.post('/', verifyToken, folderController.insertFolder);
+router.put('/:folder_id', verifyToken, folderController.updateFolder);
+router.delete('/:folder_id', verifyToken, folderController.deleteFolder);
 
 module.exports = router;

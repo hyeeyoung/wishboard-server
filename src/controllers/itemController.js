@@ -1,115 +1,124 @@
-const Items = require("../models/item");
+const Items = require('../models/item');
+const Noti = require('../models/noti');
+const { BadRequest } = require('../utils/errors');
+const {
+  StatusCode,
+  SuccessMessage,
+  ErrorMessage,
+} = require('../utils/response');
+const { Strings } = require('../utils/strings');
 
 module.exports = {
-  insertItemInfo: async function (req, res) {
-    if (!req.body.item_image) {
-      return res.status(400).json({
-        success: false,
-        message: "이미지 정보가 없습니다",
-      });
-    }
+  insertItemInfo: async function (req, res, next) {
+    try {
+      if (!req.body.item_name) {
+        throw new BadRequest(ErrorMessage.itemNameMiss);
+      }
 
-    await Items.insertItem(req)
-      .then((result) => {
-        res.status(200).json({
-          success: true,
-          data: result.insertId,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
+      await Items.insertItem(req).then((itemId) => {
+        if (
+          req.body.item_notification_date &&
+          req.body.item_notification_type
+        ) {
+          Noti.insertNoti(req, itemId).then(() => {
+            return res.status(StatusCode.CREATED).json({
+              success: true,
+              message: SuccessMessage.itemAndNotiInsert,
+            });
+          });
+        } else {
+          return res.status(StatusCode.CREATED).json({
+            success: true,
+            message: SuccessMessage.itemInsert,
+          });
+        }
       });
+    } catch (err) {
+      next(err);
+    }
   },
-  selectHomeItemInfo: async function (req, res) {
+  selectItemInfo: async function (req, res, next) {
     await Items.selectItems(req)
       .then((result) => {
-        if (result.length === 0) {
-          res.status(404).json({
-            success: false,
-            message: "아이템 정보가 없습니다.",
-          });
-        } else {
-          console.log("rows : " + JSON.stringify(result));
-          res.status(200).json(result);
-        }
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wishboard 서버 에러",
-        });
+        next(err);
       });
   },
-  selectItemDetailInfo: async function (req, res) {
-    await Items.selectItemsDetail(req)
+  selectItemLatest: async function (req, res, next) {
+    await Items.selectItemOneLatest(req)
       .then((result) => {
-        if (result.length > 0) {
-          console.log("rows : " + JSON.stringify(result));
-          res.status(200).json(result[0]);
-        } else {
-          res.status(404).json({
-            success: false,
-            message: "아이템 정보가 없습니다.",
-          });
-        }
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wishboard 서버 에러",
-        });
+        next(err);
       });
   },
-  updateItemDetailInfo: async function (req, res) {
-    await Items.updateItemsDetail(req)
-      .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to updated the items for data.");
-          res.status(400).json({
-            success: false,
-            message: "수정한 아이템이 없습니다.",
+  updateItemInfo: async function (req, res, next) {
+    try {
+      if (!req.body.item_name) {
+        throw new BadRequest(ErrorMessage.itemNameMiss);
+      }
+
+      await Items.updateItem(req).then(() => {
+        if (
+          req.body.item_notification_date &&
+          req.body.item_notification_type
+        ) {
+          //* item 수정 후 item_noti_~에 따라 알림여부를 noti에 수정/추가
+          Noti.upsertNoti(req).then((state) => {
+            if (state === Strings.INSERT) {
+              return res.status(StatusCode.CREATED).json({
+                success: true,
+                message: SuccessMessage.itemUpdateAndNotiInsert,
+              });
+            }
+
+            if (state === Strings.UPSERT) {
+              return res.status(StatusCode.OK).json({
+                success: true,
+                message: SuccessMessage.itemAndNotiUpdate,
+              });
+            }
           });
         } else {
-          console.log("Successfully updated data into the items!!");
-          res.status(200).json({
+          //* item 수정 후 item_noti_~가 null인 경우, noti에 존재하면 삭제
+          Noti.deleteNoti(req).then((result) => {
+            if (result) {
+              return res.status(StatusCode.OK).json({
+                success: true,
+                message: SuccessMessage.itemUpdateAndNotiDelete,
+              });
+            } else {
+              //* 아이템만 수정
+              return res.status(StatusCode.OK).json({
+                success: true,
+                message: SuccessMessage.itemUpdate,
+              });
+            }
+          });
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  deleteItemInfo: async function (req, res, next) {
+    try {
+      if (!req.params.item_id) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Items.deleteItem(req).then((result) => {
+        if (result) {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "아이템 수정 성공",
+            message: SuccessMessage.itemAndNotiDelete,
           });
         }
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
       });
-  },
-  deleteItemDetailInfo: async function (req, res) {
-    await Items.deleteItems(req)
-      .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to deleted the items for data.");
-          res.status(400).json({
-            success: false,
-            message: "삭제할 아이템이 없습니다.",
-          });
-        } else {
-          console.log("Successfully deleted data into the items!!");
-          res.status(200).json({
-            success: true,
-            message: "아이템 삭제 성공",
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
-      });
+    } catch (err) {
+      next(err);
+    }
   },
 };

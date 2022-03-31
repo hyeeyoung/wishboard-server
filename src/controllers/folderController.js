@@ -1,173 +1,88 @@
-const Folders = require("../models/folder");
+const Folders = require('../models/folder');
+const { BadRequest } = require('../utils/errors');
+const {
+  StatusCode,
+  SuccessMessage,
+  ErrorMessage,
+} = require('../utils/response');
 
 module.exports = {
-  selectFolderInfo: async function (req, res) {
+  selectFolderInfo: async function (req, res, next) {
     await Folders.selectFolder(req)
       .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to selected the folders for data.");
-          res.status(404).json({
-            success: false,
-            message: "폴더 정보가 없습니다.",
-          });
-        } else {
-          console.log("Successfully selected data into the folders!!");
-          res.status(200).json(result);
-          console.log(result);
-        }
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
+        next(err);
       });
   },
-  selectFolderList: async function (req, res) {
+  selectFolderList: async function (req, res, next) {
     await Folders.selectFolderList(req)
       .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to selected the folder list");
-          res.status(404).json({
-            success: false,
-            message: "폴더 리스트 정보가 없습니다.",
-          });
-        } else {
-          console.log("Successfully selected data into the folders list!!");
-          res.status(200).json(result);
-          console.log(result);
-        }
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
+        next(err);
       });
   },
-  selectFolderItemInfo: async function (req, res) {
+  selectFolderItemInfo: async function (req, res, next) {
     await Folders.selectFolderItems(req)
       .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to selected the folders for data.");
-          res.status(404).json({
-            success: false,
-            message: "폴더 내 아이템 정보가 없습니다.",
-          });
-        } else {
-          console.log("Successfully selected data into the folders list!!");
-          res.status(200).json(result);
-          console.log(result);
-        }
+        res.status(StatusCode.OK).json(result);
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
+        next(err);
       });
   },
-  insertFolder: async function (req, res) {
-    await Folders.insertFolder(req)
-      .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to inserted the folders for data.");
-          res.status(404).json({
-            success: false,
-            message: "폴더를 추가할 수 없습니다.",
-          });
-        } else {
-          console.log("Successfully inserted data into the folders list!!");
-          res.status(200).json({
+  insertFolder: async function (req, res, next) {
+    try {
+      if (!req.body.folder_name) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      const isVaildate = await Folders.validateFolder(req);
+
+      if (!isVaildate) {
+        await Folders.insertFolder(req).then((result) => {
+          res.status(StatusCode.CREATED).json({
             success: true,
-            message: "폴더 데이터베이스 추가 성공",
+            message: SuccessMessage.folderInsert,
+            data: { result },
           });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
         });
-      });
+      }
+    } catch (err) {
+      next(err);
+    }
   },
-  updateFolder: async function (req, res) {
-    await Folders.updateFolder(req)
-      .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to updated the folders for data.");
-          res.status(404).json({
-            success: false,
-            message: "폴더명을 수정할 수 없습니다.",
-          });
-        } else {
-          console.log("Successfully updated data into the folders!!");
-          res.status(200).json({
+  updateFolder: async function (req, res, next) {
+    try {
+      if (!req.body.folder_name) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      const isValidate = await Folders.validateFolder(req);
+
+      if (!isValidate) {
+        await Folders.updateFolder(req).then(() => {
+          res.status(StatusCode.OK).json({
             success: true,
-            message: "폴더명 수정 성공",
+            message: SuccessMessage.folderNameUpdate,
           });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
         });
-      });
+      }
+    } catch (err) {
+      next(err);
+    }
   },
-  updateFolderImage: async function (req, res) {
-    await Folders.updateFolderImage(req)
-      .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to inserted the folders image.");
-          res.status(404).json({
-            success: false,
-            message: "폴더 이미지 수정할 수 없습니다.",
-          });
-        } else {
-          console.log("Successfully updated into the folders image!!");
-          res.status(200).json({
-            success: true,
-            message: "폴더 이미지 수정 성공",
-          });
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
-      });
-  },
-  deleteFolder: async function (req, res) {
+  deleteFolder: async function (req, res, next) {
     await Folders.deleteFolder(req)
-      .then((result) => {
-        if (result.length === 0) {
-          console.log("Failed to deleted the folders for data.");
-          res.status(404).json({
-            success: false,
-            message: "폴더를 삭제할 수 없습니다.",
-          });
-        } else {
-          console.log("Successfully deleted data into the folders!!");
-          res.status(200).json({
-            success: true,
-            message: "폴더 삭제 성공",
-          });
-        }
+      .then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.folderDelete,
+        });
       })
       .catch((err) => {
-        console.log(err);
-        res.status(500).json({
-          success: false,
-          message: "wish boarad 서버 에러",
-        });
+        next(err);
       });
   },
 };

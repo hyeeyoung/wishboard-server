@@ -1,29 +1,42 @@
-// const conn = require("../config/db");
-const pool = require("../config/db");
+const pool = require('../config/db');
+const { CartItem } = require('../dto/cartResponse');
+const { NotFound } = require('../utils/errors');
+const { ErrorMessage } = require('../utils/response');
 
 module.exports = {
   selectCart: async function (req) {
-    var userId = Number(req.params.user_id);
+    const userId = Number(req.decoded);
 
-    var sqlSelect =
-      "SELECT a.item_id, a.item_image, a.item_name, a.item_price, b.item_count FROM items a JOIN cart b ON a.item_id = b.item_id WHERE b.user_id = ? ORDER BY a.item_id DESC";
-
-    console.log("sqlSelect : " + sqlSelect);
+    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state, c.item_count item_count
+    FROM items i LEFT OUTER JOIN notifications n 
+    ON i.item_id = n.item_id  
+    LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
+    ON i.folder_id = f.folder_id 
+    INNER JOIN cart c
+    on i.item_id = c.item_id 
+    WHERE i.user_id = ? ORDER BY c.create_at DESC;`;
 
     const connection = await pool.connection(async (conn) => conn);
     const [rows] = await connection.query(sqlSelect, userId);
     connection.release();
-    return rows;
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.cartNotFound);
+    }
+    const cartItems = [];
+    rows.forEach((row) => {
+      cartItems.push(new CartItem().convertToCartItem(row));
+    });
+    return cartItems;
   },
   insertCart: async function (req) {
-    var userId = Number(req.body.user_id);
-    var itemId = Number(req.body.item_id);
+    const userId = Number(req.decoded);
+    const itemId = Number(req.body.item_id);
 
-    var sqlInsert =
-      "INSERT INTO cart (user_id, item_id, item_count) VALUES (?, ?, 1)";
-    var params = [userId, itemId];
-
-    console.log("sqlInsert : " + sqlInsert);
+    const sqlInsert =
+      'INSERT INTO cart (user_id, item_id, item_count) VALUES (?, ?, 1)';
+    const params = [userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -32,35 +45,19 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.cartInsertError);
+    }
+    return true;
   },
   updateCart: async function (req) {
-    for (var i = 0; i < req.body.length; i++) {
-      console.log(
-        req.body[i].user_id +
-          " " +
-          req.body[i].item_id +
-          " " +
-          req.body[i].item_count +
-          " "
-      );
-    }
-    var userId = req.body[0].user_id; // @prams: user_id는 한 명이므로
-    var sqlUpdate = "UPDATE cart SET item_count = CASE ";
-    var params = [];
-
-    for (var i = 0; i < req.body.length; i++) {
-      sqlUpdate += "WHEN item_id = ? then ? ";
-      params.push(req.body[i].item_id);
-      params.push(req.body[i].item_count);
-      if (i == req.body.length - 1) {
-        //마지막 원소라면
-        sqlUpdate += "ELSE item_count END WHERE user_id = ?";
-        params.push(userId);
-      }
-    }
-
-    console.log("sqlUpdate : " + sqlUpdate + "\nparams : " + params);
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const itemCount = Number(req.body.item_count);
+    const sqlUpdate =
+      'UPDATE cart SET item_count = ? WHERE item_id = ? AND user_id = ?';
+    const params = [itemCount, itemId, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -69,16 +66,18 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.cartUpdateError);
+    }
+    return true;
   },
   deleteCart: async function (req) {
-    var userId = Number(req.body.user_id);
-    var itemId = Number(req.body.item_id);
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
 
-    var sqlDelete = "DELETE FROM cart WHERE user_id = ? AND item_id = ?";
-    var params = [userId, itemId];
-
-    console.log("sqlDelete : " + sqlDelete + "\nparams : " + params);
+    const sqlDelete = 'DELETE FROM cart WHERE user_id = ? AND item_id = ?';
+    const params = [userId, itemId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -87,6 +86,10 @@ module.exports = {
       .then(await connection.commit())
       .catch(await connection.rollback());
     connection.release();
-    return rows;
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.cartDeleteError);
+    }
+    return true;
   },
 };
