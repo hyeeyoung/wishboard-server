@@ -99,7 +99,7 @@ TEAM: Hyeeyoung
 ![image](https://user-images.githubusercontent.com/68772751/157206413-62111af6-dc6e-4865-8ae5-7f9cd542f272.png)
 
 ## Architecture
-![image](https://user-images.githubusercontent.com/68772751/157170506-ac498a6a-afb0-44cd-a865-aa1ca5daed23.png)
+![wishboard 서버 아키텍처](https://user-images.githubusercontent.com/68772751/161036877-e8da7a6f-2df1-428a-81c9-db4be316229d.png)
 
 ## Dependencies module
 - `bcrpytjs` : 회원 정보 저장 시 비밀번호 암호화를 위해 사용
