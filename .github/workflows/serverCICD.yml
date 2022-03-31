@@ -57,13 +57,13 @@ jobs:
         
         # CI 통과 시 build하여 server.js 파일 생성
       - name: Run build (main <- dev)
-        if: ${{ github.ref == 'refs/heads/main' }} 
+        if: github.base_ref == 'main'
         run: |
           echo NODE_ENV="production" >> .env
           npm run build:production --if-present
         
       - name: Run build (dev <- *)
-        if: ${{ github.ref == 'refs/heads/dev }} 
+        if: github.base_ref == 'dev'
         run: |
           echo NODE_ENV="development" >> .env
           npm run build --if-present
