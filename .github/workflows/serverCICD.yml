@@ -63,6 +63,7 @@ jobs:
           npm run build:production --if-present
         
       - name: Run build (dev <- *)
+        if: ${{ github.ref == 'refs/heads/dev }} 
         run: |
           echo NODE_ENV="development" >> .env
           npm run build --if-present
