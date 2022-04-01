@@ -49,7 +49,7 @@ module.exports = {
     CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
     FROM items i LEFT OUTER JOIN notifications n 
     ON i.item_id = n.item_id  
-    LEFT OUTER JOIN (SELECT DISTINCT folder_id, folder_name FROM folders) f 
+    LEFT OUTER JOIN (SELECT folder_id, folder_name FROM folders GROUP BY folder_id) f 
     ON i.folder_id = f.folder_id 
     LEFT OUTER JOIN cart c
     on i.item_id = c.item_id 
