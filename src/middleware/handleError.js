@@ -5,6 +5,10 @@ const Slack = require('../lib/slack');
 const handleErrors = (err, req, res, next) => {
   logger.error(err);
   if (err instanceof GeneralError) {
+    Slack.sendMessage({
+      color: Slack.Colors.info,
+      title: err,
+    });
     return res.status(err.getCode()).json({
       success: false,
       message: err.message,
