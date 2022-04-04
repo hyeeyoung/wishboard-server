@@ -71,10 +71,11 @@ jobs:
 
       - name: Sharing files between jobs.
         if: ${{ github.base_ref == 'main' }} 
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: dist
           path: ./dist
+          retention-days: 3
 
   deploy:
     needs: build
@@ -83,7 +84,7 @@ jobs:
     steps:  
       # build job에서 빌드한 파일(./dist/server.js) 가져오기
       - name: Sharing files between jobs.
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
         with:
           name: dist
       # aws s3에 빌드 파일 저장
@@ -93,6 +94,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
+          mkdir dist
+          mv ecosystem.config.js server.js server.js.LICENSE.txt ./dist
+          ls -al
           aws s3 cp \
             --recursive \
             --region ap-northeast-2 \

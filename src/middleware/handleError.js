@@ -7,7 +7,10 @@ const handleErrors = (err, req, res, next) => {
   if (err instanceof GeneralError) {
     Slack.sendMessage({
       color: Slack.Colors.info,
-      title: `${err.getCode()} ${err.message}}`,
+      title: `${err.getCode()} ${err.message}`,
+      text: `[${req.method}] ${req.url} \`\`\`user-agent: ${req.header(
+        'user-agent',
+      )} \nip-adress: ${req.ip}\`\`\``,
     });
     return res.status(err.getCode()).json({
       success: false,
