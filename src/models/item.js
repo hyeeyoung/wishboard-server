@@ -127,6 +127,28 @@ module.exports = {
     }
     return true;
   },
+  updateItemToFolder: async function (req) {
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+    const folderId = Number(req.params.folder_id);
+
+    const sqlUpdate =
+      'UPDATE items SET folder_id = ? WHERE user_id = ? AND item_id = ?';
+    const params = [folderId, userId, itemId];
+
+    const connection = await pool.connection(async (conn) => conn);
+    await connection.beginTransaction();
+    const [rows] = await connection
+      .query(sqlUpdate, params)
+      .then(await connection.commit())
+      .catch(await connection.rollback());
+    connection.release();
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.itemUpdateToFolderError);
+    }
+    return true;
+  },
   deleteItem: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);

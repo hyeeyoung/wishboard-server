@@ -18,6 +18,7 @@ const SuccessMessage = {
   itemAndNotiUpdate: '아이템 및 알림 수정 성공',
   itemUpdateAndNotiInsert: '아이템 수정 및 알림 추가 성공',
   itemUpdateAndNotiDelete: '아이템 수정 및 알림 삭제 성공',
+  itemUpdateToFolder: '아이템 폴더명 수정 성공',
 
   notiReadStateUpdate: '알림 읽음 상태 수정 성공',
 
@@ -59,6 +60,7 @@ const ErrorMessage = {
   itemDeleteError: '삭제된 아이템 없음',
   itemNotFound: '아이템 정보 없음',
   itemLatestNotFound: '최근 추가한 아이템 정보 없음',
+  itemUpdateToFolderError: '수정된 아이템 폴더명 없음',
 
   /* 장바구니*/
   cartNotFound: '장바구니 정보 없음',
