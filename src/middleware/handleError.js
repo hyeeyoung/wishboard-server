@@ -1,17 +1,23 @@
 const { GeneralError } = require('../utils/errors');
+const { ErrorMessage } = require('../utils/response');
 const logger = require('../config/winston');
 const Slack = require('../lib/slack');
 
 const handleErrors = (err, req, res, next) => {
   logger.error(err);
   if (err instanceof GeneralError) {
-    Slack.sendMessage({
-      color: Slack.Colors.info,
-      title: `${err.getCode()} ${err.message}`,
-      text: `[${req.method}] ${req.url} \`\`\`user-agent: ${req.header(
-        'user-agent',
-      )} \nip-adress: ${req.ip}\`\`\``,
-    });
+    if (
+      err.message === ErrorMessage.BadRequestMeg ||
+      err.message === ErrorMessage.ApiUrlIsInvalid
+    ) {
+      Slack.sendMessage({
+        color: Slack.Colors.info,
+        title: `${err.getCode()} ${err.message}`,
+        text: `[${req.method}] ${req.url} \`\`\`user-agent: ${req.header(
+          'user-agent',
+        )} \nip-adress: ${req.ip}\`\`\``,
+      });
+    }
     return res.status(err.getCode()).json({
       success: false,
       message: err.message,
