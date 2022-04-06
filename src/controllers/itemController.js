@@ -104,6 +104,21 @@ module.exports = {
       next(err);
     }
   },
+  updateItemToFolder: async function (req, res, next) {
+    try {
+      if (!req.params.item_id || !req.params.folder_id) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      await Items.updateItemToFolder(req).then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.itemUpdateToFolder,
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
   deleteItemInfo: async function (req, res, next) {
     try {
       if (!req.params.item_id) {
