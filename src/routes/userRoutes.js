@@ -6,6 +6,7 @@ const router = new express.Router();
 router.put('/active', verifyToken, userController.unActiveUserOne);
 router.put('/', verifyToken, userController.updateUserInfo);
 router.put('/fcm', verifyToken, userController.updateUserFCMToken);
+router.put('/re-passwd', verifyToken, userController.updateUserPassword);
 router.put(
   '/push-state/:push',
   verifyToken,

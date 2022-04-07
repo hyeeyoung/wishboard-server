@@ -214,12 +214,14 @@ module.exports = {
     return true;
   },
   updatePasswrod: async function (req) {
+    const userId = Number(req.decoded);
     const email = req.body.email;
     const password = req.body.password;
     const hashPassword = bcrypt.hashSync(password, 10);
 
-    const sqlUpdate = 'UPDATE users SET password = ? WHERE email = ?';
-    const params = [hashPassword, email];
+    const sqlUpdate =
+      'UPDATE users SET password = ? WHERE email = ? AND user_id = ?';
+    const params = [hashPassword, email, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -250,4 +252,5 @@ module.exports = {
     }
     return Object.setPrototypeOf(rows, []);
   },
+  unActiveUsersDelete: async function () {},
 };
