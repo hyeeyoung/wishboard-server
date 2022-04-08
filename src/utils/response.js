@@ -10,6 +10,7 @@ const StatusCode = {
 
 const SuccessMessage = {
   /* 아이템 및 알림*/
+  itemParse: '아이템 파싱 성공',
   itemInsert: '아이템 추가 성공',
   itemUpdate: '아이템 수정 성공',
   itemAndNotiDelete: '해당 아이템 및 알림 삭제 성공',
@@ -54,6 +55,7 @@ const SuccessMessage = {
 
 const ErrorMessage = {
   /* 아이템*/
+  itemParseFail: '아이템 파싱 실패',
   itemNameMiss: '아이템 이름 누락',
   itemUpdateError: '수정된 아이템 없음',
   itemInsertError: '추가된 아이템 없음',
