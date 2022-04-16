@@ -10,6 +10,7 @@ const StatusCode = {
 
 const SuccessMessage = {
   /* 아이템 및 알림*/
+  itemParse: '아이템 파싱 성공',
   itemInsert: '아이템 추가 성공',
   itemUpdate: '아이템 수정 성공',
   itemAndNotiDelete: '해당 아이템 및 알림 삭제 성공',
@@ -44,16 +45,21 @@ const SuccessMessage = {
   userDelete: '사용자 삭제 성공',
   userPushStateUpdate: '사용자 푸쉬 알림 여부 수정 성공',
   userPasswordUpdate: '사용자 비밀번호 수정 성공',
+  unActvieUserDelete: '매주 월요일 자정, 탈퇴 유저 삭제 성공',
 
   loginSuccessAfterSuccessSignUp: 'wishboard 회원가입 후 로그인 성공',
   loginfailedAfterSuccessSignUp: 'wishboard 회원가입 성공 후 로그인 실패',
   loginSuccess: 'wishboard 앱 로그인 성공',
   sendMailForCertifiedNumber: '비밀번호 찾기를 위한 인증번호 메일 전송 성공',
   unvalidateEmail: '회원가입이 가능한 이메일주소',
+
+  userDeleteScheudlerStart: '탈퇴 유저 삭제 스케줄러 시작',
+  userDeleteScheudlerExit: '탈퇴 유저 삭제 스케줄러 종료',
 };
 
 const ErrorMessage = {
   /* 아이템*/
+  itemParseFail: '아이템 파싱 실패',
   itemNameMiss: '아이템 이름 누락',
   itemUpdateError: '수정된 아이템 없음',
   itemInsertError: '추가된 아이템 없음',
@@ -95,6 +101,8 @@ const ErrorMessage = {
   userDeleteError: '삭제된 사용자 없음',
   userPushStateUpdateNotFound: '수정된 사용자 푸쉬 알림 여부 없음',
   userPasswordUpdateNotFound: '수정된 사용자 비밀번호 없음',
+
+  unActvieUserDelete: '매주 월요일 자정, 탈퇴 유저 삭제 실패',
 
   unActiveUser: '탈퇴 처리된 유저',
   signUpFailed: 'wishboard 앱 회원가입 실패',

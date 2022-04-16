@@ -74,24 +74,6 @@ module.exports = {
     }
     return true;
   },
-  // deleteUsers: async function (req) { //TODO 추후 유저 삭제 배치 작업 시 사용
-  //   const userId = Number(req.decoded);
-
-  //   const sqlDelete = 'DELETE FROM users WHERE is_active = false';
-
-  //   const connection = await pool.connection(async (conn) => conn);
-  //   await connection.beginTransaction();
-  //   const [rows] = await connection
-  //     .query(sqlDelete, userId)
-  //     .then(await connection.commit())
-  //     .catch(await connection.rollback());
-  //   connection.release();
-
-  //   if (rows.affectedRows < 1) {
-  //     throw new NotFound(ErrorMessage.userDeleteError);
-  //   }
-  //   return true;
-  // },
   validateNickname: async function (req) {
     if (!req.body.nickname) {
       return true;
@@ -252,5 +234,18 @@ module.exports = {
     }
     return Object.setPrototypeOf(rows, []);
   },
-  unActiveUsersDelete: async function () {},
+  unActiveUsersDelete: async function () {
+    const sqlDelete =
+      'DELETE FROM users WHERE is_active = false AND DATE(update_at) = DATE(NOW() - INTERVAL 7 DAY)';
+
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlDelete);
+    connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.unActvieUserDelete);
+    }
+
+    return Number(rows.affectedRows);
+  },
 };

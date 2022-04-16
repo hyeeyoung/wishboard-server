@@ -1,3 +1,4 @@
+const { onBindParsingType } = require('../lib/parser');
 const Items = require('../models/item');
 const Noti = require('../models/noti');
 const { BadRequest } = require('../utils/errors');
@@ -132,6 +133,24 @@ module.exports = {
           });
         }
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+  parseItemInfo: async function (req, res, next) {
+    try {
+      if (!req.query.site) {
+        throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      onBindParsingType(req.query.site)
+        .then((itemInfo) => {
+          res.status(StatusCode.OK).json({
+            success: true,
+            message: SuccessMessage.itemParse,
+            data: { itemInfo },
+          });
+        })
+        .catch((parserFailError) => next(parserFailError));
     } catch (err) {
       next(err);
     }
