@@ -143,11 +143,11 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       onBindParsingType(req.query.site)
-        .then((itemInfo) => {
+        .then((WishItem) => {
           res.status(StatusCode.OK).json({
             success: true,
             message: SuccessMessage.itemParse,
-            data: { itemInfo },
+            data: { WishItem },
           });
         })
         .catch((parserFailError) => next(parserFailError));
