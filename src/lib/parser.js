@@ -1,6 +1,5 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const { WishItem } = require('../dto/cartResponse');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
@@ -40,7 +39,9 @@ const onBindParsingType = async (url) => {
 };
 
 const parsingForGeneral = async (url) => {
-  const wishItem = new WishItem();
+  let itemImg;
+  let itemName;
+  let itemPrice;
   await getHtml(url).then((html) => {
     if (html.status == 200) {
       const $ = cheerio.load(html.data);
@@ -50,17 +51,17 @@ const parsingForGeneral = async (url) => {
           const ogValue = $(el).attr('content');
           switch (ogTag) {
             case 'title':
-              wishItem.item_name = ogValue;
+              itemName = ogValue;
               break;
             case 'image':
-              if (!wishItem.item_img) {
-                wishItem.item_img = ogValue;
+              if (!itemImg) {
+                itemImg = ogValue;
               }
               break;
             case 'price':
             case 'Price':
-              if (!wishItem.item_price) {
-                wishItem.item_price = ogValue;
+              if (!itemPrice) {
+                itemPrice = ogValue;
               }
               break;
           }
@@ -73,18 +74,20 @@ const parsingForGeneral = async (url) => {
         console.log(priceArray);
         console.log($(el).attr('class'));
       });
-      if (!wishItem.item_price) {
-        // WishItem.item_price = $(/^.lowestPrice*/).html();
+      if (itemPrice) {
+        // itemPrice = $(/^.lowestPrice*/).html();
       }
     }
   });
   // console.log(`im general ${wishItem}`);
-  return wishItem;
+  return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
 
 // TODO 구현 예정
 const parsingForMusinsa = async (url) => {
-  const wishItem = new WishItem();
+  let itemImg;
+  let itemName;
+  let itemPrice;
   let priceValue;
   await getHtml(url).then((html) => {
     if (html.status == 200) {
@@ -95,31 +98,32 @@ const parsingForMusinsa = async (url) => {
           const ogValue = $(el).attr('content');
           switch (ogTag) {
             case 'title':
-              wishItem.item_name = ogValue;
+              itemName = ogValue;
               priceValue = ogValue.split(' ');
               break;
             case 'image':
-              if (!wishItem.item_img) {
-                wishItem.item_img = ogValue;
+              if (!itemImg) {
+                itemImg = ogValue;
               }
               break;
           }
         }
       });
-      wishItem.item_price = priceValue[priceValue.length - 4];
+      itemPrice = priceValue[priceValue.length - 4];
     }
   });
-  // console.log(`im musinsa ${wishItem.item_img}`);
-  return wishItem;
+  // console.log(`im musinsa ${itemImg}`);
+  return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
 
 // const parsingForWconcept = async (url) => {
-//   return wishItem;
+//   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 // };
 
 const parsingForNaver = async (url) => {
-  // resetWishItem();
-  const wishItem = new WishItem();
+  let itemImg;
+  let itemName;
+  let itemPrice;
   await getHtml(url).then((html) => {
     if (html.status == 200) {
       const $ = cheerio.load(html.data);
@@ -129,36 +133,36 @@ const parsingForNaver = async (url) => {
           const ogValue = $(el).attr('content');
           switch (ogTag) {
             case 'title':
-              wishItem.item_name = ogValue;
+              itemName = ogValue;
               priceValue = ogValue.split(' ');
               break;
             case 'image':
-              if (!wishItem.item_img) {
-                wishItem.item_img = ogValue;
+              if (!itemImg) {
+                itemImg = ogValue;
               }
               break;
           }
         }
       });
       //* 앞 smartStore, 뒤 search~
-      if (!wishItem.item_price) {
+      if (!itemPrice) {
         if (
           String(url).includes('smartstore') ||
           String(url).includes('brand')
         ) {
-          wishItem.item_price = $('._1LY7DqCnwR').html();
+          itemPrice = $('._1LY7DqCnwR').html();
         } else {
-          wishItem.item_price = $('.lowestPrice_num__3AlQ-').text();
+          itemPrice = $('.lowestPrice_num__3AlQ-').text();
         }
       }
     }
   });
   // console.log(`im Naver ${wishItem}`);
-  return wishItem;
+  return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
 
 // const parsingForCos = async (url) => {
-//   return WishItem;
+//   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 // };
 
 module.exports = { onBindParsingType };
