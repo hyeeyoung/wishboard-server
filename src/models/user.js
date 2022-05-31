@@ -74,24 +74,6 @@ module.exports = {
     }
     return true;
   },
-  // deleteUsers: async function (req) { //TODO 추후 유저 삭제 배치 작업 시 사용
-  //   const userId = Number(req.decoded);
-
-  //   const sqlDelete = 'DELETE FROM users WHERE is_active = false';
-
-  //   const connection = await pool.connection(async (conn) => conn);
-  //   await connection.beginTransaction();
-  //   const [rows] = await connection
-  //     .query(sqlDelete, userId)
-  //     .then(await connection.commit())
-  //     .catch(await connection.rollback());
-  //   connection.release();
-
-  //   if (rows.affectedRows < 1) {
-  //     throw new NotFound(ErrorMessage.userDeleteError);
-  //   }
-  //   return true;
-  // },
   validateNickname: async function (req) {
     if (!req.body.nickname) {
       return true;
@@ -214,12 +196,14 @@ module.exports = {
     return true;
   },
   updatePasswrod: async function (req) {
+    const userId = Number(req.decoded);
     const email = req.body.email;
     const password = req.body.password;
     const hashPassword = bcrypt.hashSync(password, 10);
 
-    const sqlUpdate = 'UPDATE users SET password = ? WHERE email = ?';
-    const params = [hashPassword, email];
+    const sqlUpdate =
+      'UPDATE users SET password = ? WHERE email = ? AND user_id = ?';
+    const params = [hashPassword, email, userId];
 
     const connection = await pool.connection(async (conn) => conn);
     await connection.beginTransaction();
@@ -249,5 +233,19 @@ module.exports = {
       throw new NotFound(ErrorMessage.userNotFound);
     }
     return Object.setPrototypeOf(rows, []);
+  },
+  unActiveUsersDelete: async function () {
+    const sqlDelete =
+      'DELETE FROM users WHERE is_active = false AND DATE(update_at) = DATE(NOW() - INTERVAL 7 DAY)';
+
+    const connection = await pool.connection(async (conn) => conn);
+    const [rows] = await connection.query(sqlDelete);
+    connection.release();
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.unActvieUserDelete);
+    }
+
+    return Number(rows.affectedRows);
   },
 };
