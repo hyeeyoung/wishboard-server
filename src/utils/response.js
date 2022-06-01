@@ -55,6 +55,10 @@ const SuccessMessage = {
 
   userDeleteScheudlerStart: '탈퇴 유저 삭제 스케줄러 시작',
   userDeleteScheudlerExit: '탈퇴 유저 삭제 스케줄러 종료',
+
+  /* IpAddress */
+  readIpAddress: '차단 IP 목록 읽기 성공',
+  addIpAddressDenied: '차단 IP 목록 추가 완료',
 };
 
 const ErrorMessage = {
@@ -117,6 +121,9 @@ const ErrorMessage = {
   /* 공통*/
   BadRequestMeg: '잘못된 요청',
   ApiUrlIsInvalid: '잘못된 경로',
+
+  /* IP 차단에러*/
+  IpDeniedError: `You can't come in`,
 };
 
 module.exports = { StatusCode, SuccessMessage, ErrorMessage };
