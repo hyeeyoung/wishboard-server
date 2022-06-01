@@ -26,6 +26,7 @@
     "cheerio": "^1.0.0-rc.10",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-ipfilter": "^1.2.0",
     "helmet": "^5.0.2",
     "hpp": "^0.2.3",
     "jsonwebtoken": "^8.5.1",
