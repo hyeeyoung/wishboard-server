@@ -1,17 +1,18 @@
 const { GeneralError } = require('../utils/errors');
-const { ErrorMessage } = require('../utils/response');
+const { ErrorMessage, StatusCode } = require('../utils/response');
 require('dotenv').config({ path: '../.env' });
 const logger = require('../config/winston');
 const Slack = require('../lib/slack');
+const { Strings } = require('../utils/strings');
+const IpDeniedError = require('express-ipfilter').IpDeniedError;
 
 const handleErrors = (err, req, res, next) => {
   logger.error(err);
   if (process.env.NODE_ENV === 'production') {
     if (err instanceof GeneralError) {
-      if (
-        err.message === ErrorMessage.BadRequestMeg ||
-        err.message === ErrorMessage.ApiUrlIsInvalid
-      ) {
+      //* 잘못된 경로로 요청 시
+      if (err.message === ErrorMessage.ApiUrlIsInvalid) {
+        //* 슬랙에 알림
         Slack.sendMessage({
           color: Slack.Colors.info,
           title: `${err.getCode()} ${err.message}`,
@@ -22,7 +23,14 @@ const handleErrors = (err, req, res, next) => {
       }
       return res.status(err.getCode()).json({
         success: false,
-        message: err.message,
+        message: `${err.message} ${Strings.IPDENIED}`,
+      });
+    }
+    //* 차단된 IP 목록에 포함된 IP로 요청 시
+    if (err instanceof IpDeniedError) {
+      return res.status(StatusCode.UNAUTHORIZED).json({
+        success: false,
+        message: ErrorMessage.IpDeniedError,
       });
     }
 
