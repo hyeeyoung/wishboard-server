@@ -153,7 +153,8 @@ const parsingForWconcept = async (url) => {
               itemName = egValue;
               break;
             case 'itemImage':
-              itemImg = egValue;
+              itemImg = 'https:';
+              itemImg += egValue;
               break;
             case 'originalPrice':
               itemPrice = egValue;
