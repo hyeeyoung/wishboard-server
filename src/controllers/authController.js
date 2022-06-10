@@ -15,7 +15,7 @@ const { generateMessage } = require('../utils/sendMailMessage');
 
 const TAG = 'authController  ';
 
-function sendMailForCertified(email) {
+const sendMailForCertified = (email) => {
   const verificationCode = crypto.randomBytes(3).toString('hex');
   const mailMessage = generateMessage(email, verificationCode);
 
@@ -26,7 +26,7 @@ function sendMailForCertified(email) {
     logger.error(err);
     throw new NotFound(ErrorMessage.sendMailFailed);
   }
-}
+};
 
 module.exports = {
   checkEmail: async function (req, res, next) {
