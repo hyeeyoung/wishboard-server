@@ -2,7 +2,6 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
-const inspect = require('util').inspect;
 
 const getHtml = async (url) => {
   try {
@@ -10,50 +9,6 @@ const getHtml = async (url) => {
   } catch (err) {
     throw new NotFound(ErrorMessage.itemParseFail);
   }
-};
-
-// TODO 네이버로 검색한 쇼핑 목록의 경우 -> general에서 동작하도록 변경 필요
-// site.startsWith('https://search.shopping.naver.com/') ||
-// site.startsWith('https://m.search.shopping.naver.com/') ||
-// site.startsWith('https://msearch.shopping.naver.com/') ||
-const onBindParsingType = async (url) => {
-  const site = String(url); // startsWith쓰려고 String으로 형변환 url은 Any 데이터 타입이므로
-  if (
-    site.startsWith('https://store.musinsa.com/') ||
-    site.startsWith('https://musinsaapp.page.link/') ||
-    site.startsWith('https://www.musinsa.com/')
-  ) {
-    return await parsingForMusinsa(site);
-  }
-  if (
-    site.startsWith('https://m.wconcept.co.kr/') ||
-    site.startsWith('https://www.wconcept.co.kr/')
-  ) {
-    return await parsingForWconcept(site);
-  }
-  if (
-    site.startsWith('https://m.smartstore.naver.com/') ||
-    site.startsWith('https://smartstore.naver.com/') ||
-    site.startsWith('https://m.shopping.naver.com/') ||
-    site.startsWith('https://m.shopping.naver.com/') ||
-    site.startsWith('https://brand.naver.com/') ||
-    site.startsWith('https://toptop.naver.com/')
-  ) {
-    return await parsingForNaver(site);
-  }
-  if (
-    site.startsWith('https://www.cosstores.com/') ||
-    site.startsWith('https://www.cos.com/')
-  ) {
-    return await parsingForCos(site);
-  }
-  if (
-    site.startsWith('http://mitem.gmarket.co.kr/') ||
-    site.startsWith('http://item.gmarket.co.kr/')
-  ) {
-    return await parsingForGmarket(site);
-  }
-  return await parsingForGeneral(site);
 };
 
 const parsingForGeneral = async (url) => {
@@ -99,7 +54,7 @@ const parsingForGeneral = async (url) => {
     }
   });
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
-  console.log(`im general`);
+  // console.log(`im general`);
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
 
@@ -272,4 +227,48 @@ const getPriceWithoutString = (itemPrice) => {
   return String(itemPrice).replace(/[^0-9]/g, '');
 };
 
-module.exports = { onBindParsingType };
+module.exports = {
+  // TODO 네이버로 검색한 쇼핑 목록의 경우 -> general에서 동작하도록 변경 필요
+  // site.startsWith('https://search.shopping.naver.com/') ||
+  // site.startsWith('https://m.search.shopping.naver.com/') ||
+  // site.startsWith('https://msearch.shopping.naver.com/') ||
+  onBindParsingType: async function (url) {
+    const site = String(url); // startsWith쓰려고 String으로 형변환 url은 Any 데이터 타입이므로
+    if (
+      site.startsWith('https://store.musinsa.com/') ||
+      site.startsWith('https://musinsaapp.page.link/') ||
+      site.startsWith('https://www.musinsa.com/')
+    ) {
+      return await parsingForMusinsa(site);
+    }
+    if (
+      site.startsWith('https://m.wconcept.co.kr/') ||
+      site.startsWith('https://www.wconcept.co.kr/')
+    ) {
+      return await parsingForWconcept(site);
+    }
+    if (
+      site.startsWith('https://m.smartstore.naver.com/') ||
+      site.startsWith('https://smartstore.naver.com/') ||
+      site.startsWith('https://m.shopping.naver.com/') ||
+      site.startsWith('https://m.shopping.naver.com/') ||
+      site.startsWith('https://brand.naver.com/') ||
+      site.startsWith('https://toptop.naver.com/')
+    ) {
+      return await parsingForNaver(site);
+    }
+    if (
+      site.startsWith('https://www.cosstores.com/') ||
+      site.startsWith('https://www.cos.com/')
+    ) {
+      return await parsingForCos(site);
+    }
+    if (
+      site.startsWith('http://mitem.gmarket.co.kr/') ||
+      site.startsWith('http://item.gmarket.co.kr/')
+    ) {
+      return await parsingForGmarket(site);
+    }
+    return await parsingForGeneral(site);
+  },
+};
