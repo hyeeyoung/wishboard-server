@@ -83,7 +83,7 @@ module.exports = {
       if (!req.body.email || !req.body.password) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      await User.updatePasswrod(req).then(() => {
+      await User.updatePassword(req).then(() => {
         res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.userPasswordUpdate,
