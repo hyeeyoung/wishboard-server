@@ -2,6 +2,7 @@ const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
+const db = require('../config/db');
 
 module.exports = {
   signUp: async function (req) {
@@ -14,13 +15,7 @@ module.exports = {
       'INSERT IGNORE INTO users (email, password) VALUES (?, ?)';
     const params = [email, hashPassword];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlInsert, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.query(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.validateEmail);
@@ -30,11 +25,11 @@ module.exports = {
   },
   signIn: async function (req) {
     const email = req.body.email;
+
     const sqlSelect =
       'SELECT user_id, email FROM users WHERE email = ? AND is_active = true';
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, email);
-    connection.release();
+
+    const [rows] = await db.query(sqlSelect, [email]);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.unvalidateUser);
@@ -47,9 +42,7 @@ module.exports = {
 
     const sqlSelect = 'SELECT email, is_active FROM users WHERE email = ?';
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [row] = await connection.query(sqlSelect, email);
-    connection.release();
+    const [row] = await db.query(sqlSelect, [email]);
 
     return row.length >= 1
       ? { success: true, isActive: row[0].is_active }
@@ -58,16 +51,9 @@ module.exports = {
   unActiveUserOne: async function (req) {
     const userId = Number(req.decoded);
 
-    // const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
     const sqlUpdate = 'UPDATE users SET is_active = false WHERE user_id = ?';
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, userId)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, [userId]);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userActiveUpdateNotFound);
@@ -82,9 +68,7 @@ module.exports = {
 
     const sqlSelect = 'SELECT nickname FROM users WHERE nickname = ?';
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, nickname);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, [nickname]);
 
     if (rows.length >= 1) {
       throw new Conflict(ErrorMessage.validateNickname);
@@ -99,13 +83,7 @@ module.exports = {
     const sqlUpdate = 'UPDATE users SET profile_img = ? WHERE user_id = ?';
     const params = [profileImg, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userProfileImgUpdateNotFound);
@@ -119,13 +97,7 @@ module.exports = {
     const sqlUpdate = 'UPDATE users SET nickname = ? WHERE user_id = ?';
     const params = [nickname, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userNickNameUpdateNotFound);
@@ -141,13 +113,7 @@ module.exports = {
       'UPDATE users SET nickname = ?, profile_img = ? WHERE user_id = ?';
     const params = [nickname, profileImg, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userInfoUpdateNotFound);
@@ -161,18 +127,11 @@ module.exports = {
     const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
     const params = [fcmToken, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userFcmTokenUpdateNotFound);
     }
-
     return true;
   },
   updatePushState: async function (req, pushState) {
@@ -181,21 +140,14 @@ module.exports = {
     const sqlUpdate = 'UPDATE users SET push_state = ? WHERE user_id = ?';
     const params = [pushState, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userPushStateUpdateNotFound);
     }
-
     return true;
   },
-  updatePasswrod: async function (req) {
+  updatePassword: async function (req) {
     const userId = Number(req.decoded);
     const email = req.body.email;
     const password = req.body.password;
@@ -205,13 +157,7 @@ module.exports = {
       'UPDATE users SET password = ? WHERE email = ? AND user_id = ?';
     const params = [hashPassword, email, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.userPasswordUpdateNotFound);
@@ -225,9 +171,7 @@ module.exports = {
     const sqlSelect =
       'SELECT email, profile_img, nickname, push_state FROM users WHERE user_id = ?';
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, userId);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, [userId]);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.userNotFound);
@@ -238,9 +182,7 @@ module.exports = {
     const sqlDelete =
       'DELETE FROM users WHERE is_active = false AND DATE(update_at) = DATE(NOW() - INTERVAL 7 DAY)';
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlDelete);
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlDelete);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.unActvieUserDelete);

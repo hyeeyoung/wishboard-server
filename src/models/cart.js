@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const db = require('../config/db');
 const { CartItem } = require('../dto/cartResponse');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
@@ -17,9 +17,7 @@ module.exports = {
     on i.item_id = c.item_id 
     WHERE i.user_id = ? ORDER BY c.create_at DESC;`;
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, userId);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, [userId]);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.cartNotFound);
@@ -38,13 +36,7 @@ module.exports = {
       'INSERT INTO cart (user_id, item_id, item_count) VALUES (?, ?, 1)';
     const params = [userId, itemId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlInsert, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.cartInsertError);
@@ -55,17 +47,12 @@ module.exports = {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
     const itemCount = Number(req.body.item_count);
+
     const sqlUpdate =
       'UPDATE cart SET item_count = ? WHERE item_id = ? AND user_id = ?';
     const params = [itemCount, itemId, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.cartUpdateError);
@@ -79,13 +66,7 @@ module.exports = {
     const sqlDelete = 'DELETE FROM cart WHERE user_id = ? AND item_id = ?';
     const params = [userId, itemId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlDelete, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlDelete, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.cartDeleteError);

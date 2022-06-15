@@ -1,4 +1,4 @@
-const pool = require('../config/db');
+const db = require('../config/db');
 const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
@@ -16,9 +16,7 @@ module.exports = {
     ON f.folder_id = ic.folder_id
     WHERE f.user_id = ? ORDER BY f.create_at DESC`;
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, userId);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, [userId]);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.folderNotFound);
@@ -36,9 +34,7 @@ module.exports = {
     ON f.folder_id = i.folder_id 
     WHERE f.user_id = ? ORDER BY f.create_at DESC`;
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, userId);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, [userId]);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.folderListNotFound);
@@ -60,11 +56,9 @@ module.exports = {
     WHERE i.user_id = ? AND i.folder_id = ?
     ORDER BY i.create_at DESC`;
 
-    const parmas = [userId, folderId];
+    const params = [userId, folderId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, parmas);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, params);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.folderInItemNotFound);
@@ -78,13 +72,7 @@ module.exports = {
     const sqInsert = `INSERT INTO folders(folder_name, user_id) VALUES (?, ?)`;
     const params = [folderName, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqInsert, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqInsert, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.folderInsertError);
@@ -99,13 +87,7 @@ module.exports = {
     const sqlUpdate = `UPDATE folders SET folder_name = ? WHERE folder_id = ? and user_id = ?`;
     const params = [folderName, folderId, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.folderNameUpdateError);
@@ -119,13 +101,7 @@ module.exports = {
     const sqlDelete = `DELETE FROM folders WHERE folder_id = ? AND user_id = ?`;
     const params = [folderId, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlDelete, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlDelete, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.folderDeleteError);
@@ -140,14 +116,11 @@ module.exports = {
       'SELECT folder_name FROM folders WHERE user_id = ? AND folder_name = ?';
     const params = [userId, folderName];
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, params);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, params);
 
     if (rows.length >= 1) {
       throw new Conflict(ErrorMessage.validateFolder);
     }
-
     return false;
   },
 };
