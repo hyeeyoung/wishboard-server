@@ -16,7 +16,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.notiInsertError);
+      throw new NotFound(ErrorMessage.notiInsert);
     }
     return true;
   },
@@ -67,7 +67,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.notiReadStateUpdateError);
+      throw new NotFound(ErrorMessage.notiReadStateUpdate);
     }
     return true;
   },
@@ -92,7 +92,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlUpsert, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.notiUpsertError);
+      throw new NotFound(ErrorMessage.notiUpsert);
     }
 
     return rows.affectedRows === 1 ? Strings.INSERT : Strings.UPSERT;

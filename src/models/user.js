@@ -1,4 +1,3 @@
-const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
@@ -32,7 +31,7 @@ module.exports = {
     const [rows] = await db.query(sqlSelect, [email]);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.unvalidateUser);
+      throw new NotFound(ErrorMessage.unValidateUser);
     }
 
     return Object.setPrototypeOf(rows, []);

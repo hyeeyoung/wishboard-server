@@ -75,7 +75,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqInsert, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.folderInsertError);
+      throw new NotFound(ErrorMessage.folderInsert);
     }
     return Number(rows.insertId);
   },
@@ -90,7 +90,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.folderNameUpdateError);
+      throw new NotFound(ErrorMessage.folderNameUpdate);
     }
     return true;
   },
@@ -104,7 +104,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlDelete, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.folderDeleteError);
+      throw new NotFound(ErrorMessage.folderDelete);
     }
     return true;
   },

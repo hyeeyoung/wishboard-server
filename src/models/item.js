@@ -32,7 +32,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemInsertError);
+      throw new NotFound(ErrorMessage.itemInsert);
     }
     return Number(rows.insertId);
   },
@@ -107,7 +107,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemUpdateError);
+      throw new NotFound(ErrorMessage.itemUpdate);
     }
     return true;
   },
@@ -123,7 +123,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemUpdateToFolderError);
+      throw new NotFound(ErrorMessage.itemUpdateToFolderNotFound);
     }
     return true;
   },
@@ -136,7 +136,7 @@ module.exports = {
     const [rows] = await db.queryWithTransaction(sqlDelete, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemDeleteError);
+      throw new NotFound(ErrorMessage.itemDelete);
     }
     return true;
   },
