@@ -1,6 +1,6 @@
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
-const pool = require('../config/db');
+const db = require('../config/db');
 
 module.exports = {
   insertItem: async function (req) {
@@ -17,7 +17,7 @@ module.exports = {
     const itemMemo = req.body.item_memo;
 
     const sqlInsert =
-      'INSERT INTO items (user_id, folder_id, item_img, item_name, item_price, item_url, item_memo) VALUES(?,?,?,?,?,?,?)';
+      'INSERT INTO items (user_id, folder_id, item_img, item_name, item_price, item_url, item_memo) VALUES(?, ?, ?, ?, ?, ?, ?)';
 
     const params = [
       userId,
@@ -29,16 +29,10 @@ module.exports = {
       itemMemo,
     ];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlInsert, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemInsertError);
+      throw new NotFound(ErrorMessage.itemInsert);
     }
     return Number(rows.insertId);
   },
@@ -55,9 +49,7 @@ module.exports = {
     on i.item_id = c.item_id 
     WHERE i.user_id = ? ORDER BY i.create_at DESC`;
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, [userId]);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, userId);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.itemNotFound);
@@ -77,9 +69,7 @@ module.exports = {
     on i.item_id = c.item_id 
     WHERE i.user_id = ? ORDER BY i.create_at DESC LIMIT 1`;
 
-    const connection = await pool.connection(async (conn) => conn);
-    const [rows] = await connection.query(sqlSelect, [userId]);
-    connection.release();
+    const [rows] = await db.query(sqlSelect, [userId]);
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.itemLatestNotFound);
@@ -114,16 +104,10 @@ module.exports = {
     params.push(itemId);
     params.push(userId);
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemUpdateError);
+      throw new NotFound(ErrorMessage.itemUpdate);
     }
     return true;
   },
@@ -136,16 +120,10 @@ module.exports = {
       'UPDATE items SET folder_id = ? WHERE user_id = ? AND item_id = ?';
     const params = [folderId, userId, itemId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlUpdate, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemUpdateToFolderError);
+      throw new NotFound(ErrorMessage.itemUpdateToFolderNotFound);
     }
     return true;
   },
@@ -155,16 +133,10 @@ module.exports = {
     const sqlDelete = 'DELETE FROM items WHERE item_id = ? AND user_id = ?';
     const params = [itemId, userId];
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection.beginTransaction();
-    const [rows] = await connection
-      .query(sqlDelete, params)
-      .then(await connection.commit())
-      .catch(await connection.rollback());
-    connection.release();
+    const [rows] = await db.queryWithTransaction(sqlDelete, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.itemDeleteError);
+      throw new NotFound(ErrorMessage.itemDelete);
     }
     return true;
   },
