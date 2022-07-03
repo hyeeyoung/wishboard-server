@@ -15,7 +15,7 @@ const { generateMessage } = require('../utils/sendMailMessage');
 
 const TAG = 'authController  ';
 
-function sendMailForCertified(email) {
+const sendMailForCertified = (email) => {
   const verificationCode = crypto.randomBytes(3).toString('hex');
   const mailMessage = generateMessage(email, verificationCode);
 
@@ -26,7 +26,7 @@ function sendMailForCertified(email) {
     logger.error(err);
     throw new NotFound(ErrorMessage.sendMailFailed);
   }
-}
+};
 
 module.exports = {
   checkEmail: async function (req, res, next) {
@@ -38,7 +38,7 @@ module.exports = {
         if (!isValidate) {
           return res.status(StatusCode.OK).json({
             success: true,
-            message: SuccessMessage.unvalidateEmail,
+            message: SuccessMessage.unValidateEmail,
           });
         } else {
           if (!isValidate.isActive) {
@@ -64,7 +64,7 @@ module.exports = {
             logger.info(TAG + err || !user);
             return res.status(StatusCode.CREATED).json({
               success: false,
-              message: SuccessMessage.loginfailedAfterSuccessSignUp,
+              message: SuccessMessage.loginFailedAfterSuccessSignUp,
             });
           }
           req.login(user, { session: false }, (err) => {
@@ -132,7 +132,7 @@ module.exports = {
         });
       } else {
         if (!isValidate.success) {
-          throw new NotFound(ErrorMessage.unvalidateUser);
+          throw new NotFound(ErrorMessage.unValidateUser);
         }
         return res.status(StatusCode.NOCONTENT).send();
       }
@@ -156,7 +156,7 @@ module.exports = {
           });
         });
       } else {
-        throw new NotFound(ErrorMessage.unvalidateVerificationCode);
+        throw new NotFound(ErrorMessage.unValidateVerificationCode);
       }
     } catch (err) {
       next(err);

@@ -47,12 +47,16 @@ TEAM: Hyeeyoung
 | `auth` | 로그인 | ✔ |
 | `auth` | 이메일 인증 | ✔ |
 | `auth` | 비밀번호 없이 로그인 | ✔ |
-| `auth` | 사용자 탈퇴 배치 작업 | 배포 이후 |
+| `auth` | 사용자 비밀번호 변경 | ✔ |
+| `auth` | 사용자 회원 정보 삭제 배치 작업 | ✔ |
 | `item` | 홈화면 및 상세화면 조회 | ✔| 
 | `item`, `noti` | 아이템 등록 및 알림 추가| ✔| 
 | `item`, `noti` | 아이템 수정 및 알림 수정/추가/삭제 | ✔ |
-| `noti` | 푸쉬 알림 설정 및 배치 작업 | ✔ |
+| `item`, `folder` | 아이템 수정 시 폴더 추가| ✔ |
+| `item` | 아이템 파싱 정보 가져오기 | ✔ |
 | `item` | 아이템 삭제 | ✔ |
+| `noti` | 푸쉬 알림 설정 및 배치 작업 | ✔ |
+| `noti` | 알림 캘린더 조회 | ✔ |
 | `cart` | 장바구니 추가 | ✔ |
 | `cart` | 장바구니 수정 | ✔ |
 | `cart` | 장바구니 삭제 | ✔ |
@@ -106,7 +110,7 @@ TEAM: Hyeeyoung
 - `passport`, `passport-local`, `passport-jwt`, `jsonwebtoken` : 회원가입 및 로그인 서비스 이용과 jwt 생성을 하여 클라이언트와 작업 시 사용
 - `dotenv` : 중요 비밀 정보 파일 저장을 위해 사용
 - `morgan`, `winston`, `winston-daily-rotate-file` : http 요청에 따른 log 파일 저장을 위해 사용
-- `node-schedule` : 회원 정보 탈퇴 배치 시에도 사용 될 예정
+- `node-schedule` : 회원 정보 탈퇴 배치 시 사용
 - `node-mailer` : 비밀번호 없이 로그인 시 이메일 인증을 위해 사용
 - `webpack` : build 파일 압축을 위해 사용
 ```json
