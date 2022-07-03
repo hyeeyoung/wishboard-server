@@ -30,7 +30,6 @@ module.exports = {
         ORDER BY n.item_notification_date DESC`;
 
     const [rows] = await db.query(sqlSelect, [userId]);
-    connection.release();
 
     if (Array.isArray(rows) && !rows.length) {
       throw new NotFound(ErrorMessage.notiTabNotFound);
