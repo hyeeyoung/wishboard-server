@@ -53,12 +53,8 @@ const SuccessMessage = {
   sendMailForCertifiedNumber: '비밀번호 찾기를 위한 인증번호 메일 전송 성공',
   unValidateEmail: '회원가입이 가능한 이메일주소',
 
-  userDeleteScheudlerStart: '탈퇴 유저 삭제 스케줄러 시작',
-  userDeleteScheudlerExit: '탈퇴 유저 삭제 스케줄러 종료',
-
-  /* IpAddress */
-  readIpAddress: '차단 IP 목록 읽기 성공',
-  addIpAddressDenied: '차단 IP 목록 추가 완료',
+  userDeleteSchedulerStart: '탈퇴 유저 삭제 스케줄러 시작',
+  userDeleteSchedulerExit: '탈퇴 유저 삭제 스케줄러 종료',
 };
 
 const ErrorMessage = {
@@ -121,9 +117,7 @@ const ErrorMessage = {
   /* 공통*/
   BadRequestMeg: '잘못된 요청',
   ApiUrlIsInvalid: '잘못된 경로',
-
-  /* IP 차단에러*/
-  IpDeniedError: `You can't come in`,
+  RequestWithIntentionalInvalidUrl: '의도적인 잘못된 경로 요청',
 };
 
 module.exports = { StatusCode, SuccessMessage, ErrorMessage };
