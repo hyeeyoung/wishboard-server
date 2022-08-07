@@ -14,7 +14,7 @@ module.exports = {
       'INSERT IGNORE INTO users (email, password) VALUES (?, ?)';
     const params = [email, hashPassword];
 
-    const [rows] = await db.query(sqlInsert, params);
+    const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.validateEmail);

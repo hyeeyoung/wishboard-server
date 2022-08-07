@@ -43,7 +43,7 @@ const server = app.listen(port, () => {
   process.send('ready');
   logger.info(`[API Server] on port ${port} | ${nodeEnv}`);
 
-  /** 앱 시작과 동시에 푸쉬알림 스케줄러 실행 */
+  /** 앱 시작과 동시에 사용자 탈퇴 스케줄러 실행 */
   logger.info(SuccessMessage.userDeleteSchedulerStart);
   schedule.scheduleJob('0 0 0 ? * MON *', function () {
     schduleService.usersDelete();

@@ -1,4 +1,3 @@
-const pool = require('./db');
 const passport = require('passport');
 const LocalStragegy = require('passport-local').Strategy;
 const JWTStrategy = require('passport-jwt').Strategy;
@@ -7,6 +6,7 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config({ path: '../.env' });
 const logger = require('./winston');
 const { ErrorMessage } = require('../utils/response');
+const db = require('./db');
 
 const TAG = 'PASSPORT ';
 
@@ -26,8 +26,7 @@ async function localVerify(email, password, done) {
     const sqlSelect =
       'SELECT user_id, email, password, is_active FROM users WHERE email = ?';
 
-    const connection = await pool.connection(async (conn) => conn);
-    await connection
+    await db
       .query(sqlSelect, email)
       .then((rows) => {
         if (!rows[0]) return done(null, false);
@@ -46,7 +45,6 @@ async function localVerify(email, password, done) {
         logger.error(TAG + err);
         return done(null, false);
       });
-    connection.release();
   } catch (e) {
     return done(e);
   }
@@ -56,8 +54,8 @@ async function jwtVerify(payload, done) {
   let user;
   try {
     const sqlSelect = 'SELECT user_id, email FROM users WHERE user_id = ?';
-    const connection = await pool.connection(async (conn) => conn);
-    await connection
+
+    await db
       .query(sqlSelect, payload.user_id)
       .then((rows) => {
         if (!rows[0]) return done(null, false);
@@ -69,7 +67,6 @@ async function jwtVerify(payload, done) {
         logger.error(TAG + err);
         return done(null, false);
       });
-    connection.release();
   } catch (e) {
     return done(e);
   }
