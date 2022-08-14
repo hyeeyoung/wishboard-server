@@ -16,10 +16,8 @@ const schduleService = require('./middleware/userScheduler');
 const handleErrors = require('./middleware/handleError');
 const { NotFound } = require('./utils/errors');
 const { SuccessMessage, ErrorMessage } = require('./utils/response');
-const { Strings } = require('./utils/strings');
 
-const fs = require('fs').promises;
-const ipFilter = require('express-ipfilter').IpFilter;
+const rateLimit = require('./middleware/rateLimiter');
 
 /** 기본 설정 */
 // 서버 환경에 따라 다르게 설정 (배포/개발)
@@ -40,55 +38,33 @@ app.use(function (req, res, next) {
   next();
 });
 
-let deniedIpAddressArray = [];
 const server = app.listen(port, () => {
   /** 앱 시작 알림 */
   process.send('ready');
   logger.info(`[API Server] on port ${port} | ${nodeEnv}`);
 
-  /** 사용자 탈퇴 스케줄러 실행 */
-  logger.info(SuccessMessage.userDeleteScheudlerStart);
-  schedule.scheduleJob('0 0 * * *', function () {
+  /** 앱 시작과 동시에 사용자 탈퇴 스케줄러 실행 */
+  logger.info(SuccessMessage.userDeleteSchedulerStart);
+  schedule.scheduleJob('0 0 0 ? * MON *', function () {
     schduleService.usersDelete();
   });
-
-  /** Denied ipAddress 목록 불러와 배열에 저장*/
-  fs.readFile(Strings.IPDENIED_FILENAME)
-    .then((ipAddressList) => {
-      if (ipAddressList.toString().length !== 0) {
-        deniedIpAddressArray = ipAddressList.toString().split(' ');
-      }
-      logger.info(
-        `[${SuccessMessage.readIpAddress}] ${deniedIpAddressArray.length}개`,
-      );
-    })
-    .catch((err) => {
-      throw err;
-    });
 });
 
 process.on('SIGINT', function () {
-  /** Denied Ip Address 파일로 쓰고 종료*/
-  const deniedIpAddressList = deniedIpAddressArray
-    .toString()
-    .replace('/,/g', ' ');
-
-  fs.writeFile(Strings.IPDENIED_FILENAME, deniedIpAddressList, 'utf8')
-    .then((data) => {
-      logger.info(SuccessMessage.addIpAddressDenied);
-    })
-    .catch((err) => logger.error(err));
   isDisableKeepAlive = true;
   server.close(function () {
     /** 앱 및 스케줄러 종료*/
     logger.info('pm2 process closed');
     schedule.gracefulShutdown().then(() => process.exit(0));
-    logger.info(SuccessMessage.userDeleteScheudlerExit);
+    logger.info(SuccessMessage.userDeleteSchedulerExit);
   });
 });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+/** DDos 공격 방지 */
+app.use(rateLimit);
 
 /** passport 설정 */
 app.use(passport.initialize());
@@ -97,17 +73,10 @@ passportConfig();
 /** router 설정 */
 app.use(require('./routes/index'));
 
-/** 에러페이지 및 ip 차단 추가 */
+/** 에러페이지 및 에러 핸들링 */
 app.use((req, res, next) => {
-  const ipAddress = req.ip.toString().split('::')[1];
-  if (deniedIpAddressArray.indexOf(ipAddress) === -1) {
-    deniedIpAddressArray.push(ipAddress);
-  }
-  throw new NotFound(ErrorMessage.ApiUrlIsInvalid);
+  throw new NotFound(ErrorMessage.RequestWithIntentionalInvalidUrl);
 });
 app.use(handleErrors);
-
-/** ip 차단 설정 */
-app.use(ipFilter(deniedIpAddressArray));
 
 module.exports = app;

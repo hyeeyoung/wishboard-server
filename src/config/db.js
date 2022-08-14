@@ -67,9 +67,11 @@ module.exports = {
         .catch(await connection.rollback());
     } else {
       let sqlQuery = '';
-      args.forEach((parameter) => {
-        sqlQuery += mysql.format(query, parameter);
-      });
+      await Promise.all(
+        args.map(async (parameter) => {
+          sqlQuery += mysql.format(query, parameter);
+        }),
+      );
       rows = await connection
         .query(sqlQuery)
         .then(await connection.commit())
