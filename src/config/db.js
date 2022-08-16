@@ -23,6 +23,22 @@ const pool = mysql.createPool({
 
 logger.info(TAG_SUCCESS);
 
+// eslint-disable-next-line valid-jsdoc
+/**
+ * TODO refactoring
+ * TypeError [ERR_INVALID_ARG_TYPE]: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received undefined
+ **/
+const generateSQL = async (str, args) => {
+  console.log(typeof str);
+  let sqlQuery = '';
+  await Promise.all(
+    args.map(async (parameter) => {
+      sqlQuery += mysql.format(str, parameter);
+    }),
+  );
+  return sqlQuery;
+};
+
 module.exports = {
   connection: async function () {
     const connection = await pool.getConnection(async (conn) => conn);
@@ -49,7 +65,13 @@ module.exports = {
     if (!args) {
       rows = await connection.query(query);
     } else {
-      rows = await connection.query(query, args);
+      let sqlQuery = '';
+      await Promise.all(
+        args.map(async (parameter) => {
+          sqlQuery += mysql.format(query, parameter);
+        }),
+      );
+      rows = await connection.query(sqlQuery, args);
     }
     connection.release();
 
