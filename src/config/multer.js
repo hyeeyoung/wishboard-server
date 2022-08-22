@@ -9,6 +9,7 @@ module.exports = {
       s3: s3,
       bucket: process.env.BUCKET_NAME,
       contentType: multerS3.AUTO_CONTENT_TYPE,
+      acl: 'public-read',
       key: function (req, file, cb) {
         cb(null, `${Date.now()}_${file.originalname}`);
       },

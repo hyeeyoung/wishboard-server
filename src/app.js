@@ -60,7 +60,7 @@ process.on('SIGINT', function () {
   });
 });
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 /** DDos 공격 방지 */

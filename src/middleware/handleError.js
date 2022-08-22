@@ -2,6 +2,7 @@ const { GeneralError } = require('../utils/errors');
 require('dotenv').config({ path: '../.env' });
 const logger = require('../config/winston');
 const Slack = require('../lib/slack');
+const multer = require('multer');
 
 const handleErrors = (err, req, res, next) => {
   logger.error(err);
