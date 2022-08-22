@@ -71,7 +71,7 @@ module.exports = {
           sqlQuery += mysql.format(query, parameter);
         }),
       );
-      rows = await connection.query(sqlQuery, args);
+      rows = await connection.query(sqlQuery);
     }
     connection.release();
 
