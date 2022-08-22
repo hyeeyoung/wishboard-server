@@ -77,10 +77,16 @@ module.exports = {
   },
   updateImage: async function (req) {
     const userId = Number(req.decoded);
-    const profileImg = req.body.profile_img;
 
-    const sqlUpdate = 'UPDATE users SET profile_img = ? WHERE user_id = ?';
-    const params = [profileImg, userId];
+    const image = { originalname: '', location: '' };
+    if (req.file != undefined) {
+      image.originalname = req.file.key;
+      image.location = req.file.location;
+    }
+
+    const sqlUpdate =
+      'UPDATE users SET profile_img = ?, profile_img_url = ?  WHERE user_id = ?';
+    const params = [image.originalname, image.location, userId];
 
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
@@ -106,11 +112,16 @@ module.exports = {
   updateInfo: async function (req) {
     const userId = Number(req.decoded);
     const nickname = req.body.nickname;
-    const profileImg = req.body.profile_img;
+
+    const image = { originalname: '', location: '' };
+    if (req.file != undefined) {
+      image.originalname = req.file.key;
+      image.location = req.file.location;
+    }
 
     const sqlUpdate =
-      'UPDATE users SET nickname = ?, profile_img = ? WHERE user_id = ?';
-    const params = [nickname, profileImg, userId];
+      'UPDATE users SET nickname = ?, profile_img = ?, profile_img_url = ?   WHERE user_id = ?';
+    const params = [nickname, image.originalname, image.location, userId];
 
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
@@ -178,9 +189,21 @@ module.exports = {
     return Object.setPrototypeOf(rows, []);
   },
   unActiveUsersDelete: async function () {
+    const sqlSelect =
+      'SELECT profile_img_url FROM users WHERE is_active = false AND DATE(update_at) = DATE(NOW() - INTERVAL 7 DAY)';
     const sqlDelete =
       'DELETE FROM users WHERE is_active = false AND DATE(update_at) = DATE(NOW() - INTERVAL 7 DAY)';
 
+    const [deleteImages] = await db.query(sqlSelect);
+
+    // s3에서 삭제
+    await Promise.all(
+      deleteImages.map(async (imageName) => {
+        await multer.s3Delete(imageName.profile_img);
+      }),
+    );
+
+    // db에서 삭제
     const [rows] = await db.queryWithTransaction(sqlDelete);
 
     if (Array.isArray(rows) && !rows.length) {

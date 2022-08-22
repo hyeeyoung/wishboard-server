@@ -35,7 +35,7 @@ module.exports = {
               message: SuccessMessage.userNickNameUpdate,
             });
           });
-        } else if (req.body.nickname && req.body.profile_img) {
+        } else if (req.body.nickname && req.file) {
           await User.updateInfo(req).then(() => {
             res.status(StatusCode.OK).json({
               success: true,
@@ -44,7 +44,7 @@ module.exports = {
           });
         }
       } else {
-        if (req.body.profile_img) {
+        if (req.file) {
           await User.updateImage(req).then(() => {
             res.status(StatusCode.OK).json({
               success: true,
