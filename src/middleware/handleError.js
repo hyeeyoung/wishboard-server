@@ -3,6 +3,7 @@ require('dotenv').config({ path: '../.env' });
 const logger = require('../config/winston');
 const Slack = require('../lib/slack');
 const multer = require('multer');
+const { ErrorMessage } = require('../utils/response');
 
 const handleErrors = (err, req, res, next) => {
   logger.error(err);
