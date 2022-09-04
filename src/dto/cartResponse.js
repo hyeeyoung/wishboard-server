@@ -11,7 +11,7 @@ class CartItem {
       row.folder_id,
       row.folder_name,
       row.item_id,
-      row.item_img,
+      row.item_img_url,
       row.item_name,
       row.item_price,
       row.item_url,
@@ -31,7 +31,7 @@ class WishItem {
     folderId,
     folderName,
     itemId,
-    itemImg,
+    itemImgUrl,
     itemName,
     itemPrice,
     itemUrl,
@@ -44,7 +44,7 @@ class WishItem {
     this.folder_id = folderId;
     this.folder_name = folderName;
     this.item_id = itemId;
-    this.item_img = itemImg;
+    this.item_img = itemImgUrl;
     this.item_name = itemName;
     this.item_price = itemPrice;
     this.item_url = itemUrl;
