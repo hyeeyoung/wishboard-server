@@ -8,7 +8,7 @@ module.exports = {
 
     const sqlSelect = `SELECT f.folder_id, f.folder_name, i.folder_thumbnail, ifnull(ic.item_count, 0) item_count FROM folders f 
     LEFT OUTER JOIN (
-    (SELECT a.folder_id, a.item_img folder_thumbnail, a.create_at
+    (SELECT a.folder_id, a.item_img_url folder_thumbnail, a.create_at
     FROM items a INNER JOIN (SELECT max(create_at) create_at FROM items GROUP BY folder_id) b
     WHERE a.create_at = b.create_at)) i
     ON f.folder_id = i.folder_id 
@@ -28,7 +28,7 @@ module.exports = {
 
     const sqlSelect = `SELECT f.folder_id, f.folder_name, i.folder_thumbnail FROM folders f 
     LEFT OUTER JOIN (
-    (SELECT a.folder_id, a.item_img folder_thumbnail, a.create_at
+    (SELECT a.folder_id, a.item_img_url folder_thumbnail, a.create_at
     FROM items a INNER JOIN (SELECT max(create_at) create_at FROM items GROUP BY folder_id) b
     WHERE a.create_at = b.create_at)) i
     ON f.folder_id = i.folder_id 
@@ -45,7 +45,7 @@ module.exports = {
     const userId = Number(req.decoded);
     const folderId = Number(req.params.folder_id);
 
-    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name,
+    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img_url, i.item_name,
     i.item_price, i.item_url, i.item_memo, IF(c.item_id IS NULL, false, true) as cart_state, 
     CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date
     FROM items i LEFT OUTER JOIN notifications n 
