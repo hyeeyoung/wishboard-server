@@ -12,21 +12,37 @@ const TAG_PROTOCOL_CONNECTION_LOST = 'Database connection was closed.';
 const TAG_ER_CON_COUNT_ERROR = 'Database has too many connections.';
 const TAG_ECONNREFUSED = 'Database connection was refused.';
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  connectionLimit: 50,
-});
+let pool;
+if (process.env.NODE_ENV === 'development') {
+  logger.info('connect dev database');
+  logger.info(process.env.DB_DEV_HOST);
+  pool = mysql.createPool({
+    host: process.env.DB_DEV_HOST,
+    user: process.env.DB_DEV_USER,
+    password: process.env.DB_DEV_PASSWORD,
+    port: process.env.DB_PORT,
+    database: process.env.DB_DEV_NAME,
+    connectionLimit: 50,
+  });
+} else {
+  logger.info('connect product database');
+  logger.info(process.env.DB_DEV_HOST);
+  pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    connectionLimit: 50,
+  });
+}
 
 logger.info(TAG_SUCCESS);
 
 // eslint-disable-next-line valid-jsdoc
 /**
  * TODO refactoring
- * TypeError [ERR_INVALID_ARG_TYPE]: The first argument must be of type string or an instance of Buffer, ArrayBuffer, or Array or an Array-like Object. Received undefined
+ * TypeError [ERR_INVALID_ARG_TYPE]: The first argument must be of type string or an instance of , , or Array or an Array-like Object. Received undefined
  **/
 const generateSQL = async (str, args) => {
   console.log(typeof str);
