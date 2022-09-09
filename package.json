@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "lint": "eslint .",
-    "build": "webpack --config ./webpack.config.js --mode development",
-    "build:production": "webpack --config ./webpack.config.js --mode production",
+    "build": "webpack --config ./webpack.config.js --mode=development",
+    "build:production": "webpack --config ./webpack.prod.config.js --mode=production",
     "start": "node dist/server.js"
   },
   "repository": {

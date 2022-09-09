@@ -1,0 +1,62 @@
+name: Server PR Check Work Flow
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  PR_Check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.13.2] # 개발환경과 동일하게 맞춤
+
+    steps:
+      # 브랜치에 checkout해 코드를 가져온다
+      - name: Checkout source code.
+        uses: actions/checkout@v2
+
+      # node 설치 및 버전 확인한다.
+      - name: Node.js ${{ matrix.node-version }} install
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Check Npm -v
+        run: npm -v
+
+        # npm ci를 통해 npm install 진행
+      - name: Npm CI
+        run: npm ci
+
+        #lint 통과 확인
+      - name: Check ESLint
+        run: npm run lint
+
+        # .env 파일 생성
+      - name: Create .env file
+        run: |
+          touch .env
+          echo PORT=${{ secrets.PORT }} >> .env
+
+          echo DB_HOST=${{ secrets.DB_DEV_HOST }} >> .env
+          echo DB_USER=${{ secrets.DB_DEV_USER }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
+          echo DB_NAME=${{ secrets.DB_DEV_NAME }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+
+          echo WISHBOARD_GMAIL_ID=${{ secrets.WISHBOARD_GMAIL_ID }} >> .env
+          echo WISHBOARD_GMAIL_PW=${{ secrets.WISHBOARD_GMAIL_PW }} >> .env
+
+          echo JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }} >> .env
+
+          echo SLACK_API_TOKEN=${{ secrets.SLACK_API_TOKEN }} >> .env
+
+          echo AWS_ACCESS_KEY=${{ secrets.AWS_S3_IMAGE_ACCESS_KEY }} >> .env
+          echo AWS_SECRET_KEY=${{ secrets.AWS_S3_IMAGE_SECRET_KEY }} >> .env
+          echo BUCKET_NAME=${{ secrets.AWS_S3_IMAGE_BUCKET_NAME }} >> .env
+
+      - name: Run build
+        run: |
+          echo NODE_ENV="development" >> .env
+          npm run build --if-present
