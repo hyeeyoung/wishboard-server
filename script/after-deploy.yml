@@ -1,0 +1,10 @@
+#!/bin/bash
+REPOSITORY=/home/ubuntu/server
+
+cd $REPOSITORY
+
+sudo /usr/bin/yarn
+
+cd ./dist
+
+sudo pm2 reload ecosystem.config.js
