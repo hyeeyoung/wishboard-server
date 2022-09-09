@@ -15,7 +15,6 @@ const TAG_ECONNREFUSED = 'Database connection was refused.';
 let pool;
 if (process.env.NODE_ENV === 'development') {
   logger.info('connect dev database');
-  logger.info(process.env.DB_DEV_HOST);
   pool = mysql.createPool({
     host: process.env.DB_DEV_HOST,
     user: process.env.DB_DEV_USER,
@@ -26,7 +25,6 @@ if (process.env.NODE_ENV === 'development') {
   });
 } else {
   logger.info('connect product database');
-  logger.info(process.env.DB_DEV_HOST);
   pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
