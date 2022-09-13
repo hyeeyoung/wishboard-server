@@ -6,7 +6,7 @@
 
 **위시리스트 통합관리 앱, 위시보드(Wishboard)**
 
-Timeline: 21.9.26 - 22.3.8 (+ iOS 개발 예정)
+Timeline: 21.9.26 ~
 
 TEAM: Hyeeyoung
 
@@ -105,7 +105,7 @@ TEAM: Hyeeyoung
 - PM2 5.7.2
 ```
 
-## [API Documents 바로가기 Click✔](https://www.notion.so/84c305675a7e43308bc8c90e94afeb9c?v=6593c15e7edf4f6188f4a3e9c370c8d6&p=a48acc4185544784a0c78100fdc6ff45)
+## [API Documents 바로가기 Click✔](https://www.notion.so/API-2de8a10150a8402281ffde4f25591104)
 
 ## ERD
 
@@ -117,6 +117,7 @@ TEAM: Hyeeyoung
 
 ## Dependencies module
 
+- `aws-sdk`, `multer`, `multer-s3` : 이미지 저장을 위한 작업시 사용
 - `bcrpytjs` : 회원 정보 저장 시 비밀번호 암호화를 위해 사용
 - `passport`, `passport-local`, `passport-jwt`, `jsonwebtoken` : 회원가입 및 로그인 서비스 이용과 jwt 생성을 하여 클라이언트와 작업 시 사용
 - `dotenv` : 중요 비밀 정보 파일 저장을 위해 사용
