@@ -53,7 +53,7 @@ jobs:
 
           echo AWS_ACCESS_KEY=${{ secrets.AWS_S3_IMAGE_ACCESS_KEY }} >> .env
           echo AWS_SECRET_KEY=${{ secrets.AWS_S3_IMAGE_SECRET_KEY }} >> .env
-          echo BUCKET_NAME=${{ secrets.AWS_S3_IMAGE_BUCKET_NAME }} >> .env
+          echo BUCKET_NAME=${{ secrets.AWS_S3_IMAGE_BUCKET_NAME_DEV }} >> .env
 
         # 빌드하여 S3에 업로드
       - name: Run build (dev)
