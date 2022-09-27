@@ -179,7 +179,7 @@ module.exports = {
     const userId = Number(req.decoded);
 
     const sqlSelect =
-      'SELECT email, profile_img, nickname, push_state FROM users WHERE user_id = ?';
+      'SELECT email, profile_img_url, nickname, push_state FROM users WHERE user_id = ?';
 
     const [rows] = await db.query(sqlSelect, [userId]);
 

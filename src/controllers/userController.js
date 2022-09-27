@@ -21,14 +21,14 @@ module.exports = {
   },
   updateUserInfo: async function (req, res, next) {
     try {
-      if (!req.body.nickname && !req.body.profile_img) {
+      if (!req.body.nickname && !req.file) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
       const isValidate = await User.validateNickname(req);
 
       if (!isValidate) {
-        if (req.body.nickname && !req.body.profile_img) {
+        if (req.body.nickname && !req.file) {
           await User.updateNickname(req).then(() => {
             res.status(StatusCode.OK).json({
               success: true,
