@@ -78,6 +78,18 @@ module.exports = {
   updateImage: async function (req) {
     const userId = Number(req.decoded);
 
+    const sqlSelect = 'SELECT profile_img FROM users WHERE user_id = ?';
+    const [deleteImage] = await db.query(sqlSelect, [userId]);
+
+    // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
+    await Promise.all(
+      deleteImage.map(async (item) => {
+        if (!item) {
+          await multer.s3Delete(item.profile_img);
+        }
+      }),
+    );
+
     const image = { originalname: '', location: '' };
     if (req.file != undefined) {
       image.originalname = req.file.key;
@@ -112,6 +124,18 @@ module.exports = {
   updateInfo: async function (req) {
     const userId = Number(req.decoded);
     const nickname = req.body.nickname;
+
+    const sqlSelect = 'SELECT profile_img FROM users WHERE user_id = ?';
+    const [deleteImage] = await db.query(sqlSelect, [userId]);
+
+    // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
+    await Promise.all(
+      deleteImage.map(async (item) => {
+        if (!item) {
+          await multer.s3Delete(item.profile_img);
+        }
+      }),
+    );
 
     const image = { originalname: '', location: '' };
     if (req.file != undefined) {
@@ -198,8 +222,10 @@ module.exports = {
 
     // s3에서 삭제
     await Promise.all(
-      deleteImages.map(async (imageName) => {
-        await multer.s3Delete(imageName.profile_img);
+      deleteImages.map(async (item) => {
+        if (!item) {
+          await multer.s3Delete(imageName.profile_img);
+        }
       }),
     );
 
