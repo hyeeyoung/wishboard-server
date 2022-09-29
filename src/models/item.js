@@ -101,7 +101,9 @@ module.exports = {
     // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
     await Promise.all(
       deleteImage.map(async (item) => {
-        await multer.s3Delete(item.item_img);
+        if (!item) {
+          await multer.s3Delete(item.item_img);
+        }
       }),
     );
 
@@ -168,7 +170,9 @@ module.exports = {
     // s3에서 삭제
     await Promise.all(
       deleteImages.map(async (item) => {
-        await multer.s3Delete(item.item_img);
+        if (!item) {
+          await multer.s3Delete(item.item_img);
+        }
       }),
     );
 
