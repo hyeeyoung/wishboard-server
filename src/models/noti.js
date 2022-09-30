@@ -22,7 +22,7 @@ module.exports = {
   },
   selectNoti: async function (req) {
     const userId = Number(req.decoded);
-    const sqlSelect = `SELECT i.item_id, i.item_img, i.item_name, i.item_url, n.item_notification_type, 
+    const sqlSelect = `SELECT i.item_id, i.item_img_url, i.item_name, i.item_url, n.item_notification_type, 
         CAST(n.item_notification_date AS CHAR(19)) item_notification_date, n.read_state 
         FROM notifications n JOIN items i 
         ON n.item_id = i.item_id 
@@ -41,7 +41,7 @@ module.exports = {
     const userId = Number(req.decoded);
     // const month = req.query.month;
 
-    const sqlSelect = `SELECT i.item_id, i.item_img, i.item_name, i.item_url, n.item_notification_type, 
+    const sqlSelect = `SELECT i.item_id, i.item_img_url, i.item_name, i.item_url, n.item_notification_type, 
     CAST(n.item_notification_date AS CHAR(19)) item_notification_date, n.read_state 
     FROM notifications n JOIN items i 
     ON n.item_id = i.item_id WHERE n.user_id = ? 
