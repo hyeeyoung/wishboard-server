@@ -47,6 +47,15 @@ module.exports = {
         next(err);
       });
   },
+  selectItemDetailInfo: async function (req, res, next) {
+    await Items.selectItemDetail(req)
+      .then((result) => {
+        res.status(StatusCode.OK).json(result);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  },
   selectItemLatest: async function (req, res, next) {
     await Items.selectItemOneLatest(req)
       .then((result) => {

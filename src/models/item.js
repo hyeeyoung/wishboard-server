@@ -65,6 +65,25 @@ module.exports = {
     }
     return Object.setPrototypeOf(rows, []);
   },
+  selectItemDetail: async function (req) {
+    const userId = Number(req.decoded);
+    const itemId = Number(req.params.item_id);
+
+    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img_url, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date
+    FROM items i LEFT OUTER JOIN notifications n 
+    ON i.item_id = n.item_id  
+    LEFT OUTER JOIN (SELECT folder_id, folder_name FROM folders GROUP BY folder_id) f 
+    ON i.folder_id = f.folder_id 
+    WHERE i.item_id = ? AND i.user_id = ? ORDER BY i.create_at DESC`;
+
+    const [rows] = await db.query(sqlSelect, [itemId, userId]);
+
+    if (Array.isArray(rows) && !rows.length) {
+      throw new NotFound(ErrorMessage.itemNotFound);
+    }
+    return Object.setPrototypeOf(rows, []);
+  },
   selectItemOneLatest: async function (req) {
     const userId = Number(req.decoded);
 

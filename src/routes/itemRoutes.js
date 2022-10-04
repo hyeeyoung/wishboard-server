@@ -13,6 +13,7 @@ router.post(
 router.get('/', verifyToken, itemController.selectItemInfo);
 router.get('/latest', verifyToken, itemController.selectItemLatest);
 router.get('/parse', itemController.parseItemInfo);
+router.get('/:item_id', verifyToken, itemController.selectItemDetailInfo);
 router.put(
   '/:item_id',
   verifyToken,
