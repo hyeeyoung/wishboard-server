@@ -11,6 +11,7 @@ router.post(
   itemController.insertItemInfo,
 );
 router.get('/', verifyToken, itemController.selectItemInfo);
+router.get('/:item_id', verifyToken, itemController.selectItemDetailInfo);
 router.get('/latest', verifyToken, itemController.selectItemLatest);
 router.get('/parse', itemController.parseItemInfo);
 router.put(
