@@ -1,12 +1,19 @@
 const rateLimit = require('express-rate-limit');
+const { StatusCode, ErrorMessage } = require('../utils/response');
 
 const limiter = rateLimit({
-  // 1초에 1개의 요청만 가능하도록
-  windowMs: 1000, // 1초 ... 15 * 60 * 1000 15분
-  max: 1,
+  // 1초에 100개의 요청만 가능하도록
+  windowMs: 60000, // 1초, 60 * 1000
+  max: 100,
+  delayMs: 1000,
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: 'Too many accounts created from this IP',
+  handler(req, res) {
+    res.status(StatusCode.TOOMANYREQUEST).json({
+      success: false,
+      message: ErrorMessage.TooManyRequest,
+    });
+  },
 });
 
 module.exports = limiter;

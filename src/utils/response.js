@@ -6,6 +6,7 @@ const StatusCode = {
   UNAUTHORIZED: 401,
   NOTFOUND: 404,
   CONFLICT: 409,
+  TOOMANYREQUEST: 429,
 };
 
 const SuccessMessage = {
@@ -118,6 +119,7 @@ const ErrorMessage = {
   BadRequestMeg: '잘못된 요청',
   ApiUrlIsInvalid: '잘못된 경로',
   RequestWithIntentionalInvalidUrl: '의도적인 잘못된 경로 요청',
+  TooManyRequest: 'Too many accounts created from this IP',
 };
 
 module.exports = { StatusCode, SuccessMessage, ErrorMessage };
