@@ -90,6 +90,7 @@ const ErrorMessage = {
   notiReadStateUpdate: '수정된 알림 읽음 상태 없음',
   notiInsert: '추가된 알림 없음',
   notiUpsert: '추가되거나 수정된 알림 없음',
+  notiDateBadRequest: '알림 날짜의 분은 00 또는 30',
 
   /* 사용자*/
   validateNickname: '이미 존재하는 닉네임',
