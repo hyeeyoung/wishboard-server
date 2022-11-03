@@ -41,9 +41,6 @@ module.exports = {
             message: SuccessMessage.unValidateEmail,
           });
         } else {
-          if (!isValidate.isActive) {
-            return res.status(StatusCode.NOCONTENT).send();
-          }
           throw new Conflict(ErrorMessage.validateEmail);
         }
       });
@@ -89,28 +86,21 @@ module.exports = {
       if (!req.body.email || !req.body.password) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      passport.authenticate(
-        'local',
-        { session: false },
-        (err, user, unActiveUser) => {
-          if (err || !user) {
-            logger.info(TAG + err || !user);
-            if (unActiveUser) {
-              return res.status(StatusCode.NOCONTENT).send();
-            }
-            return res.status(StatusCode.BADREQUEST).json({
-              success: false,
-              message: ErrorMessage.checkIDPasswordAgain,
-            });
-          }
-          const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-          return res.status(StatusCode.OK).json({
-            success: true,
-            message: SuccessMessage.loginSuccess,
-            data: { token },
+      passport.authenticate('local', { session: false }, (err, user) => {
+        if (err || !user) {
+          logger.info(TAG + err || !user);
+          return res.status(StatusCode.BADREQUEST).json({
+            success: false,
+            message: ErrorMessage.checkIDPasswordAgain,
           });
-        },
-      )(req, res, next);
+        }
+        const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.loginSuccess,
+          data: { token },
+        });
+      })(req, res, next);
     } catch (err) {
       next(err);
     }
@@ -134,7 +124,6 @@ module.exports = {
         if (!isValidate.success) {
           throw new NotFound(ErrorMessage.unValidateUser);
         }
-        return res.status(StatusCode.NOCONTENT).send();
       }
     } catch (err) {
       next(err);

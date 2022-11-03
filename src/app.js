@@ -11,7 +11,6 @@ const nodeEnv = process.env.NODE_ENV;
 const passport = require('passport');
 const passportConfig = require('./config/passport');
 const schedule = require('node-schedule');
-const schduleService = require('./middleware/userScheduler');
 
 const handleErrors = require('./middleware/handleError');
 const { NotFound } = require('./utils/errors');
@@ -42,12 +41,6 @@ const server = app.listen(port, () => {
   /** 앱 시작 알림 */
   process.send('ready');
   logger.info(`[API Server] on port ${port} | ${nodeEnv}`);
-
-  /** 앱 시작과 동시에 사용자 탈퇴 스케줄러 실행 */
-  logger.info(SuccessMessage.userDeleteSchedulerStart);
-  schedule.scheduleJob('0 0 0 ? * MON *', function () {
-    schduleService.usersDelete();
-  });
 });
 
 process.on('SIGINT', function () {
@@ -55,8 +48,6 @@ process.on('SIGINT', function () {
   server.close(function () {
     /** 앱 및 스케줄러 종료*/
     logger.info('pm2 process closed');
-    schedule.gracefulShutdown().then(() => process.exit(0));
-    logger.info(SuccessMessage.userDeleteSchedulerExit);
   });
 });
 

@@ -32,8 +32,6 @@ async function localVerify(email, password, done) {
         if (!rows[0]) return done(null, false);
 
         user = rows[0];
-        if (!user[0].is_active)
-          return done(null, false, ErrorMessage.unActiveUser);
 
         const checkPassword = bcrypt.compareSync(password, user[0].password);
         logger.info(TAG + checkPassword);

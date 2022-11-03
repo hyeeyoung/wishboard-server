@@ -113,4 +113,16 @@ module.exports = {
         next(err);
       });
   },
+  deleteUser: async function (req, res, next) {
+    await User.deleteUser(req)
+      .then(() => {
+        res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.userDelete,
+        });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  },
 };
