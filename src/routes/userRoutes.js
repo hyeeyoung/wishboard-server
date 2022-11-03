@@ -19,5 +19,6 @@ router.put(
   userController.updateUserPushState,
 );
 router.get('/', verifyToken, userController.selectUserInfo);
+router.delete('/', verifyToken, userController.deleteUser);
 
 module.exports = router;

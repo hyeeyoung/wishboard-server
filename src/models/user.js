@@ -238,4 +238,16 @@ module.exports = {
 
     return Number(rows.affectedRows);
   },
+  deleteUser: async function (req) {
+    const userId = Number(req.decoded);
+    const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
+
+    const [rows] = await db.queryWithTransaction(sqlDelete, [userId]);
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userDelete);
+    }
+
+    return true;
+  },
 };
