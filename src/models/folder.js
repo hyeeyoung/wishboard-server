@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
+const { trimToString } = require('../utils/util');
 
 module.exports = {
   selectFolder: async function (req) {
@@ -66,7 +67,7 @@ module.exports = {
     return Object.setPrototypeOf(rows, []);
   },
   insertFolder: async function (req) {
-    const folderName = req.body.folder_name;
+    const folderName = trimToString(req.body.folder_name);
     const userId = Number(req.decoded);
 
     const sqInsert = `INSERT INTO folders(folder_name, user_id) VALUES (?, ?)`;
@@ -81,7 +82,7 @@ module.exports = {
   },
   updateFolder: async function (req) {
     const userId = Number(req.decoded);
-    const folderName = req.body.folder_name;
+    const folderName = trimToString(req.body.folder_name);
     const folderId = Number(req.params.folder_id);
 
     const sqlUpdate = `UPDATE folders SET folder_name = ? WHERE folder_id = ? and user_id = ?`;
@@ -110,7 +111,7 @@ module.exports = {
   },
   validateFolder: async function (req) {
     const userId = Number(req.decoded);
-    const folderName = req.body.folder_name;
+    const folderName = trimToString(req.body.folder_name);
 
     const sqlSelect =
       'SELECT folder_name FROM folders WHERE user_id = ? AND folder_name = ?';

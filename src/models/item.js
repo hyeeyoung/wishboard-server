@@ -2,6 +2,7 @@ const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 const db = require('../config/db');
 const multer = require('../config/multer');
+const { trimToString } = require('../utils/util');
 
 module.exports = {
   insertItem: async function (req) {
@@ -12,10 +13,10 @@ module.exports = {
       folderId = Number(req.body.folder_id);
     }
 
-    const itemName = req.body.item_name;
+    const itemName = trimToString(req.body.item_name);
     const itemPrice = !req.body.item_price ? 0 : req.body.item_price;
     const itemUrl = req.body.item_url;
-    const itemMemo = req.body.item_memo;
+    const itemMemo = trimToString(req.body.item_memo);
 
     const params = [userId, folderId, itemName, itemPrice, itemUrl, itemMemo];
 
@@ -107,10 +108,10 @@ module.exports = {
   updateItem: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
-    const itemName = req.body.item_name;
+    const itemName = trimToString(req.body.item_name);
     const itemPrice = !req.body.item_price ? 0 : Number(req.body.item_price);
     const itemUrl = req.body.item_url;
-    const itemMemo = req.body.item_memo;
+    const itemMemo = trimToString(req.body.item_memo);
     const folderId = Number(req.body.folder_id);
 
     const sqlSelect =
