@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 const db = require('../config/db');
+const { trimToString } = require('../utils/util');
 
 module.exports = {
   signUp: async function (req) {
@@ -63,7 +64,7 @@ module.exports = {
     if (!req.body.nickname) {
       return true;
     }
-    const nickname = req.body.nickname;
+    const nickname = trimToString(req.body.nickname);
 
     const sqlSelect = 'SELECT nickname FROM users WHERE nickname = ?';
 
@@ -109,7 +110,7 @@ module.exports = {
   },
   updateNickname: async function (req) {
     const userId = Number(req.decoded);
-    const nickname = req.body.nickname;
+    const nickname = trimToString(req.body.nickname);
 
     const sqlUpdate = 'UPDATE users SET nickname = ? WHERE user_id = ?';
     const params = [nickname, userId];
@@ -123,7 +124,7 @@ module.exports = {
   },
   updateInfo: async function (req) {
     const userId = Number(req.decoded);
-    const nickname = req.body.nickname;
+    const nickname = trimToString(req.body.nickname);
 
     const sqlSelect = 'SELECT profile_img FROM users WHERE user_id = ?';
     const [deleteImage] = await db.query(sqlSelect, [userId]);
