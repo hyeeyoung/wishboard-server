@@ -1,5 +1,7 @@
 const trimToString = (str) => {
-  return str.trim();
+  if (typeof str == 'string') {
+    return str.trim();
+  }
 };
 
 module.exports = { trimToString };
