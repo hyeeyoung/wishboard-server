@@ -85,7 +85,7 @@ module.exports = {
     // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
     await Promise.all(
       deleteImage.map(async (item) => {
-        if (!item) {
+        if (!item.profile_img) {
           await multer.s3Delete(item.profile_img);
         }
       }),
@@ -132,7 +132,7 @@ module.exports = {
     // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
     await Promise.all(
       deleteImage.map(async (item) => {
-        if (!item) {
+        if (!item.profile_img) {
           await multer.s3Delete(item.profile_img);
         }
       }),
@@ -224,8 +224,8 @@ module.exports = {
     // s3에서 삭제
     await Promise.all(
       deleteImages.map(async (item) => {
-        if (!item) {
-          await multer.s3Delete(imageName.profile_img);
+        if (!item.profile_img) {
+          await multer.s3Delete(item.profile_img);
         }
       }),
     );
@@ -242,6 +242,27 @@ module.exports = {
   deleteUser: async function (req) {
     const userId = Number(req.decoded);
     const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
+
+    const sqlDeleteItemImg = 'SELECT item_img FROM items WHERE user_id = ?';
+    const sqlDeleteProfileImg =
+      'SELECT profile_img FROM users WHERE user_id = ?';
+
+    const [deleteItemImages] = await db.query(sqlDeleteItemImg, [userId]);
+    const [deleteProfileImages] = await db.query(sqlDeleteProfileImg, [userId]);
+
+    // s3에서 삭제
+    await Promise.all(
+      deleteItemImages.map(async (item) => {
+        if (!item.item_img) {
+          await multer.s3Delete(item.item_img);
+        }
+      }),
+      deleteProfileImages.map(async (item) => {
+        if (!item.profile_img) {
+          await multer.s3Delete(item.profile_img);
+        }
+      }),
+    );
 
     const [rows] = await db.queryWithTransaction(sqlDelete, [userId]);
 
