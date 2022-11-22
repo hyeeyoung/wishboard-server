@@ -15,7 +15,7 @@ module.exports = {
 
     const itemName = trimToString(req.body.item_name);
     const itemPrice = !req.body.item_price ? 0 : req.body.item_price;
-    const itemUrl = req.body.item_url;
+    const itemUrl = !req.body.item_url ? null : trimToString(req.body.item_url);
     const itemMemo = trimToString(req.body.item_memo);
 
     const params = [userId, folderId, itemName, itemPrice, itemUrl, itemMemo];
@@ -121,7 +121,7 @@ module.exports = {
     // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
     await Promise.all(
       deleteImage.map(async (item) => {
-        if (!item) {
+        if (!item.item_img) {
           await multer.s3Delete(item.item_img);
         }
       }),
@@ -190,7 +190,7 @@ module.exports = {
     // s3에서 삭제
     await Promise.all(
       deleteImages.map(async (item) => {
-        if (!item) {
+        if (!item.item_img) {
           await multer.s3Delete(item.item_img);
         }
       }),
