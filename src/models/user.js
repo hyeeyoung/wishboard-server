@@ -3,6 +3,7 @@ const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 const db = require('../config/db');
 const { trimToString } = require('../utils/util');
+const S3ImageUtils = require('../utils/S3ImageUtils');
 
 module.exports = {
   signUp: async function (req) {
@@ -79,17 +80,7 @@ module.exports = {
   updateImage: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = 'SELECT profile_img FROM users WHERE user_id = ?';
-    const [deleteImage] = await db.query(sqlSelect, [userId]);
-
-    // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
-    await Promise.all(
-      deleteImage.map(async (item) => {
-        if (!item.profile_img) {
-          await multer.s3Delete(item.profile_img);
-        }
-      }),
-    );
+    S3ImageUtils.deleteProfileImg(userId);
 
     const image = { originalname: '', location: '' };
     if (req.file != undefined) {
@@ -126,20 +117,10 @@ module.exports = {
     const userId = Number(req.decoded);
     const nickname = trimToString(req.body.nickname);
 
-    const sqlSelect = 'SELECT profile_img FROM users WHERE user_id = ?';
-    const [deleteImage] = await db.query(sqlSelect, [userId]);
-
-    // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
-    await Promise.all(
-      deleteImage.map(async (item) => {
-        if (!item.profile_img) {
-          await multer.s3Delete(item.profile_img);
-        }
-      }),
-    );
-
     const image = { originalname: '', location: '' };
     if (req.file != undefined) {
+      S3ImageUtils.deleteProfileImg(userId);
+
       image.originalname = req.file.key;
       image.location = req.file.location;
     }
@@ -243,26 +224,9 @@ module.exports = {
     const userId = Number(req.decoded);
     const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
 
-    const sqlDeleteItemImg = 'SELECT item_img FROM items WHERE user_id = ?';
-    const sqlDeleteProfileImg =
-      'SELECT profile_img FROM users WHERE user_id = ?';
-
-    const [deleteItemImages] = await db.query(sqlDeleteItemImg, [userId]);
-    const [deleteProfileImages] = await db.query(sqlDeleteProfileImg, [userId]);
-
     // s3에서 삭제
-    await Promise.all(
-      deleteItemImages.map(async (item) => {
-        if (!item.item_img) {
-          await multer.s3Delete(item.item_img);
-        }
-      }),
-      deleteProfileImages.map(async (item) => {
-        if (!item.profile_img) {
-          await multer.s3Delete(item.profile_img);
-        }
-      }),
-    );
+    S3ImageUtils.deleteItemImgAll(userId);
+    S3ImageUtils.deleteProfileImg(userId);
 
     const [rows] = await db.queryWithTransaction(sqlDelete, [userId]);
 

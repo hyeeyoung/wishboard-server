@@ -1,8 +1,8 @@
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 const db = require('../config/db');
-const multer = require('../config/multer');
 const { trimToString } = require('../utils/util');
+const S3ImageUtils = require('../utils/S3ImageUtils');
 
 module.exports = {
   insertItem: async function (req) {
@@ -114,25 +114,14 @@ module.exports = {
     const itemMemo = trimToString(req.body.item_memo);
     const folderId = Number(req.body.folder_id);
 
-    const sqlSelect =
-      'SELECT item_img FROM items WHERE item_id = ? AND user_id = ?';
-    const [deleteImage] = await db.query(sqlSelect, [itemId, userId]);
-
-    // 이미 itemImg가 있는 상태라면, 이미지 s3에서 삭제
-    await Promise.all(
-      deleteImage.map(async (item) => {
-        if (!item.item_img) {
-          await multer.s3Delete(item.item_img);
-        }
-      }),
-    );
-
     let sqlUpdate =
       'UPDATE items SET item_name = ?, item_price = ?, item_url = ?, item_memo = ?';
     const params = [itemName, itemPrice, itemUrl, itemMemo];
 
     // 아이템이미지 있을 경우에만 동작
     if (req.file != undefined) {
+      S3ImageUtils.deleteItemImg([itemId, userId]);
+
       const image = { originalname: '', location: '' };
       image.originalname = req.file.key;
       image.location = req.file.location;
@@ -180,23 +169,10 @@ module.exports = {
   deleteItem: async function (req) {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
-    const sqlSelect =
-      'SELECT item_img FROM items WHERE item_id = ? AND user_id = ?';
     const sqlDelete = 'DELETE FROM items WHERE item_id = ? AND user_id = ?';
     const params = [itemId, userId];
 
-    const [deleteImages] = await db.query(sqlSelect, params);
-
-    // s3에서 삭제
-    await Promise.all(
-      deleteImages.map(async (item) => {
-        if (!item.item_img) {
-          await multer.s3Delete(item.item_img);
-        }
-      }),
-    );
-
-    // db에서 삭제
+    S3ImageUtils.deleteItemImg(params);
     const [rows] = await db.queryWithTransaction(sqlDelete, params);
 
     if (rows.affectedRows < 1) {
