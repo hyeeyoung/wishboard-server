@@ -49,7 +49,7 @@ module.exports = {
   selectItems: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img_url, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    const sqlSelect = `SELECT i.folder_id, ifNull(f.folder_name, "") folder_name, i.item_id, i.item_img_url, i.item_name, i.item_price, ifNull(i.item_url, "") item_url, ifNull(i.item_memo, "") item_memo, 
     CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
     FROM items i LEFT OUTER JOIN notifications n 
     ON i.item_id = n.item_id  
@@ -70,7 +70,7 @@ module.exports = {
     const userId = Number(req.decoded);
     const itemId = Number(req.params.item_id);
 
-    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img_url, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    const sqlSelect = `SELECT i.folder_id, ifNull(f.folder_name, "") folder_name, i.item_id, i.item_img_url, i.item_name, i.item_price, ifNull(i.item_url, "") item_url, ifNull(i.item_memo, "") item_memo, 
     CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date
     FROM items i LEFT OUTER JOIN notifications n 
     ON i.item_id = n.item_id  
@@ -88,7 +88,7 @@ module.exports = {
   selectItemOneLatest: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img_url, i.item_name, i.item_price, i.item_url, i.item_memo, 
+    const sqlSelect = `SELECT i.folder_id, ifNull(f.folder_name, "") folder_name, i.item_id, i.item_img_url, i.item_name, i.item_price, ifNull(i.item_url, "") item_url, ifNull(i.item_memo, "") item_memo, 
     CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date, IF(c.item_id IS NULL, false, true) as cart_state
     FROM items i LEFT OUTER JOIN notifications n 
     ON i.item_id = n.item_id  
