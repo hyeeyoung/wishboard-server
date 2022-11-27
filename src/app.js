@@ -46,7 +46,7 @@ const server = app.listen(port, () => {
 process.on('SIGINT', function () {
   isDisableKeepAlive = true;
   server.close(function () {
-    /** 앱 및 스케줄러 종료*/
+    /** 앱 종료*/
     logger.info('pm2 process closed');
   });
 });
