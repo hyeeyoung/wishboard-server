@@ -28,7 +28,7 @@ module.exports = {
     const email = req.body.email;
 
     const sqlSelect =
-      'SELECT user_id, email FROM users WHERE email = ? AND is_active = true';
+      'SELECT user_id, email, push_state FROM users WHERE email = ? AND is_active = true';
 
     const [rows] = await db.query(sqlSelect, [email]);
 
