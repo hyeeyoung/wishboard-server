@@ -21,12 +21,21 @@ module.exports = {
           req.body.item_notification_date &&
           req.body.item_notification_type
         ) {
-          Noti.insertNoti(req, itemId).then(() => {
-            return res.status(StatusCode.CREATED).json({
-              success: true,
-              message: SuccessMessage.itemAndNotiInsert,
+          // TODO request DTO 분리하기
+          const itemNotiDate = req.body.item_notification_date;
+          const minute = Number(
+            itemNotiDate.slice(-5, itemNotiDate.length - 3),
+          );
+          if (minute === 0 || minute === 30) {
+            Noti.insertNoti(req, itemId).then(() => {
+              return res.status(StatusCode.CREATED).json({
+                success: true,
+                message: SuccessMessage.itemAndNotiInsert,
+              });
             });
-          });
+          } else {
+            throw new BadRequest(ErrorMessage.notiDateBadRequest);
+          }
         } else {
           return res.status(StatusCode.CREATED).json({
             success: true,
@@ -40,6 +49,15 @@ module.exports = {
   },
   selectItemInfo: async function (req, res, next) {
     await Items.selectItems(req)
+      .then((result) => {
+        res.status(StatusCode.OK).json(result);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  },
+  selectItemDetailInfo: async function (req, res, next) {
+    await Items.selectItemDetail(req)
       .then((result) => {
         res.status(StatusCode.OK).json(result);
       })
@@ -67,22 +85,31 @@ module.exports = {
           req.body.item_notification_date &&
           req.body.item_notification_type
         ) {
-          //* item 수정 후 item_noti_~에 따라 알림여부를 noti에 수정/추가
-          Noti.upsertNoti(req).then((state) => {
-            if (state === Strings.INSERT) {
-              return res.status(StatusCode.CREATED).json({
-                success: true,
-                message: SuccessMessage.itemUpdateAndNotiInsert,
-              });
-            }
+          // TODO request DTO 분리하기
+          const itemNotiDate = req.body.item_notification_date;
+          const minute = Number(
+            itemNotiDate.slice(-5, itemNotiDate.length - 3),
+          );
+          if (minute === 0 || minute === 30) {
+            //* item 수정 후 item_noti_~에 따라 알림여부를 noti에 수정/추가
+            Noti.upsertNoti(req).then((state) => {
+              if (state === Strings.INSERT) {
+                return res.status(StatusCode.CREATED).json({
+                  success: true,
+                  message: SuccessMessage.itemUpdateAndNotiInsert,
+                });
+              }
 
-            if (state === Strings.UPSERT) {
-              return res.status(StatusCode.OK).json({
-                success: true,
-                message: SuccessMessage.itemAndNotiUpdate,
-              });
-            }
-          });
+              if (state === Strings.UPSERT) {
+                return res.status(StatusCode.OK).json({
+                  success: true,
+                  message: SuccessMessage.itemAndNotiUpdate,
+                });
+              }
+            });
+          } else {
+            throw new BadRequest(ErrorMessage.notiDateBadRequest);
+          }
         } else {
           //* item 수정 후 item_noti_~가 null인 경우, noti에 존재하면 삭제
           Noti.deleteNoti(req).then((result) => {

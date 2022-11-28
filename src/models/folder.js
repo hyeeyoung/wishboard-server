@@ -1,14 +1,15 @@
 const db = require('../config/db');
 const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
+const { trimToString } = require('../utils/util');
 
 module.exports = {
   selectFolder: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT f.folder_id, f.folder_name, i.folder_thumbnail, ifnull(ic.item_count, 0) item_count FROM folders f 
+    const sqlSelect = `SELECT f.folder_id, ifNull(f.folder_name, "") folder_name, i.folder_thumbnail, ifnull(ic.item_count, 0) item_count FROM folders f 
     LEFT OUTER JOIN (
-    (SELECT a.folder_id, a.item_img folder_thumbnail, a.create_at
+    (SELECT a.folder_id, a.item_img_url folder_thumbnail, a.create_at
     FROM items a INNER JOIN (SELECT max(create_at) create_at FROM items GROUP BY folder_id) b
     WHERE a.create_at = b.create_at)) i
     ON f.folder_id = i.folder_id 
@@ -26,9 +27,9 @@ module.exports = {
   selectFolderList: async function (req) {
     const userId = Number(req.decoded);
 
-    const sqlSelect = `SELECT f.folder_id, f.folder_name, i.folder_thumbnail FROM folders f 
+    const sqlSelect = `SELECT f.folder_id, ifNull(f.folder_name, "") folder_name, i.folder_thumbnail FROM folders f 
     LEFT OUTER JOIN (
-    (SELECT a.folder_id, a.item_img folder_thumbnail, a.create_at
+    (SELECT a.folder_id, a.item_img_url folder_thumbnail, a.create_at
     FROM items a INNER JOIN (SELECT max(create_at) create_at FROM items GROUP BY folder_id) b
     WHERE a.create_at = b.create_at)) i
     ON f.folder_id = i.folder_id 
@@ -45,8 +46,8 @@ module.exports = {
     const userId = Number(req.decoded);
     const folderId = Number(req.params.folder_id);
 
-    const sqlSelect = `SELECT i.folder_id, f.folder_name, i.item_id, i.item_img, i.item_name,
-    i.item_price, i.item_url, i.item_memo, IF(c.item_id IS NULL, false, true) as cart_state, 
+    const sqlSelect = `SELECT i.folder_id, ifNull(f.folder_name, "") folder_name, i.item_id, i.item_img_url, i.item_name,
+    i.item_price, ifNull(i.item_url, "") item_url, ifNull(i.item_memo, "") item_memo, IF(c.item_id IS NULL, false, true) as cart_state, 
     CAST(i.create_at AS CHAR) create_at, n.item_notification_type, CAST(n.item_notification_date AS CHAR(16)) item_notification_date
     FROM items i LEFT OUTER JOIN notifications n 
     ON i.item_id = n.item_id  
@@ -66,7 +67,7 @@ module.exports = {
     return Object.setPrototypeOf(rows, []);
   },
   insertFolder: async function (req) {
-    const folderName = req.body.folder_name;
+    const folderName = trimToString(req.body.folder_name);
     const userId = Number(req.decoded);
 
     const sqInsert = `INSERT INTO folders(folder_name, user_id) VALUES (?, ?)`;
@@ -81,7 +82,7 @@ module.exports = {
   },
   updateFolder: async function (req) {
     const userId = Number(req.decoded);
-    const folderName = req.body.folder_name;
+    const folderName = trimToString(req.body.folder_name);
     const folderId = Number(req.params.folder_id);
 
     const sqlUpdate = `UPDATE folders SET folder_name = ? WHERE folder_id = ? and user_id = ?`;
@@ -110,7 +111,7 @@ module.exports = {
   },
   validateFolder: async function (req) {
     const userId = Number(req.decoded);
-    const folderName = req.body.folder_name;
+    const folderName = trimToString(req.body.folder_name);
 
     const sqlSelect =
       'SELECT folder_name FROM folders WHERE user_id = ? AND folder_name = ?';

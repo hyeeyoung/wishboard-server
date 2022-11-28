@@ -3,10 +3,18 @@ const cheerio = require('cheerio');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
+const config = {
+  // headers: { 'User-Agent': 'Mozilla/5.0' },
+  validateStatus: function (status) {
+    return status >= 200 && status < 300;
+  },
+};
+
 const getHtml = async (url) => {
   try {
-    return await axios.get(url);
+    return await axios.get(encodeURI(url), config);
   } catch (err) {
+    console.log(err);
     throw new NotFound(ErrorMessage.itemParseFail);
   }
 };

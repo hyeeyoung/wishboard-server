@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const { NotFound, Conflict } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 const db = require('../config/db');
+const { trimToString } = require('../utils/util');
+const S3ImageUtils = require('../utils/S3ImageUtils');
 
 module.exports = {
   signUp: async function (req) {
@@ -14,7 +16,7 @@ module.exports = {
       'INSERT IGNORE INTO users (email, password) VALUES (?, ?)';
     const params = [email, hashPassword];
 
-    const [rows] = await db.query(sqlInsert, params);
+    const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.validateEmail);
@@ -26,7 +28,7 @@ module.exports = {
     const email = req.body.email;
 
     const sqlSelect =
-      'SELECT user_id, email FROM users WHERE email = ? AND is_active = true';
+      'SELECT user_id, email, push_state FROM users WHERE email = ? AND is_active = true';
 
     const [rows] = await db.query(sqlSelect, [email]);
 
@@ -63,7 +65,7 @@ module.exports = {
     if (!req.body.nickname) {
       return true;
     }
-    const nickname = req.body.nickname;
+    const nickname = trimToString(req.body.nickname);
 
     const sqlSelect = 'SELECT nickname FROM users WHERE nickname = ?';
 
@@ -77,10 +79,18 @@ module.exports = {
   },
   updateImage: async function (req) {
     const userId = Number(req.decoded);
-    const profileImg = req.body.profile_img;
 
-    const sqlUpdate = 'UPDATE users SET profile_img = ? WHERE user_id = ?';
-    const params = [profileImg, userId];
+    S3ImageUtils.deleteProfileImg(userId);
+
+    const image = { originalname: '', location: '' };
+    if (req.file != undefined) {
+      image.originalname = req.file.key;
+      image.location = req.file.location;
+    }
+
+    const sqlUpdate =
+      'UPDATE users SET profile_img = ?, profile_img_url = ?  WHERE user_id = ?';
+    const params = [image.originalname, image.location, userId];
 
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
@@ -91,7 +101,7 @@ module.exports = {
   },
   updateNickname: async function (req) {
     const userId = Number(req.decoded);
-    const nickname = req.body.nickname;
+    const nickname = trimToString(req.body.nickname);
 
     const sqlUpdate = 'UPDATE users SET nickname = ? WHERE user_id = ?';
     const params = [nickname, userId];
@@ -105,12 +115,19 @@ module.exports = {
   },
   updateInfo: async function (req) {
     const userId = Number(req.decoded);
-    const nickname = req.body.nickname;
-    const profileImg = req.body.profile_img;
+    const nickname = trimToString(req.body.nickname);
+
+    const image = { originalname: '', location: '' };
+    if (req.file != undefined) {
+      S3ImageUtils.deleteProfileImg(userId);
+
+      image.originalname = req.file.key;
+      image.location = req.file.location;
+    }
 
     const sqlUpdate =
-      'UPDATE users SET nickname = ?, profile_img = ? WHERE user_id = ?';
-    const params = [nickname, profileImg, userId];
+      'UPDATE users SET nickname = ?, profile_img = ?, profile_img_url = ?   WHERE user_id = ?';
+    const params = [nickname, image.originalname, image.location, userId];
 
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
@@ -168,7 +185,7 @@ module.exports = {
     const userId = Number(req.decoded);
 
     const sqlSelect =
-      'SELECT email, profile_img, nickname, push_state FROM users WHERE user_id = ?';
+      'SELECT email, profile_img_url, nickname, push_state FROM users WHERE user_id = ?';
 
     const [rows] = await db.query(sqlSelect, [userId]);
 
@@ -178,9 +195,23 @@ module.exports = {
     return Object.setPrototypeOf(rows, []);
   },
   unActiveUsersDelete: async function () {
+    const sqlSelect =
+      'SELECT profile_img_url FROM users WHERE is_active = false AND DATE(update_at) = DATE(NOW() - INTERVAL 7 DAY)';
     const sqlDelete =
       'DELETE FROM users WHERE is_active = false AND DATE(update_at) = DATE(NOW() - INTERVAL 7 DAY)';
 
+    const [deleteImages] = await db.query(sqlSelect);
+
+    // s3에서 삭제
+    await Promise.all(
+      deleteImages.map(async (item) => {
+        if (!item.profile_img) {
+          await multer.s3Delete(item.profile_img);
+        }
+      }),
+    );
+
+    // db에서 삭제
     const [rows] = await db.queryWithTransaction(sqlDelete);
 
     if (Array.isArray(rows) && !rows.length) {
@@ -188,5 +219,21 @@ module.exports = {
     }
 
     return Number(rows.affectedRows);
+  },
+  deleteUser: async function (req) {
+    const userId = Number(req.decoded);
+    const sqlDelete = 'DELETE FROM users WHERE user_id = ?';
+
+    // s3에서 삭제
+    S3ImageUtils.deleteItemImgAll(userId);
+    S3ImageUtils.deleteProfileImg(userId);
+
+    const [rows] = await db.queryWithTransaction(sqlDelete, [userId]);
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.userDelete);
+    }
+
+    return true;
   },
 };
