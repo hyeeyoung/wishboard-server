@@ -10,11 +10,10 @@ const nodeEnv = process.env.NODE_ENV;
 
 const passport = require('passport');
 const passportConfig = require('./config/passport');
-const schedule = require('node-schedule');
 
 const handleErrors = require('./middleware/handleError');
 const { NotFound } = require('./utils/errors');
-const { SuccessMessage, ErrorMessage } = require('./utils/response');
+const { ErrorMessage } = require('./utils/response');
 
 const rateLimit = require('./middleware/rateLimiter');
 
