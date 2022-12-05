@@ -169,7 +169,7 @@ module.exports = {
       if (!req.query.site) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      onBindParsingType(req.query.site)
+      await onBindParsingType(req.query.site)
         .then((data) => {
           res.status(StatusCode.OK).json({
             success: true,
