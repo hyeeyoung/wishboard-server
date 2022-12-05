@@ -7,12 +7,7 @@ const S3ImageUtils = require('../utils/S3ImageUtils');
 module.exports = {
   insertItem: async function (req) {
     const userId = Number(req.decoded);
-    let folderId = req.body.folder_id;
-
-    if (folderId != undefined) {
-      folderId = Number(req.body.folder_id);
-    }
-
+    const folderId = !req.body.folder_id ? null : Number(req.body.folder_id);
     const itemName = trimToString(req.body.item_name);
     const itemPrice = !req.body.item_price ? 0 : req.body.item_price;
     const itemUrl = !req.body.item_url ? null : trimToString(req.body.item_url);
