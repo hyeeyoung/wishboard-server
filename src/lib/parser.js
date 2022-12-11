@@ -108,23 +108,25 @@ const parsingForWconcept = async (url) => {
     if (html.status == 200) {
       const $ = cheerio.load(html.data);
       $('meta').each((_, el) => {
-        const egTag = $(el).attr('property')?.split(/^eg:/)[1];
-        if (egTag) {
-          const egValue = $(el).attr('content');
-          switch (egTag) {
-            case 'itemName':
-              itemName = egValue;
+        const ogTag = $(el).attr('property')?.split(/^og:/)[1];
+        if (ogTag) {
+          const ogValue = $(el).attr('content');
+          switch (ogTag) {
+            case 'description':
+              itemName = ogValue;
               break;
-            case 'itemImage':
-              itemImg = 'https:';
-              itemImg += egValue;
-              break;
-            case 'originalPrice':
-              itemPrice = egValue;
+            case 'image':
+              itemImg = ogValue;
               break;
           }
         }
       });
+      if (!itemPrice) {
+        // TODO 개선 필요
+        itemPrice = $(
+          '#frmproduct > div.price_wrap > dl > dd.normal > em',
+        ).text();
+      }
     }
   });
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
