@@ -9,6 +9,16 @@ const {
 } = require('../utils/response');
 const { Strings } = require('../utils/strings');
 
+const existEmptyData = (obj) => {
+  if (obj.constructor !== Object) {
+    return false;
+  }
+  if (JSON.stringify(obj) !== '{}') {
+    return false;
+  }
+  return true;
+};
+
 module.exports = {
   insertItemInfo: async function (req, res, next) {
     try {
@@ -171,7 +181,10 @@ module.exports = {
       }
       await onBindParsingType(req.query.site)
         .then((data) => {
-          res.status(StatusCode.OK).json({
+          if (existEmptyData(data)) {
+            return res.status(StatusCode.NOCONTENT).json();
+          }
+          return res.status(StatusCode.OK).json({
             success: true,
             message: SuccessMessage.itemParse,
             data,
