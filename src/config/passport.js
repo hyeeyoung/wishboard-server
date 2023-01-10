@@ -24,7 +24,7 @@ async function localVerify(email, password, done) {
   let user;
   try {
     const sqlSelect =
-      'SELECT user_id, email, password, is_active FROM users WHERE email = ?';
+      'SELECT user_id, email, password, nickname, is_active FROM users WHERE email = ?';
 
     await db
       .query(sqlSelect, email)

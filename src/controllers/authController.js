@@ -97,7 +97,7 @@ module.exports = {
           });
         }
         const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-        const tempNickname = getRandomNickname();
+        const tempNickname = user[0].nickname ? null : getRandomNickname();
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
@@ -141,7 +141,7 @@ module.exports = {
       if (isVerify) {
         await User.signIn(req).then((result) => {
           const token = jwt.sign(result[0].user_id, process.env.JWT_SECRET_KEY);
-          const tempNickname = getRandomNickname();
+          const tempNickname = result[0].nickname ? null : getRandomNickname();
           return res.status(StatusCode.OK).json({
             success: true,
             message: SuccessMessage.loginSuccess,
