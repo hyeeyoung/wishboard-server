@@ -8,9 +8,6 @@ require('dotenv').config({ path: '../.env' });
 const port = process.env.PORT;
 const nodeEnv = process.env.NODE_ENV;
 
-const passport = require('passport');
-const passportConfig = require('./config/passport');
-
 const handleErrors = require('./middleware/handleError');
 const { NotFound } = require('./utils/errors');
 const { ErrorMessage } = require('./utils/response');
@@ -55,10 +52,6 @@ app.use(express.json());
 
 /** DDos 공격 방지 */
 app.use(rateLimit);
-
-/** passport 설정 */
-app.use(passport.initialize());
-passportConfig();
 
 /** router 설정 */
 app.use(require('./routes/index'));

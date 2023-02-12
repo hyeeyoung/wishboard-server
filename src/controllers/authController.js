@@ -1,5 +1,3 @@
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const logger = require('../config/winston');
 require('dotenv').config({ path: '../.env' });
@@ -13,8 +11,7 @@ const transport = require('../middleware/mailTransport');
 const crypto = require('crypto'); // npm built-in module
 const { generateMessage } = require('../utils/sendMailMessage');
 const { getRandomNickname } = require('../utils/TemporaryNicknames');
-
-const TAG = 'authController  ';
+const { createJwt, verifyRefresh } = require('../utils/jwtUtils');
 
 const sendMailForCertified = (email) => {
   const verificationCode = crypto.randomBytes(3).toString('hex');
