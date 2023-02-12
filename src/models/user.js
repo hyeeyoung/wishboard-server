@@ -21,10 +21,25 @@ module.exports = {
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.validateEmail);
     }
-
-    return Object.setPrototypeOf(rows, []);
+    return rows.insertId;
   },
   signIn: async function (req) {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    const sqlSelect =
+      'SELECT user_id, email, password, is_active FROM users WHERE email = ?';
+    const [rows] = await db.query(sqlSelect, [email]);
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.unValidateUser);
+    }
+
+    const checkPassword = bcrypt.compareSync(password, rows[0].password);
+
+    return { result: checkPassword, userId: rows[0].user_id };
+  },
+  restartSignIn: async function (req) {
     const email = req.body.email;
 
     const sqlSelect =
@@ -37,6 +52,17 @@ module.exports = {
     }
 
     return Object.setPrototypeOf(rows, []);
+  },
+  selectUser: async function (userId) {
+    const sqlSelect = 'SELECT * FROM users WHERE user_id = ?';
+
+    const [rows] = await db.query(sqlSelect, [userId]);
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.unValidateUser);
+    }
+
+    return rows[0].is_active === true ? true : false;
   },
   validateEmail: async function (req) {
     const email = req.body.email;
