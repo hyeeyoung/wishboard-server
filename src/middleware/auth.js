@@ -16,7 +16,7 @@ const verifyToken = (req, res, next) => {
     if (err.name == 'TokenExpiredError') {
       throw new Unauthorized(ErrorMessage.expireToken);
     }
-    throw new Unauthorized(ErrorMessage.unValidateToken);
+    throw new Unauthorized(ErrorMessage.expireToken);
   }
 };
 

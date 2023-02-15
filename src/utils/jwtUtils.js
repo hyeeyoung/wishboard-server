@@ -65,4 +65,19 @@ const verifyRefresh = async (req, res, next) => {
   }
 };
 
-module.exports = { createJwt, verifyRefresh };
+const expiredRefreshToken = async (req, res, next) => {
+  try {
+    const userId = Number(req.decoded);
+    await User.selectUser(userId);
+    const redisRefreshToken = await getRedisClient().get(userId);
+    if (redisRefreshToken) {
+      // redis에 있는 값은 삭제
+      await getRedisClient().expire(userId, EXPIRE_TIME);
+    }
+    return;
+  } catch (err) {
+    throw new Unauthorized(ErrorMessage.unValidateToken);
+  }
+};
+
+module.exports = { createJwt, verifyRefresh, expiredRefreshToken };

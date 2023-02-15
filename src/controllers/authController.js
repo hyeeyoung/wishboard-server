@@ -11,7 +11,11 @@ const transport = require('../middleware/mailTransport');
 const crypto = require('crypto'); // npm built-in module
 const { generateMessage } = require('../utils/sendMailMessage');
 const { getRandomNickname } = require('../utils/TemporaryNicknames');
-const { createJwt, verifyRefresh } = require('../utils/jwtUtils');
+const {
+  createJwt,
+  verifyRefresh,
+  expiredRefreshToken,
+} = require('../utils/jwtUtils');
 
 const sendMailForCertified = (email) => {
   const verificationCode = crypto.randomBytes(3).toString('hex');
@@ -160,6 +164,18 @@ module.exports = {
           data: {
             token,
           },
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  logout: async function (req, res, next) {
+    try {
+      await expiredRefreshToken(req).then(() => {
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.logoutSuccess,
         });
       });
     } catch (err) {

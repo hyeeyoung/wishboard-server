@@ -55,6 +55,7 @@ const SuccessMessage = {
   unValidateEmail: '회원가입이 가능한 이메일주소',
 
   refreshTokenSuccess: '토큰 갱신 성공',
+  logoutSuccess: '로그아웃 성공',
 
   userDeleteSchedulerStart: '탈퇴 유저 삭제 스케줄러 시작',
   userDeleteSchedulerExit: '탈퇴 유저 삭제 스케줄러 종료',
