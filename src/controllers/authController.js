@@ -53,9 +53,8 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
-      await User.signUp(req).then((userId) => {
-        console.log('AUTHCONTROlLER: ' + userId);
-        const token = createJwt(userId);
+      await User.signUp(req).then(async (userId) => {
+        const token = await createJwt(userId);
         const tempNickname = getRandomNickname();
         return res.status(StatusCode.CREATED).json({
           success: true,
@@ -80,12 +79,14 @@ module.exports = {
           });
         }
         const token = await createJwt(data.userId);
-        console.log(token);
-        const tempNickname = getRandomNickname();
+        let nickname = null;
+        if (!data.nickname) {
+          nickname = getRandomNickname();
+        }
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
-          data: { token, tempNickname },
+          data: { token, nickname },
         });
       });
     } catch (err) {
@@ -123,16 +124,19 @@ module.exports = {
       }
       const isVerify = req.body.verify;
       if (isVerify) {
-        await User.restartSignIn(req).then((result) => {
-          const token = createJwt(result[0].user_id);
-          const tempNickname = getRandomNickname();
+        await User.restartSignIn(req).then(async (data) => {
+          const token = await createJwt(data[0].user_id);
+          let nickname = null;
+          if (!data[0].nickname) {
+            nickname = getRandomNickname();
+          }
           return res.status(StatusCode.OK).json({
             success: true,
             message: SuccessMessage.loginSuccess,
             data: {
               token,
-              pushState: result[0].push_state,
-              tempNickname,
+              pushState: data[0].push_state,
+              nickname,
             },
           });
         });

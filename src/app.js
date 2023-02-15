@@ -34,7 +34,6 @@ app.use(function (req, res, next) {
   next();
 });
 
-// app.use(redisConnect());
 redisConnect();
 const server = app.listen(port, () => {
   /** 앱 시작 알림 */

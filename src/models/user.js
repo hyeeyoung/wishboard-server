@@ -28,7 +28,7 @@ module.exports = {
     const password = req.body.password;
 
     const sqlSelect =
-      'SELECT user_id, email, password, is_active FROM users WHERE email = ?';
+      'SELECT user_id, email, nickname, password, is_active FROM users WHERE email = ?';
     const [rows] = await db.query(sqlSelect, [email]);
 
     if (rows.affectedRows < 1) {
@@ -37,7 +37,11 @@ module.exports = {
 
     const checkPassword = bcrypt.compareSync(password, rows[0].password);
 
-    return { result: checkPassword, userId: rows[0].user_id };
+    return {
+      result: checkPassword,
+      userId: rows[0].user_id,
+      nickname: rows[0].nickname,
+    };
   },
   restartSignIn: async function (req) {
     const email = req.body.email;
