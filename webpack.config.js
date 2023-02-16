@@ -23,6 +23,8 @@ module.exports = {
       ),
       'process.env.DB_PORT': JSON.stringify(process.env.DB_PORT),
       'process.env.DB_DEV_NAME': JSON.stringify(process.env.DB_DEV_NAME),
+      'process.env.REDIS_HOST': JSON.stringify(process.env.REDIS_HOST),
+      'process.env.REDIS_PORT': JSON.stringify(process.env.REDIS_PORT),
       'process.env.JWT_SECRET_KEY': JSON.stringify(process.env.JWT_SECRET_KEY),
       'process.env.WISHBOARD_GMAIL_ID': JSON.stringify(
         process.env.WISHBOARD_GMAIL_ID,

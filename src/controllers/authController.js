@@ -1,5 +1,3 @@
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const logger = require('../config/winston');
 require('dotenv').config({ path: '../.env' });
@@ -13,8 +11,11 @@ const transport = require('../middleware/mailTransport');
 const crypto = require('crypto'); // npm built-in module
 const { generateMessage } = require('../utils/sendMailMessage');
 const { getRandomNickname } = require('../utils/TemporaryNicknames');
-
-const TAG = 'authController  ';
+const {
+  createJwt,
+  verifyRefresh,
+  expiredRefreshToken,
+} = require('../utils/jwtUtils');
 
 const sendMailForCertified = (email) => {
   const verificationCode = crypto.randomBytes(3).toString('hex');
@@ -56,28 +57,14 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
-      await User.signUp(req).then(() => {
-        passport.authenticate('local', { session: false }, (err, user) => {
-          if (err || !user) {
-            logger.info(TAG + err || !user);
-            return res.status(StatusCode.CREATED).json({
-              success: false,
-              message: SuccessMessage.loginFailedAfterSuccessSignUp,
-            });
-          }
-          req.login(user, { session: false }, (err) => {
-            if (err) {
-              next(err);
-            }
-            const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-            const tempNickname = getRandomNickname();
-            return res.status(StatusCode.CREATED).json({
-              success: true,
-              message: SuccessMessage.loginSuccessAfterSuccessSignUp,
-              data: { token, tempNickname },
-            });
-          });
-        })(req, res);
+      await User.signUp(req).then(async (userId) => {
+        const token = await createJwt(userId);
+        const tempNickname = getRandomNickname();
+        return res.status(StatusCode.CREATED).json({
+          success: true,
+          message: SuccessMessage.loginSuccessAfterSuccessSignUp,
+          data: { token, tempNickname },
+        });
       });
     } catch (err) {
       next(err);
@@ -88,22 +75,24 @@ module.exports = {
       if (!req.body.email || !req.body.password) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      passport.authenticate('local', { session: false }, (err, user) => {
-        if (err || !user) {
-          logger.info(TAG + err || !user);
+      await User.signIn(req).then(async (data) => {
+        if (!data.result) {
           return res.status(StatusCode.BADREQUEST).json({
             success: false,
             message: ErrorMessage.checkIDPasswordAgain,
           });
         }
-        const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-        const tempNickname = user[0].nickname ? null : getRandomNickname();
+        const token = await createJwt(data.userId);
+        let nickname = null;
+        if (!data.nickname) {
+          nickname = getRandomNickname();
+        }
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
-          data: { token, tempNickname },
+          data: { token, nickname },
         });
-      })(req, res, next);
+      });
     } catch (err) {
       next(err);
     }
@@ -139,22 +128,56 @@ module.exports = {
       }
       const isVerify = req.body.verify;
       if (isVerify) {
-        await User.signIn(req).then((result) => {
-          const token = jwt.sign(result[0].user_id, process.env.JWT_SECRET_KEY);
-          const tempNickname = result[0].nickname ? null : getRandomNickname();
+        await User.restartSignIn(req).then(async (data) => {
+          const token = await createJwt(data[0].user_id);
+          let nickname = null;
+          if (!data[0].nickname) {
+            nickname = getRandomNickname();
+          }
           return res.status(StatusCode.OK).json({
             success: true,
             message: SuccessMessage.loginSuccess,
             data: {
               token,
-              pushState: result[0].push_state,
-              tempNickname,
+              pushState: data[0].push_state,
+              nickname,
             },
           });
         });
       } else {
         throw new NotFound(ErrorMessage.unValidateVerificationCode);
       }
+    } catch (err) {
+      next(err);
+    }
+  },
+  refreshToken: async function (req, res, next) {
+    try {
+      if (!req.body.accessToken && !req.body.refreshToken) {
+        throw new BadRequest(ErrorMessage.tokenBadRequest);
+      }
+
+      await verifyRefresh(req).then((token) => {
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.refreshTokenSuccess,
+          data: {
+            token,
+          },
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  logout: async function (req, res, next) {
+    try {
+      await expiredRefreshToken(req).then(() => {
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.logoutSuccess,
+        });
+      });
     } catch (err) {
       next(err);
     }
