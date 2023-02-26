@@ -83,14 +83,14 @@ module.exports = {
           });
         }
         const token = await createJwt(data.userId);
-        let nickname = null;
+        let tempNickname = null;
         if (!data.nickname) {
-          nickname = getRandomNickname();
+          tempNickname = getRandomNickname();
         }
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
-          data: { token, nickname },
+          data: { token, tempNickname },
         });
       });
     } catch (err) {
@@ -130,9 +130,9 @@ module.exports = {
       if (isVerify) {
         await User.restartSignIn(req).then(async (data) => {
           const token = await createJwt(data[0].user_id);
-          let nickname = null;
+          let tempNickname = null;
           if (!data[0].nickname) {
-            nickname = getRandomNickname();
+            tempNickname = getRandomNickname();
           }
           return res.status(StatusCode.OK).json({
             success: true,
@@ -140,7 +140,7 @@ module.exports = {
             data: {
               token,
               pushState: data[0].push_state,
-              nickname,
+              tempNickname,
             },
           });
         });
