@@ -111,6 +111,7 @@ const ErrorMessage = {
 
   unActiveUser: '탈퇴 처리된 유저',
   signUpFailed: 'wishboard 앱 회원가입 실패',
+  existsUserFcmToken: '이미 존재하는 사용자의 fcmToken',
   validateEmail: '이미 존재하는 이메일 주소',
   unValidateUser: '존재하지 않는 유저',
   checkIDPasswordAgain: '이메일 주소 혹은 비밀번호를 다시 확인',

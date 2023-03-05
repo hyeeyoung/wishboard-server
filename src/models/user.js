@@ -9,38 +9,51 @@ module.exports = {
   signUp: async function (req) {
     const email = req.body.email;
     const password = req.body.password;
+    const fcmToken = req.body.fcmToken;
 
     const hashPassword = bcrypt.hashSync(password, 10);
 
     const sqlInsert =
-      'INSERT IGNORE INTO users (email, password) VALUES (?, ?)';
-    const params = [email, hashPassword];
+      'INSERT IGNORE INTO users (email, password, fcm_token) VALUES (?, ?, ?)';
+    const params = [email, hashPassword, fcmToken];
 
     const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.validateEmail);
+      throw new NotFound(ErrorMessage.existsUserFcmToken);
     }
     return rows.insertId;
   },
   signIn: async function (req) {
     const email = req.body.email;
     const password = req.body.password;
+    const fcmToken = req.body.fcmToken;
 
     const sqlSelect =
-      'SELECT user_id, email, nickname, password, is_active FROM users WHERE email = ?';
-    const [rows] = await db.query(sqlSelect, [email]);
+      'SELECT user_id, email, nickname, fcm_token, password, is_active FROM users WHERE email = ?';
+    const [selectRows] = await db.query(sqlSelect, [email]);
 
-    if (rows.affectedRows < 1) {
+    if (selectRows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
-    const checkPassword = bcrypt.compareSync(password, rows[0].password);
+    const checkPassword = bcrypt.compareSync(password, selectRows[0].password);
+
+    if (selectRows[0].fcm_token !== fcmToken) {
+      const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
+      const params = [fcmToken, selectRows[0].user_id];
+
+      const [updateRows] = await db.queryWithTransaction(sqlUpdate, params);
+
+      if (updateRows.affectedRows < 1) {
+        throw new NotFound(ErrorMessage.failedUpdateFcmToken);
+      }
+    }
 
     return {
       result: checkPassword,
-      userId: rows[0].user_id,
-      nickname: rows[0].nickname,
+      userId: selectRows[0].user_id,
+      nickname: selectRows[0].nickname,
     };
   },
   restartSignIn: async function (req) {
