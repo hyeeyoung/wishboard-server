@@ -53,7 +53,7 @@ module.exports = {
   signUp: async function (req, res, next) {
     try {
       // TODO DTO 만들어서 req.body로 넘기지 않도록 수정하기 (전체적으로)
-      if (!req.body.email || !req.body.password) {
+      if (!req.body.email || !req.body.password || !req.body.fcmToken) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
@@ -72,7 +72,7 @@ module.exports = {
   },
   signIn: async function (req, res, next) {
     try {
-      if (!req.body.email || !req.body.password) {
+      if (!req.body.email || !req.body.password || !req.body.fcmToken) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       await User.signIn(req).then(async (data) => {
@@ -139,7 +139,6 @@ module.exports = {
             message: SuccessMessage.loginSuccess,
             data: {
               token,
-              pushState: data[0].push_state,
               tempNickname,
             },
           });
@@ -172,11 +171,11 @@ module.exports = {
   },
   logout: async function (req, res, next) {
     try {
-      await expiredRefreshToken(req).then(() => {
-        return res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.logoutSuccess,
-        });
+      await expiredRefreshToken(req);
+      await User.updateFCM(req);
+      return res.status(StatusCode.OK).json({
+        success: true,
+        message: SuccessMessage.logoutSuccess,
       });
     } catch (err) {
       next(err);

@@ -57,18 +57,18 @@ module.exports = {
       next(err);
     }
   },
-  updateUserFCMToken: async function (req, res, next) {
-    await User.updateFCM(req)
-      .then(() => {
-        res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.userFcmTokenUpdate,
-        });
-      })
-      .catch((err) => {
-        next(err);
-      });
-  },
+  // updateUserFCMToken: async function (req, res, next) {
+  //   await User.updateFCM(req)
+  //     .then(() => {
+  //       res.status(StatusCode.OK).json({
+  //         success: true,
+  //         message: SuccessMessage.userFcmTokenUpdate,
+  //       });
+  //     })
+  //     .catch((err) => {
+  //       next(err);
+  //     });
+  // },
   selectUserInfo: async function (req, res, next) {
     await User.selectInfo(req)
       .then((result) => {
