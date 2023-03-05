@@ -139,7 +139,6 @@ module.exports = {
             message: SuccessMessage.loginSuccess,
             data: {
               token,
-              pushState: data[0].push_state,
               tempNickname,
             },
           });
