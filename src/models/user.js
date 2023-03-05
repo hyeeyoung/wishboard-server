@@ -168,7 +168,7 @@ module.exports = {
   },
   updateFCM: async function (req) {
     const userId = Number(req.decoded);
-    const fcmToken = req.body.fcm_token;
+    const fcmToken = null;
 
     const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
     const params = [fcmToken, userId];

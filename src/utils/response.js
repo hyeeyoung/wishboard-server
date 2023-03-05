@@ -114,6 +114,7 @@ const ErrorMessage = {
   validateEmail: '이미 존재하는 이메일 주소',
   unValidateUser: '존재하지 않는 유저',
   checkIDPasswordAgain: '이메일 주소 혹은 비밀번호를 다시 확인',
+  failedUpdateFcmToken: '로그인 시 사용자 fcm 토큰 변경 실패',
 
   sendMailFailed: '새 비밀번호 지정을 위한 메일 전송 실패',
   unValidateVerificationCode: '유효하지 않은 인증번호.',

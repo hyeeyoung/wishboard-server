@@ -172,11 +172,11 @@ module.exports = {
   },
   logout: async function (req, res, next) {
     try {
-      await expiredRefreshToken(req).then(() => {
-        return res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.logoutSuccess,
-        });
+      await expiredRefreshToken(req);
+      await User.updateFCM(req);
+      return res.status(StatusCode.OK).json({
+        success: true,
+        message: SuccessMessage.logoutSuccess,
       });
     } catch (err) {
       next(err);
