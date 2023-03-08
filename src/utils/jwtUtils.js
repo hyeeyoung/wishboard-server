@@ -22,7 +22,7 @@ const createJwt = async (userId) => {
       algorithm: ALGORITHM,
       expiresIn: ACCESS_TOKEN_EXPIRES_TIME,
     });
-    const refreshToken = jwt.sign({}, jwtSecret, {
+    const refreshToken = jwt.sign({ data: userId }, jwtSecret, {
       algorithm: ALGORITHM,
       expiresIn: REFRESH_TOKEN_EXPIRES_TIME,
     });
@@ -38,12 +38,8 @@ const createJwt = async (userId) => {
 
 const verifyRefresh = async (req, res, next) => {
   try {
-    const reqAccessToken = req.body.accessToken;
     const reqRefreshToken = req.body.refreshToken;
-    const jwtVerify = jwt.verify(reqAccessToken, jwtSecret);
-
-    // access token 값으로 존재하는 유저인지 확인
-    await User.selectUser(jwtVerify.data);
+    const jwtVerify = jwt.verify(reqRefreshToken, jwtSecret);
 
     const redisRefreshToken = await getRedisClient().get(jwtVerify.data);
 
@@ -61,7 +57,7 @@ const verifyRefresh = async (req, res, next) => {
 
     return token;
   } catch (err) {
-    throw new Unauthorized(ErrorMessage.expireToken);
+    throw new Unauthorized(ErrorMessage.unValidateToken);
   }
 };
 

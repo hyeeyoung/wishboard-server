@@ -152,7 +152,7 @@ module.exports = {
   },
   refreshToken: async function (req, res, next) {
     try {
-      if (!req.body.accessToken && !req.body.refreshToken) {
+      if (!req.body.refreshToken) {
         throw new BadRequest(ErrorMessage.tokenBadRequest);
       }
 
