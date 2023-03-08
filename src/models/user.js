@@ -208,13 +208,11 @@ module.exports = {
   },
   updatePassword: async function (req) {
     const userId = Number(req.decoded);
-    const email = req.body.email;
-    const password = req.body.password;
-    const hashPassword = bcrypt.hashSync(password, 10);
+    const newPassword = req.body.newPassword;
+    const hashPassword = bcrypt.hashSync(newPassword, 10);
 
-    const sqlUpdate =
-      'UPDATE users SET password = ? WHERE email = ? AND user_id = ?';
-    const params = [hashPassword, email, userId];
+    const sqlUpdate = 'UPDATE users SET password = ? WHERE user_id = ?';
+    const params = [hashPassword, userId];
 
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
