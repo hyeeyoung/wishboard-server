@@ -233,6 +233,37 @@ const parsingForGmarket = async (url) => {
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
 
+/* Seoul store */
+const parsingForSeoulStore = async (url) => {
+  let itemImg;
+  let itemName;
+  let itemPrice;
+  await getHtml(url).then((html) => {
+    if (html.status == 200) {
+      const $ = cheerio.load(html.data);
+      $('meta').each((_, el) => {
+        const tag = $(el).attr('property')?.split(':')[1];
+        if (tag) {
+          const value = $(el).attr('content');
+          switch (tag) {
+            case 'title':
+              itemName = value;
+              itemPrice = value.split('|').reverse()[1];
+              break;
+            case 'image':
+              if (!itemImg) {
+                itemImg = value;
+              }
+              break;
+          }
+        }
+      });
+    }
+  });
+  itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
+  return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
+};
+
 const getPriceWithoutString = (itemPrice) => {
   return String(itemPrice).replace(/[^0-9]/g, '');
 };
@@ -250,6 +281,9 @@ module.exports = {
       site.startsWith('https://www.musinsa.com/')
     ) {
       return await parsingForMusinsa(site);
+    }
+    if (site.startsWith('https://www.seoulstore.com/')) {
+      return await parsingForSeoulStore(site);
     }
     if (
       site.startsWith('https://m.wconcept.co.kr/') ||
