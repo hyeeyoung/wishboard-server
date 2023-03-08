@@ -80,9 +80,10 @@ module.exports = {
   },
   updateUserPassword: async function (req, res, next) {
     try {
-      if (!req.body.email || !req.body.password) {
+      if (!req.body.newPassword) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
+
       await User.updatePassword(req).then(() => {
         res.status(StatusCode.OK).json({
           success: true,
