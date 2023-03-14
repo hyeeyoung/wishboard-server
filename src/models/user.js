@@ -58,6 +58,7 @@ module.exports = {
   },
   restartSignIn: async function (req) {
     const email = req.body.email;
+    const fcmToken = req.body.fcmToken;
 
     const sqlSelect =
       'SELECT user_id, email, nickname FROM users WHERE email = ? AND is_active = true';
@@ -66,6 +67,17 @@ module.exports = {
 
     if (rows.affectedRows < 1) {
       throw new NotFound(ErrorMessage.unValidateUser);
+    }
+
+    if (selectRows[0].fcm_token !== fcmToken) {
+      const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
+      const params = [fcmToken, selectRows[0].user_id];
+
+      const [updateRows] = await db.queryWithTransaction(sqlUpdate, params);
+
+      if (updateRows.affectedRows < 1) {
+        throw new NotFound(ErrorMessage.failedUpdateFcmToken);
+      }
     }
 
     return Object.setPrototypeOf(rows, []);
