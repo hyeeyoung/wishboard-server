@@ -45,6 +45,7 @@ jobs:
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
           echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
           echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+          echo REDIS_DEV_PASSWORD=${{ secrets.REDIS_DEV_PASSWORD }} >> .env
 
           echo WISHBOARD_GMAIL_ID=${{ secrets.WISHBOARD_GMAIL_ID }} >> .env
           echo WISHBOARD_GMAIL_PW=${{ secrets.WISHBOARD_GMAIL_PW }} >> .env
@@ -78,7 +79,7 @@ jobs:
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
-          --application-name wishboard-dev-codedeploy
+          --application-name wishboard-dev-codedeploy1
           --deployment-config-name CodeDeployDefault.OneAtATime
           --deployment-group-name GROUP
           --s3-location bucket=wishboard-dev-build,bundleType=zip,key=deploy/wishboard-dev.zip

@@ -4,6 +4,7 @@ const { ErrorMessage } = require('../utils/response');
 const db = require('../config/db');
 const { trimToString } = require('../utils/util');
 const S3ImageUtils = require('../utils/S3ImageUtils');
+const e = require('express');
 
 module.exports = {
   signUp: async function (req) {
@@ -33,7 +34,7 @@ module.exports = {
       'SELECT user_id, email, nickname, fcm_token, password, is_active FROM users WHERE email = ?';
     const [selectRows] = await db.query(sqlSelect, [email]);
 
-    if (selectRows.affectedRows < 1) {
+    if (selectRows.length < 1) {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
