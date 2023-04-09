@@ -121,6 +121,7 @@ const ErrorMessage = {
   unValidateVerificationCode: '유효하지 않은 인증번호.',
 
   tokenBadRequest: 'token 정보 없음. accessToken, refreshToken 필요',
+  refreshTokenBadRequest: 'token 정보 없음. refreshToken 필요',
   unValidateToken: 'token이 유효하지 않음',
   expireToken: 'token이 만료. 다시 로그인 필요',
   requestTokenAgain: 'token 없음. 요청 token 확인',

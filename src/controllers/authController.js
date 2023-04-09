@@ -153,7 +153,7 @@ module.exports = {
   refreshToken: async function (req, res, next) {
     try {
       if (!req.body.refreshToken) {
-        throw new BadRequest(ErrorMessage.tokenBadRequest);
+        throw new BadRequest(ErrorMessage.refreshTokenBadRequest);
       }
 
       await verifyRefresh(req).then((token) => {
