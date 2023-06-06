@@ -1,5 +1,3 @@
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const logger = require('../config/winston');
 require('dotenv').config({ path: '../.env' });
@@ -13,8 +11,11 @@ const transport = require('../middleware/mailTransport');
 const crypto = require('crypto'); // npm built-in module
 const { generateMessage } = require('../utils/sendMailMessage');
 const { getRandomNickname } = require('../utils/TemporaryNicknames');
-
-const TAG = 'authController  ';
+const {
+  createJwt,
+  verifyRefresh,
+  expiredRefreshToken,
+} = require('../utils/jwtUtils');
 
 const sendMailForCertified = (email) => {
   const verificationCode = crypto.randomBytes(3).toString('hex');
@@ -52,32 +53,18 @@ module.exports = {
   signUp: async function (req, res, next) {
     try {
       // TODO DTO 만들어서 req.body로 넘기지 않도록 수정하기 (전체적으로)
-      if (!req.body.email || !req.body.password) {
+      if (!req.body.email || !req.body.password || !req.body.fcmToken) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
-      await User.signUp(req).then(() => {
-        passport.authenticate('local', { session: false }, (err, user) => {
-          if (err || !user) {
-            logger.info(TAG + err || !user);
-            return res.status(StatusCode.CREATED).json({
-              success: false,
-              message: SuccessMessage.loginFailedAfterSuccessSignUp,
-            });
-          }
-          req.login(user, { session: false }, (err) => {
-            if (err) {
-              next(err);
-            }
-            const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-            const tempNickname = getRandomNickname();
-            return res.status(StatusCode.CREATED).json({
-              success: true,
-              message: SuccessMessage.loginSuccessAfterSuccessSignUp,
-              data: { token, tempNickname },
-            });
-          });
-        })(req, res);
+      await User.signUp(req).then(async (userId) => {
+        const token = await createJwt(userId);
+        const tempNickname = getRandomNickname();
+        return res.status(StatusCode.CREATED).json({
+          success: true,
+          message: SuccessMessage.loginSuccessAfterSuccessSignUp,
+          data: { token, tempNickname },
+        });
       });
     } catch (err) {
       next(err);
@@ -85,25 +72,27 @@ module.exports = {
   },
   signIn: async function (req, res, next) {
     try {
-      if (!req.body.email || !req.body.password) {
+      if (!req.body.email || !req.body.password || !req.body.fcmToken) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
-      passport.authenticate('local', { session: false }, (err, user) => {
-        if (err || !user) {
-          logger.info(TAG + err || !user);
+      await User.signIn(req).then(async (data) => {
+        if (!data.result) {
           return res.status(StatusCode.BADREQUEST).json({
             success: false,
             message: ErrorMessage.checkIDPasswordAgain,
           });
         }
-        const token = jwt.sign(user[0].user_id, process.env.JWT_SECRET_KEY);
-        const tempNickname = getRandomNickname();
+        const token = await createJwt(data.userId);
+        let tempNickname = null;
+        if (!data.nickname) {
+          tempNickname = getRandomNickname();
+        }
         return res.status(StatusCode.OK).json({
           success: true,
           message: SuccessMessage.loginSuccess,
           data: { token, tempNickname },
         });
-      })(req, res, next);
+      });
     } catch (err) {
       next(err);
     }
@@ -134,20 +123,22 @@ module.exports = {
   },
   restartSignIn: async function (req, res, next) {
     try {
-      if (!req.body.verify && !req.body.email) {
+      if (!req.body.verify && !req.body.email && !req.body.fcmToken) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       const isVerify = req.body.verify;
       if (isVerify) {
-        await User.signIn(req).then((result) => {
-          const token = jwt.sign(result[0].user_id, process.env.JWT_SECRET_KEY);
-          const tempNickname = getRandomNickname();
+        await User.restartSignIn(req).then(async (data) => {
+          const token = await createJwt(data[0].user_id);
+          let tempNickname = null;
+          if (!data[0].nickname) {
+            tempNickname = getRandomNickname();
+          }
           return res.status(StatusCode.OK).json({
             success: true,
             message: SuccessMessage.loginSuccess,
             data: {
               token,
-              pushState: result[0].push_state,
               tempNickname,
             },
           });
@@ -155,6 +146,37 @@ module.exports = {
       } else {
         throw new NotFound(ErrorMessage.unValidateVerificationCode);
       }
+    } catch (err) {
+      next(err);
+    }
+  },
+  refreshToken: async function (req, res, next) {
+    try {
+      if (!req.body.refreshToken) {
+        throw new BadRequest(ErrorMessage.refreshTokenBadRequest);
+      }
+
+      await verifyRefresh(req).then((token) => {
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.refreshTokenSuccess,
+          data: {
+            token,
+          },
+        });
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
+  logout: async function (req, res, next) {
+    try {
+      await expiredRefreshToken(req);
+      await User.updateFCM(req);
+      return res.status(StatusCode.OK).json({
+        success: true,
+        message: SuccessMessage.logoutSuccess,
+      });
     } catch (err) {
       next(err);
     }

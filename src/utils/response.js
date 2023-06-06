@@ -54,6 +54,9 @@ const SuccessMessage = {
   sendMailForCertifiedNumber: '비밀번호 찾기를 위한 인증번호 메일 전송 성공',
   unValidateEmail: '회원가입이 가능한 이메일주소',
 
+  refreshTokenSuccess: '토큰 갱신 성공',
+  logoutSuccess: '로그아웃 성공',
+
   userDeleteSchedulerStart: '탈퇴 유저 삭제 스케줄러 시작',
   userDeleteSchedulerExit: '탈퇴 유저 삭제 스케줄러 종료',
 };
@@ -108,13 +111,22 @@ const ErrorMessage = {
 
   unActiveUser: '탈퇴 처리된 유저',
   signUpFailed: 'wishboard 앱 회원가입 실패',
+  existsUserFcmToken: '이미 존재하는 사용자의 fcmToken',
   validateEmail: '이미 존재하는 이메일 주소',
   unValidateUser: '존재하지 않는 유저',
   checkIDPasswordAgain: '이메일 주소 혹은 비밀번호를 다시 확인',
-  unValidateToken: 'token이 유효하지 않음',
-  requestTokenAgain: 'token 없음. 요청 token 확인',
+  failedUpdateFcmToken: '로그인 시 사용자 fcm 토큰 변경 실패',
+
   sendMailFailed: '새 비밀번호 지정을 위한 메일 전송 실패',
   unValidateVerificationCode: '유효하지 않은 인증번호.',
+
+  tokenBadRequest: 'token 정보 없음. accessToken, refreshToken 필요',
+  refreshTokenBadRequest: 'token 정보 없음. refreshToken 필요',
+  unValidateToken: 'token이 유효하지 않음',
+  expireToken: 'token이 만료. 다시 로그인 필요',
+  requestTokenAgain: 'token 없음. 요청 token 확인',
+  failedCreateToken: 'token 생성 실패',
+  userIdNotFound: '토큰을 생성하기 위한 userId data 없음',
 
   /* 공통*/
   BadRequestMeg: '잘못된 요청',

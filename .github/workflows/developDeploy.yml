@@ -43,6 +43,9 @@ jobs:
           echo DB_DEV_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
           echo DB_DEV_NAME=${{ secrets.DB_DEV_NAME }} >> .env
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo REDIS_DEV_HOST=${{ secrets.REDIS_DEV_HOST }} >> .env
+          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+          echo REDIS_DEV_PASSWORD=${{ secrets.REDIS_DEV_PASSWORD }} >> .env
 
           echo WISHBOARD_GMAIL_ID=${{ secrets.WISHBOARD_GMAIL_ID }} >> .env
           echo WISHBOARD_GMAIL_PW=${{ secrets.WISHBOARD_GMAIL_PW }} >> .env
@@ -53,7 +56,7 @@ jobs:
 
           echo AWS_ACCESS_KEY=${{ secrets.AWS_S3_IMAGE_ACCESS_KEY }} >> .env
           echo AWS_SECRET_KEY=${{ secrets.AWS_S3_IMAGE_SECRET_KEY }} >> .env
-          echo BUCKET_NAME=${{ secrets.AWS_S3_IMAGE_BUCKET_NAME_DEV }} >> .env
+          echo BUCKET_NAME_DEV=${{ secrets.AWS_S3_IMAGE_BUCKET_NAME_DEV }} >> .env
 
         # 빌드하여 S3에 업로드
       - name: Run build (dev)
@@ -76,7 +79,7 @@ jobs:
 
       - name: deploy with AWS codeDeploy
         run: aws deploy create-deployment
-          --application-name wishboard-dev-codedeploy
+          --application-name wishboard-dev-codedeploy1
           --deployment-config-name CodeDeployDefault.OneAtATime
           --deployment-group-name GROUP
           --s3-location bucket=wishboard-dev-build,bundleType=zip,key=deploy/wishboard-dev.zip

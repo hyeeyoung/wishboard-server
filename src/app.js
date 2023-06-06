@@ -8,14 +8,12 @@ require('dotenv').config({ path: '../.env' });
 const port = process.env.PORT;
 const nodeEnv = process.env.NODE_ENV;
 
-const passport = require('passport');
-const passportConfig = require('./config/passport');
-
 const handleErrors = require('./middleware/handleError');
 const { NotFound } = require('./utils/errors');
 const { ErrorMessage } = require('./utils/response');
 
 const rateLimit = require('./middleware/rateLimiter');
+const { redisConnect } = require('./config/redis');
 
 /** 기본 설정 */
 // 서버 환경에 따라 다르게 설정 (배포/개발)
@@ -36,6 +34,7 @@ app.use(function (req, res, next) {
   next();
 });
 
+redisConnect();
 const server = app.listen(port, () => {
   /** 앱 시작 알림 */
   process.send('ready');
@@ -55,10 +54,6 @@ app.use(express.json());
 
 /** DDos 공격 방지 */
 app.use(rateLimit);
-
-/** passport 설정 */
-app.use(passport.initialize());
-passportConfig();
 
 /** router 설정 */
 app.use(require('./routes/index'));

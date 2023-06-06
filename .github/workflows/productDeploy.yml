@@ -43,6 +43,9 @@ jobs:
           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
+          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+          echo REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} >> .env
 
           echo WISHBOARD_GMAIL_ID=${{ secrets.WISHBOARD_GMAIL_ID }} >> .env
           echo WISHBOARD_GMAIL_PW=${{ secrets.WISHBOARD_GMAIL_PW }} >> .env
@@ -73,4 +76,4 @@ jobs:
           aws s3 cp \
             --recursive \
             --region ap-northeast-2 \
-            dist s3://wishboard-server-build
+            dist s3://wishboard-prod-build

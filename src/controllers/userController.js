@@ -57,18 +57,6 @@ module.exports = {
       next(err);
     }
   },
-  updateUserFCMToken: async function (req, res, next) {
-    await User.updateFCM(req)
-      .then(() => {
-        res.status(StatusCode.OK).json({
-          success: true,
-          message: SuccessMessage.userFcmTokenUpdate,
-        });
-      })
-      .catch((err) => {
-        next(err);
-      });
-  },
   selectUserInfo: async function (req, res, next) {
     await User.selectInfo(req)
       .then((result) => {
@@ -80,9 +68,10 @@ module.exports = {
   },
   updateUserPassword: async function (req, res, next) {
     try {
-      if (!req.body.email || !req.body.password) {
+      if (!req.body.newPassword) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
+
       await User.updatePassword(req).then(() => {
         res.status(StatusCode.OK).json({
           success: true,

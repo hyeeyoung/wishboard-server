@@ -21,6 +21,9 @@ module.exports = {
       'process.env.DB_PASSWORD': JSON.stringify(process.env.DB_PASSWORD),
       'process.env.DB_PORT': JSON.stringify(process.env.DB_PORT),
       'process.env.DB_NAME': JSON.stringify(process.env.DB_NAME),
+      'process.env.REDIS_HOST': JSON.stringify(process.env.REDIS_HOST),
+      'process.env.REDIS_PORT': JSON.stringify(process.env.REDIS_PORT),
+      'process.env.REDIS_PASSWORD': JSON.stringify(process.env.REDIS_PASSWORD),
       'process.env.JWT_SECRET_KEY': JSON.stringify(process.env.JWT_SECRET_KEY),
       'process.env.WISHBOARD_GMAIL_ID': JSON.stringify(
         process.env.WISHBOARD_GMAIL_ID,

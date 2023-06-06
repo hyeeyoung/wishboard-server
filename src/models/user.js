@@ -9,26 +9,59 @@ module.exports = {
   signUp: async function (req) {
     const email = req.body.email;
     const password = req.body.password;
+    const fcmToken = req.body.fcmToken;
 
     const hashPassword = bcrypt.hashSync(password, 10);
 
     const sqlInsert =
-      'INSERT IGNORE INTO users (email, password) VALUES (?, ?)';
-    const params = [email, hashPassword];
+      'INSERT IGNORE INTO users (email, password, fcm_token) VALUES (?, ?, ?)';
+    const params = [email, hashPassword, fcmToken];
 
     const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
     if (rows.affectedRows < 1) {
-      throw new NotFound(ErrorMessage.validateEmail);
+      throw new NotFound(ErrorMessage.existsUserFcmToken);
     }
-
-    return Object.setPrototypeOf(rows, []);
+    return rows.insertId;
   },
   signIn: async function (req) {
     const email = req.body.email;
+    const password = req.body.password;
+    const fcmToken = req.body.fcmToken;
 
     const sqlSelect =
-      'SELECT user_id, email, push_state FROM users WHERE email = ? AND is_active = true';
+      'SELECT user_id, email, nickname, fcm_token, password, is_active FROM users WHERE email = ?';
+    const [selectRows] = await db.query(sqlSelect, [email]);
+
+    if (selectRows.length < 1) {
+      throw new NotFound(ErrorMessage.unValidateUser);
+    }
+
+    const checkPassword = bcrypt.compareSync(password, selectRows[0].password);
+
+    if (selectRows[0].fcm_token !== fcmToken) {
+      const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
+      const params = [fcmToken, selectRows[0].user_id];
+
+      const [updateRows] = await db.queryWithTransaction(sqlUpdate, params);
+
+      if (updateRows.affectedRows < 1) {
+        throw new NotFound(ErrorMessage.failedUpdateFcmToken);
+      }
+    }
+
+    return {
+      result: checkPassword,
+      userId: selectRows[0].user_id,
+      nickname: selectRows[0].nickname,
+    };
+  },
+  restartSignIn: async function (req) {
+    const email = req.body.email;
+    const fcmToken = req.body.fcmToken;
+
+    const sqlSelect =
+      'SELECT user_id, email, nickname FROM users WHERE email = ? AND is_active = true';
 
     const [rows] = await db.query(sqlSelect, [email]);
 
@@ -36,7 +69,29 @@ module.exports = {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
+    if (rows[0].fcm_token !== fcmToken) {
+      const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
+      const params = [fcmToken, selectRows[0].user_id];
+
+      const [updateRows] = await db.queryWithTransaction(sqlUpdate, params);
+
+      if (updateRows.affectedRows < 1) {
+        throw new NotFound(ErrorMessage.failedUpdateFcmToken);
+      }
+    }
+
     return Object.setPrototypeOf(rows, []);
+  },
+  selectUser: async function (userId) {
+    const sqlSelect = 'SELECT * FROM users WHERE user_id = ?';
+
+    const [rows] = await db.query(sqlSelect, [userId]);
+
+    if (rows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.unValidateUser);
+    }
+
+    return rows[0].is_active === true ? true : false;
   },
   validateEmail: async function (req) {
     const email = req.body.email;
@@ -138,7 +193,7 @@ module.exports = {
   },
   updateFCM: async function (req) {
     const userId = Number(req.decoded);
-    const fcmToken = req.body.fcm_token;
+    const fcmToken = null;
 
     const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
     const params = [fcmToken, userId];
@@ -165,13 +220,11 @@ module.exports = {
   },
   updatePassword: async function (req) {
     const userId = Number(req.decoded);
-    const email = req.body.email;
-    const password = req.body.password;
-    const hashPassword = bcrypt.hashSync(password, 10);
+    const newPassword = req.body.newPassword;
+    const hashPassword = bcrypt.hashSync(newPassword, 10);
 
-    const sqlUpdate =
-      'UPDATE users SET password = ? WHERE email = ? AND user_id = ?';
-    const params = [hashPassword, email, userId];
+    const sqlUpdate = 'UPDATE users SET password = ? WHERE user_id = ?';
+    const params = [hashPassword, userId];
 
     const [rows] = await db.queryWithTransaction(sqlUpdate, params);
 
