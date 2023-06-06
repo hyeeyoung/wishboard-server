@@ -11,7 +11,6 @@ router.put(
   multer.upload.single('profile_img'),
   userController.updateUserInfo,
 );
-// router.put('/fcm', verifyToken, userController.updateUserFCMToken);
 router.put('/re-passwd', verifyToken, userController.updateUserPassword);
 router.put(
   '/push-state/:push',
