@@ -2,26 +2,37 @@ const Redis = require('ioredis');
 const logger = require('./winston');
 require('dotenv').config({ path: '../.env' });
 
-const REDIS_HOST = process.env.REDIS_HOST;
-const REDIS_PORT = process.env.REDIS_PORT;
-const nodeEnv = process.env.NODE_ENV;
+let redisHost;
+let redisPort;
 
-let redisPassword = process.env.REDIS_DEV_PASSWORD;
+const nodeEnv = process.env.NODE_ENV;
 if (nodeEnv === 'production') {
-  redisPassword = process.env.REDIS_PASSWORD;
+  redisHost = process.env.REDIS_HOST;
+  redisPort = process.env.REDIS_PORT;
+} else {
+  redisHost = process.env.REDIS_DEV_HOST;
+  redisPort = process.env.REDIS_DEV_PORT;
 }
 
 let redis;
 
 const redisConnect = () => {
   try {
-    redis = new Redis({
-      host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT,
-      password: redisPassword,
-      showFriendlyErrorStack: true,
-    });
-    logger.info(`redis(${REDIS_HOST}:${REDIS_PORT}) connect success!`);
+    if (nodeEnv === 'production') {
+      redis = new Redis({
+        host: redisHost,
+        port: redisPort,
+        showFriendlyErrorStack: true,
+      });
+    } else {
+      redis = new Redis({
+        host: redisHost,
+        port: redisPort,
+        password: redisPassword,
+        showFriendlyErrorStack: true,
+      });
+    }
+    logger.info(`redis ${nodeEnv} connect success!`);
   } catch (err) {
     logger.error(err.message);
     process.exit(1);
