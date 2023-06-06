@@ -44,8 +44,8 @@ jobs:
           echo DB_PASSWORD=${{ secrets.DB_DEV_PASSWORD }} >> .env
           echo DB_NAME=${{ secrets.DB_DEV_NAME }} >> .env
           echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-          echo REDIS_HOST=${{ secrets.REDIS_HOST }} >> .env
-          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .env
+          echo REDIS_DEV_HOST=${{ secrets.REDIS_DEV_HOST }} >> .env
+          echo REDIS_PORT=${{ secrets.REDIS_PORT }} >> .envx
           echo REDIS_DEV_PASSWORD=${{ secrets.REDIS_DEV_PASSWORD }} >> .env
 
           echo WISHBOARD_GMAIL_ID=${{ secrets.WISHBOARD_GMAIL_ID }} >> .env
