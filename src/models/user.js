@@ -71,7 +71,7 @@ module.exports = {
 
     if (rows[0].fcm_token !== fcmToken) {
       const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
-      const params = [fcmToken, selectRows[0].user_id];
+      const params = [fcmToken, rows[0].user_id];
 
       const [updateRows] = await db.queryWithTransaction(sqlUpdate, params);
 
