@@ -123,7 +123,7 @@ module.exports = {
   },
   restartSignIn: async function (req, res, next) {
     try {
-      if (!req.body.verify && !req.body.email && !req.body.fcmToken) {
+      if (!req.body.verify || !req.body.email || !req.body.fcmToken) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       const isVerify = req.body.verify;
