@@ -16,7 +16,7 @@ module.exports = {
     );
   },
   deleteItemImgAll: async (userId) => {
-    const sqlSelect = 'SELECT item_img FROM items WHERE userId = ?';
+    const sqlSelect = 'SELECT item_img FROM items WHERE user_id = ?';
     const [deleteImages] = await db.query(sqlSelect, [userId]);
 
     await Promise.all(
