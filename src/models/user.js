@@ -13,6 +13,21 @@ module.exports = {
 
     const hashPassword = bcrypt.hashSync(password, 10);
 
+    const sqlSelect =
+      'SELECT user_id, fcm_token FROM users WHERE fcm_token = ?';
+    const [selectRows] = await db.query(sqlSelect, [fcmToken]);
+
+    if (selectRows.affectedRows > 1) {
+      const sqlUpdate = 'UPDATE users SET fcm_token = null WHERE user_id = ?';
+      const [updateRows] = await db.queryWithTransaction(sqlUpdate, [
+        selectRows[0].user_id,
+      ]);
+
+      if (updateRows.affectedRows < 1) {
+        throw new NotFound(ErrorMessage.failedUpdateFcmToken);
+      }
+    }
+
     const sqlInsert =
       'INSERT IGNORE INTO users (email, password, fcm_token) VALUES (?, ?, ?)';
     const params = [email, hashPassword, fcmToken];

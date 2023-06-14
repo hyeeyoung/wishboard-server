@@ -57,15 +57,20 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
-      await User.signUp(req).then(async (userId) => {
-        const token = await createJwt(userId);
-        const tempNickname = getRandomNickname();
-        return res.status(StatusCode.CREATED).json({
-          success: true,
-          message: SuccessMessage.loginSuccessAfterSuccessSignUp,
-          data: { token, tempNickname },
+      const isExist = await User.validateEmail(req);
+      if (!isExist) {
+        await User.signUp(req).then(async (userId) => {
+          const token = await createJwt(userId);
+          const tempNickname = getRandomNickname();
+          return res.status(StatusCode.CREATED).json({
+            success: true,
+            message: SuccessMessage.loginSuccessAfterSuccessSignUp,
+            data: { token, tempNickname },
+          });
         });
-      });
+      } else {
+        throw new Conflict(ErrorMessage.validateEmail);
+      }
     } catch (err) {
       next(err);
     }
