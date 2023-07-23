@@ -92,7 +92,7 @@ const parsingForMusinsa = async (url) => {
           }
         }
       });
-      itemPrice = priceValue[priceValue.length - 4];
+      itemPrice = priceValue[priceValue.length - 3];
     }
   });
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
