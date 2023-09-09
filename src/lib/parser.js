@@ -82,17 +82,21 @@ const parsingForMusinsa = async (url) => {
           switch (ogTag) {
             case 'title':
               itemName = ogValue;
-              priceValue = ogValue.split(' ');
               break;
             case 'image':
               if (!itemImg) {
                 itemImg = ogValue;
               }
               break;
+            case 'description': {
+              priceValue = ogValue;
+              const matchPrice = priceValue.match(/\d{1,3}(,\d{3})*/g);
+              itemPrice = matchPrice[matchPrice.length - 1];
+              break;
+            }
           }
         }
       });
-      itemPrice = priceValue[priceValue.length - 3];
     }
   });
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
