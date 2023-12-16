@@ -8,6 +8,7 @@ const {
   ErrorMessage,
 } = require('../utils/response');
 const { Strings } = require('../utils/strings');
+const { isValidDateFormat } = require('../utils/util');
 
 const existEmptyData = (obj) => {
   if (obj.constructor !== Object) {
@@ -25,7 +26,6 @@ module.exports = {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.itemNameMiss);
       }
-
       await Items.insertItem(req).then((itemId) => {
         if (
           req.body.item_notification_date &&
@@ -33,19 +33,22 @@ module.exports = {
         ) {
           // TODO request DTO 분리하기
           const itemNotiDate = req.body.item_notification_date;
+          const date = itemNotiDate.slice(0, 10);
           const minute = Number(
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
-          if (minute === 0 || minute === 30) {
-            Noti.insertNoti(req, itemId).then(() => {
-              return res.status(StatusCode.CREATED).json({
-                success: true,
-                message: SuccessMessage.itemAndNotiInsert,
-              });
-            });
-          } else {
+          if (!isValidDateFormat(date)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
+          if (!(minute === 0 || minute === 30)) {
+            throw new BadRequest(ErrorMessage.notiDateMinuteBadRequest);
+          }
+          Noti.insertNoti(req, itemId).then(() => {
+            return res.status(StatusCode.CREATED).json({
+              success: true,
+              message: SuccessMessage.itemAndNotiInsert,
+            });
+          });
         } else {
           return res.status(StatusCode.CREATED).json({
             success: true,
@@ -97,29 +100,32 @@ module.exports = {
         ) {
           // TODO request DTO 분리하기
           const itemNotiDate = req.body.item_notification_date;
+          const date = itemNotiDate.slice(0, 10);
           const minute = Number(
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
-          if (minute === 0 || minute === 30) {
-            //* item 수정 후 item_noti_~에 따라 알림여부를 noti에 수정/추가
-            Noti.upsertNoti(req).then((state) => {
-              if (state === Strings.INSERT) {
-                return res.status(StatusCode.CREATED).json({
-                  success: true,
-                  message: SuccessMessage.itemUpdateAndNotiInsert,
-                });
-              }
 
-              if (state === Strings.UPSERT) {
-                return res.status(StatusCode.OK).json({
-                  success: true,
-                  message: SuccessMessage.itemAndNotiUpdate,
-                });
-              }
-            });
-          } else {
+          if (!isValidDateFormat(date)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
+          if (!(minute === 0 || minute === 30)) {
+            throw new BadRequest(ErrorMessage.notiDateMinuteBadRequest);
+          }
+          Noti.upsertNoti(req).then((state) => {
+            if (state === Strings.INSERT) {
+              return res.status(StatusCode.CREATED).json({
+                success: true,
+                message: SuccessMessage.itemUpdateAndNotiInsert,
+              });
+            }
+
+            if (state === Strings.UPSERT) {
+              return res.status(StatusCode.OK).json({
+                success: true,
+                message: SuccessMessage.itemAndNotiUpdate,
+              });
+            }
+          });
         } else {
           //* item 수정 후 item_noti_~가 null인 경우, noti에 존재하면 삭제
           Noti.deleteNoti(req).then((result) => {
