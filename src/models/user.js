@@ -17,7 +17,7 @@ module.exports = {
       'SELECT user_id, fcm_token FROM users WHERE fcm_token = ?';
     const [selectRows] = await db.query(sqlSelect, [fcmToken]);
 
-    if (selectRows.length > 1) {
+    if (selectRows.length >= 1) {
       const sqlUpdate = 'UPDATE users SET fcm_token = null WHERE user_id = ?';
       const [updateRows] = await db.queryWithTransaction(sqlUpdate, [
         selectRows[0].user_id,
@@ -54,15 +54,15 @@ module.exports = {
 
     const checkPassword = bcrypt.compareSync(password, selectRows[0].password);
 
-    // fcm 토큰이 다른 유저에 존재한다면, null 처리
+    // fcm 토큰이 다른 유저에 존재한다면, 다른 유저를 null 처리
     const sqlSelectByFcmToken =
       'SELECT user_id, fcm_token FROM users WHERE fcm_token = ?';
     const [selectFcmToken] = await db.query(sqlSelectByFcmToken, [fcmToken]);
 
-    console.log(selectFcmToken);
-    console.log(selectFcmToken.length >= 1);
-
-    if (selectFcmToken.length >= 1) {
+    if (
+      selectFcmToken.length >= 1 &&
+      selectFcmToken.user_id !== selectRows.user_id
+    ) {
       const sqlUpdate = 'UPDATE users SET fcm_token = null WHERE user_id = ?';
       const [updateRows] = await db.queryWithTransaction(sqlUpdate, [
         selectFcmToken[0].user_id,
@@ -100,7 +100,7 @@ module.exports = {
 
     const [rows] = await db.query(sqlSelect, [email]);
 
-    if (rows.affectedRows < 1) {
+    if (rows.length > 1) {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
@@ -122,7 +122,7 @@ module.exports = {
 
     const [rows] = await db.query(sqlSelect, [userId]);
 
-    if (rows.affectedRows < 1) {
+    if (rows.length < 1) {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
