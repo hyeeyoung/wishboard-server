@@ -59,9 +59,6 @@ module.exports = {
       'SELECT user_id, fcm_token FROM users WHERE fcm_token = ?';
     const [selectFcmToken] = await db.query(sqlSelectByFcmToken, [fcmToken]);
 
-    console.log(selectFcmToken);
-    console.log(selectFcmToken.length >= 1);
-
     if (selectFcmToken.length >= 1) {
       const sqlUpdate = 'UPDATE users SET fcm_token = null WHERE user_id = ?';
       const [updateRows] = await db.queryWithTransaction(sqlUpdate, [
@@ -100,7 +97,7 @@ module.exports = {
 
     const [rows] = await db.query(sqlSelect, [email]);
 
-    if (rows.affectedRows < 1) {
+    if (rows.length > 1) {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
@@ -122,7 +119,7 @@ module.exports = {
 
     const [rows] = await db.query(sqlSelect, [userId]);
 
-    if (rows.affectedRows < 1) {
+    if (rows.length > 1) {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
