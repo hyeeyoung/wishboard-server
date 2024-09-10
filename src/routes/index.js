@@ -3,6 +3,7 @@ const router = new express.Router();
 
 router.get('/', (req, res) => res.send('Welcome to WishBoard!!'));
 
+router.use('/version', require('./versionRoutes'));
 router.use('/auth', require('./authRoutes'));
 router.use('/user', require('./userRoutes'));
 router.use('/item', require('./itemRoutes'));
