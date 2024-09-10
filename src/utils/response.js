@@ -129,6 +129,10 @@ const ErrorMessage = {
   failedCreateToken: 'token 생성 실패',
   userIdNotFound: '토큰을 생성하기 위한 userId data 없음',
 
+  /* 버전 */
+  versionInfoNotFound: '버전 정보 없음',
+  versionUpdatedFailed: '버전 정보 수정 실패',
+
   /* 공통*/
   BadRequestMeg: '잘못된 요청',
   ApiUrlIsInvalid: '잘못된 경로',
