@@ -13,7 +13,11 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       await Version.checkVersion(req).then((result) => {
-        return res.status(StatusCode.OK).json(result);
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.versionSuccess,
+          data: result,
+        });
       });
     } catch (err) {
       next(err);
@@ -29,7 +33,11 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
       await Version.updateVersion(req).then((result) => {
-        return res.status(StatusCode.OK).json(result);
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.versionUpdate,
+          data: result,
+        });
       });
     } catch (err) {
       next(err);
@@ -38,7 +46,11 @@ module.exports = {
   getVersions: async function (req, res, next) {
     try {
       await Version.getVersions(req).then((result) => {
-        return res.status(StatusCode.OK).json(result);
+        return res.status(StatusCode.OK).json({
+          success: true,
+          message: SuccessMessage.versionSuccess,
+          data: result,
+        });
       });
     } catch (err) {
       next(err);

@@ -59,6 +59,10 @@ const SuccessMessage = {
 
   userDeleteSchedulerStart: '탈퇴 유저 삭제 스케줄러 시작',
   userDeleteSchedulerExit: '탈퇴 유저 삭제 스케줄러 종료',
+
+  /* 버전 */
+  versionSuccess: '버전 정보 조회 성공',
+  versionUpdate: '버전 정보 수정 성공',
 };
 
 const ErrorMessage = {
