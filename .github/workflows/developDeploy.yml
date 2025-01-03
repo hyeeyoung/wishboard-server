@@ -65,22 +65,33 @@ jobs:
           npm run build --if-present
 
         # S3에 빌드 파일 저장
-      - name: zip file
-        run: zip -r wishboard-dev.zip ./dist ./scripts ./appspec.yml
+      - name: Build file upload to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 cp \
+            --recursive \
+            --region ap-northeast-2 \
+            dist s3://wishboard-dev-build
 
-      - name: AWS configure credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_DEPLOY_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_DEPLOY_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+      #   # S3에 빌드 파일 저장
+      # - name: zip file
+      #   run: zip -r wishboard-dev.zip ./dist ./scripts ./appspec.yml
 
-      - name: upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./wishboard-dev.zip s3://wishboard-dev-build/deploy/
+      # - name: AWS configure credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_DEPLOY_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_DEPLOY_SECRET_ACCESS_KEY }}
+      #     aws-region: ap-northeast-2
 
-      - name: deploy with AWS codeDeploy
-        run: aws deploy create-deployment
-          --application-name wishboard-dev-codedeploy1
-          --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name GROUP
-          --s3-location bucket=wishboard-dev-build,bundleType=zip,key=deploy/wishboard-dev.zip
+      # - name: upload to S3
+      #   run: aws s3 cp --region ap-northeast-2 ./wishboard-dev.zip s3://wishboard-dev-build/deploy/
+
+      # - name: deploy with AWS codeDeploy
+      #   run: aws deploy create-deployment
+      #     --application-name wishboard-dev-codedeploy1
+      #     --deployment-config-name CodeDeployDefault.OneAtATime
+      #     --deployment-group-name GROUP
+      #     --s3-location bucket=wishboard-dev-build,bundleType=zip,key=deploy/wishboard-dev.zip
