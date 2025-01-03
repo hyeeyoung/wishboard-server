@@ -10,7 +10,14 @@ const ItemAddType = {
   MANUAL: 'MANUAL',
 };
 
+const OsType = {
+  IOS: 'IOS',
+  AOS: 'AOS',
+  SERVER: 'SERVER',
+};
+
 module.exports = {
   Strings,
   ItemAddType,
+  OsType,
 };

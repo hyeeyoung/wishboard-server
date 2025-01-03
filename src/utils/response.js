@@ -116,6 +116,7 @@ const ErrorMessage = {
   unActvieUserDelete: '매주 월요일 자정, 탈퇴 유저 삭제 실패',
 
   unActiveUser: '탈퇴 처리된 유저',
+  signInPasswordNotCorrect: '입력하신 비밀번호가 올바르지 않음',
   signUpFailed: 'wishboard 앱 회원가입 실패',
   existsUserFcmToken: '이미 존재하는 사용자의 fcmToken',
   validateEmail: '이미 존재하는 이메일 주소',
@@ -133,6 +134,9 @@ const ErrorMessage = {
   requestTokenAgain: 'token 없음. 요청 token 확인',
   failedCreateToken: 'token 생성 실패',
   userIdNotFound: '토큰을 생성하기 위한 userId data 없음',
+
+  userAgentNotFound: 'User-Agent가 없음',
+  userAgentInOsInfoNotFound: 'User-Agent에 OS정보가 없음',
 
   /* 버전 */
   versionInfoNotFound: '버전 정보 없음',
