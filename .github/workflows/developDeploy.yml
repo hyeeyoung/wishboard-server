@@ -36,7 +36,8 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
-          echo PORT=${{ secrets.PORT }} >> .env
+          echo NODE_ENV=development >> .env
+          echo PORT=${{ secrets.DEV_PORT }} >> .env
 
           echo DB_DEV_HOST=${{ secrets.DB_DEV_HOST }} >> .env
           echo DB_DEV_USER=${{ secrets.DB_DEV_USER }} >> .env
