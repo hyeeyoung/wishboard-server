@@ -49,6 +49,17 @@ const parsingForGeneral = async (url) => {
                 itemPrice = value;
               }
               break;
+            case 'description':
+              if (!itemPrice) {
+                const description = value;
+
+                const priceRegex = /(\d{1,3}(,\d{3})*(\.\d{2})?)/;
+                const matchPriceString = priceRegex.exec(description)[1];
+                if (matchPriceString) {
+                  itemPrice = matchPriceString;
+                }
+              }
+              break;
           }
         }
       });
