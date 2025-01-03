@@ -4,7 +4,7 @@ const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
 const config = {
-  // headers: { 'User-Agent': 'Mozilla/5.0' },
+  headers: { 'User-Agent': 'Mozilla/5.0' },
   validateStatus: function (status) {
     return status >= 200 && status < 300;
   },
@@ -61,6 +61,9 @@ const parsingForGeneral = async (url) => {
       // }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   // console.log(`im general`);
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
@@ -99,6 +102,9 @@ const parsingForMusinsa = async (url) => {
       });
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -133,6 +139,9 @@ const parsingForWconcept = async (url) => {
       }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -176,6 +185,9 @@ const parsingForNaver = async (url) => {
       }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -193,6 +205,9 @@ const parsingForCos = async (url) => {
       itemPrice = $('.m-product-price').children('#priceValue').text();
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -233,6 +248,9 @@ const parsingForGmarket = async (url) => {
       }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -264,6 +282,9 @@ const parsingForSeoulStore = async (url) => {
       });
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
