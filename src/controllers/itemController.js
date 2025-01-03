@@ -7,7 +7,7 @@ const {
   SuccessMessage,
   ErrorMessage,
 } = require('../utils/response');
-const { Strings } = require('../utils/strings');
+const { Strings, ItemAddType } = require('../utils/strings');
 const { isValidDateFormat } = require('../utils/util');
 
 const existEmptyData = (obj) => {
@@ -25,6 +25,12 @@ module.exports = {
     try {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.itemNameMiss);
+      }
+      if (
+        !req.query.type ||
+        !Object.keys(ItemAddType).includes(req.query.type)
+      ) {
+        throw new BadRequest(ErrorMessage.itemInsertTypeMiss);
       }
       await Items.insertItem(req).then((itemId) => {
         if (

@@ -5,6 +5,12 @@ const Strings = {
   IPDENIED_FILENAME: 'deniedIpAddress.txt',
 };
 
+const ItemAddType = {
+  PARSING: 'PARSING',
+  MANUAL: 'MANUAL',
+};
+
 module.exports = {
   Strings,
+  ItemAddType,
 };

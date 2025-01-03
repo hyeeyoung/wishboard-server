@@ -69,6 +69,7 @@ const ErrorMessage = {
   /* 아이템*/
   itemParseFail: '아이템 파싱 실패',
   itemNameMiss: '아이템 이름 누락',
+  itemInsertTypeMiss: '자동(PARSING)/수동(MANUAL) 타입 누락',
   itemUpdate: '수정된 아이템 없음',
   itemInsert: '추가된 아이템 없음',
   itemDelete: '삭제된 아이템 없음',

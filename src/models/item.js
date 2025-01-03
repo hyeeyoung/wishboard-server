@@ -12,12 +12,21 @@ module.exports = {
     const itemPrice = !req.body.item_price ? 0 : req.body.item_price;
     const itemUrl = !req.body.item_url ? null : trimToString(req.body.item_url);
     const itemMemo = trimToString(req.body.item_memo);
+    const addType = trimToString(req.query.type);
 
     if (isNaN(folderId)) {
       folderId = null;
     }
 
-    const params = [userId, folderId, itemName, itemPrice, itemUrl, itemMemo];
+    const params = [
+      userId,
+      folderId,
+      itemName,
+      itemPrice,
+      itemUrl,
+      itemMemo,
+      addType,
+    ];
 
     let sqlInsert;
     if (req.file != undefined) {
@@ -30,12 +39,12 @@ module.exports = {
       const itemImgUrl = image.location;
 
       sqlInsert =
-        'INSERT INTO items (user_id, folder_id, item_name, item_price, item_url, item_memo, item_img, item_img_url) VALUES(?, ?, ?, ?, ?, ?, ?, ?)';
+        'INSERT INTO items (user_id, folder_id, item_name, item_price, item_url, item_memo, add_type, item_img, item_img_url) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
       params.push(itemImg);
       params.push(itemImgUrl);
     } else {
       sqlInsert =
-        'INSERT INTO items (user_id, folder_id, item_name, item_price, item_url, item_memo) VALUES(?, ?, ?, ?, ?, ?)';
+        'INSERT INTO items (user_id, folder_id, item_name, item_price, item_url, item_memo, add_type) VALUES(?, ?, ?, ?, ?, ?, ?)';
     }
 
     const [rows] = await db.queryWithTransaction(sqlInsert, params);
