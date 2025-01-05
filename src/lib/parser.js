@@ -75,23 +75,12 @@ const parsingForGeneral = async (url) => {
           }
         }
       });
-      // TODO itemPrice를 못가져올 경우, div에서 꺼내오는 방법 연구해보기
-      // if (!itemPrice) {
-      //   console.log('itemPrice가 비었음!');
-      //   $('body').map((i, elem) => {
-      //     console.log($(elem).find(`div`).text());
-      //     // return $(elem)
-      //     //   .find(`.${/.*[pP]rice.*/}`)
-      //     //   .text();
-      //   });
-      // }
     }
   });
   if (!itemName) {
     itemName = $('title').text();
   }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
-  // console.log(`im general`);
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
 
