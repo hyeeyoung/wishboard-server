@@ -65,10 +65,10 @@ const parsingForGeneral = async (url) => {
               if (!itemPrice) {
                 const description = value;
 
-                const priceRegex = /(\d{1,3}(,\d{3})*(\.\d{2})?)/;
-                const matchPriceString = priceRegex.exec(description)[1];
+                const priceRegex = /\d{1,3}(,\d{3})*원/g;
+                const matchPriceString = description.match(priceRegex);
                 if (matchPriceString) {
-                  itemPrice = matchPriceString;
+                  itemPrice = matchPriceString[0];
                 }
               }
               break;
