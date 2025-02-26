@@ -57,8 +57,6 @@ module.exports = {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
       }
 
-      console.log(req.osType);
-
       const isExist = await User.validateEmail(req);
       if (!isExist) {
         await User.signUp(req).then(async (userId) => {

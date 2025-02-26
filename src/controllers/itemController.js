@@ -26,12 +26,6 @@ module.exports = {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.itemNameMiss);
       }
-      if (
-        !req.query.type ||
-        !Object.keys(ItemAddType).includes(req.query.type)
-      ) {
-        throw new BadRequest(ErrorMessage.itemInsertTypeMiss);
-      }
       await Items.insertItem(req).then((itemId) => {
         if (
           req.body.item_notification_date &&
