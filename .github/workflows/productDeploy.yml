@@ -36,6 +36,7 @@ jobs:
       - name: Create .env file
         run: |
           touch .env
+          echo NODE_ENV=production >> .env
           echo PORT=${{ secrets.PORT }} >> .env
 
           echo DB_HOST=${{ secrets.DB_HOST }} >> .env
@@ -68,7 +69,7 @@ jobs:
           cp ./ecosystem.config.js ./dist
 
         # S3에 빌드 파일 저장
-      - name: Build file upload to S3 and PM2 script
+      - name: Build file and PM2 script upload to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

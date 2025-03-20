@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { NotFound, Conflict } = require('../utils/errors');
+const { NotFound, Conflict, BadRequest } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 const db = require('../config/db');
 const { trimToString } = require('../utils/util');
@@ -10,6 +10,7 @@ module.exports = {
     const email = req.body.email;
     const password = req.body.password;
     const fcmToken = req.body.fcmToken;
+    const osType = req.osType;
 
     const hashPassword = bcrypt.hashSync(password, 10);
 
@@ -29,8 +30,8 @@ module.exports = {
     }
 
     const sqlInsert =
-      'INSERT IGNORE INTO users (email, password, fcm_token) VALUES (?, ?, ?)';
-    const params = [email, hashPassword, fcmToken];
+      'INSERT IGNORE INTO users (email, password, fcm_token, os_type) VALUES (?, ?, ?, ?)';
+    const params = [email, hashPassword, fcmToken, osType];
 
     const [rows] = await db.queryWithTransaction(sqlInsert, params);
 
@@ -43,6 +44,7 @@ module.exports = {
     const email = req.body.email;
     const password = req.body.password;
     const fcmToken = req.body.fcmToken;
+    const osType = req.osType;
 
     const sqlSelect =
       'SELECT user_id, email, nickname, fcm_token, password, is_active FROM users WHERE email = ?';
@@ -53,6 +55,9 @@ module.exports = {
     }
 
     const checkPassword = bcrypt.compareSync(password, selectRows[0].password);
+    if (!checkPassword) {
+      throw new BadRequest(ErrorMessage.signInPasswordNotCorrect);
+    }
 
     // fcm 토큰이 다른 유저에 존재한다면, 다른 유저를 null 처리
     const sqlSelectByFcmToken =
@@ -85,6 +90,16 @@ module.exports = {
       }
     }
 
+    // osType 저장
+    const sqlUpdate = 'UPDATE users SET os_type = ? WHERE user_id = ?';
+    const params = [osType, selectRows[0].user_id];
+
+    const [updateRows] = await db.queryWithTransaction(sqlUpdate, params);
+
+    if (updateRows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.failedUpdateFcmToken);
+    }
+
     return {
       result: checkPassword,
       userId: selectRows[0].user_id,
@@ -94,6 +109,7 @@ module.exports = {
   restartSignIn: async function (req) {
     const email = req.body.email;
     const fcmToken = req.body.fcmToken;
+    const osType = req.osType;
 
     const sqlSelect =
       'SELECT user_id, email, nickname FROM users WHERE email = ? AND is_active = true';
@@ -113,6 +129,16 @@ module.exports = {
       if (updateRows.affectedRows < 1) {
         throw new NotFound(ErrorMessage.failedUpdateFcmToken);
       }
+    }
+
+    // osType 저장
+    const sqlUpdate = 'UPDATE users SET os_type = ? WHERE user_id = ?';
+    const params = [osType, rows[0].user_id];
+
+    const [updateRows] = await db.queryWithTransaction(sqlUpdate, params);
+
+    if (updateRows.affectedRows < 1) {
+      throw new NotFound(ErrorMessage.failedUpdateFcmToken);
     }
 
     return Object.setPrototypeOf(rows, []);

@@ -3,8 +3,23 @@ const cheerio = require('cheerio');
 const { NotFound } = require('../utils/errors');
 const { ErrorMessage } = require('../utils/response');
 
+const userAgents = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36',
+  'Mozilla/5.0 (Linux; U; Android 2.1; en-us; sdk Build/ERD79) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17',
+];
+
+const getRandomUserAgent = () => {
+  return userAgents[Math.floor(Math.random() * userAgents.length)];
+};
+
 const config = {
-  // headers: { 'User-Agent': 'Mozilla/5.0' },
+  headers: {
+    'User-Agent': getRandomUserAgent(),
+    Accept:
+      'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate, br',
+    Connection: 'keep-alive',
+  },
   validateStatus: function (status) {
     return status >= 200 && status < 300;
   },
@@ -46,23 +61,26 @@ const parsingForGeneral = async (url) => {
                 itemPrice = value;
               }
               break;
+            case 'description':
+              if (!itemPrice) {
+                const description = value;
+
+                const priceRegex = /\d{1,3}(,\d{3})*원/g;
+                const matchPriceString = description.match(priceRegex);
+                if (matchPriceString) {
+                  itemPrice = matchPriceString[0];
+                }
+              }
+              break;
           }
         }
       });
-      // TODO itemPrice를 못가져올 경우, div에서 꺼내오는 방법 연구해보기
-      // if (!itemPrice) {
-      //   console.log('itemPrice가 비었음!');
-      //   $('body').map((i, elem) => {
-      //     console.log($(elem).find(`div`).text());
-      //     // return $(elem)
-      //     //   .find(`.${/.*[pP]rice.*/}`)
-      //     //   .text();
-      //   });
-      // }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
-  // console.log(`im general`);
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
 
@@ -99,6 +117,9 @@ const parsingForMusinsa = async (url) => {
       });
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -133,6 +154,9 @@ const parsingForWconcept = async (url) => {
       }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -176,6 +200,9 @@ const parsingForNaver = async (url) => {
       }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -193,6 +220,9 @@ const parsingForCos = async (url) => {
       itemPrice = $('.m-product-price').children('#priceValue').text();
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -233,6 +263,9 @@ const parsingForGmarket = async (url) => {
       }
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -264,6 +297,9 @@ const parsingForSeoulStore = async (url) => {
       });
     }
   });
+  if (!itemName) {
+    itemName = $('title').text();
+  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };

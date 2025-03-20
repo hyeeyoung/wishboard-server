@@ -31,6 +31,11 @@
         cmd: apt install -y net-tools
       become: yes
 
+    - name: set up curl
+      shell:
+        cmd: apt install -y curl
+      become: yes
+
     - name: set up mysql client
       shell:
         cmd: apt-get install -y mysql-client
@@ -94,14 +99,14 @@
         chdir: '{{ homedir }}'
       become: yes
 
-    - name: create swap memory
-      shell:
-        cmd: sudo fallocate -l {{ swap_memory }} /swapfile
-      become: yes
-
     - name: create swap memory file
       shell:
         cmd: chmod 600 /swapfile
+      become: yes
+
+    - name: create swap memory
+      shell:
+        cmd: sudo fallocate -l {{ swap_memory }} /swapfile
       become: yes
 
     - name: active swap memory 1
@@ -131,10 +136,6 @@
         creates: '{{ ansible_env.HOME }}/.nvm/nvm.sh'
       become: yes
 
-    - name: check installed node 16.13.2
-      shell:
-        cmd: source
-
     - name: apply to nvm script terminal
       lineinfile:
         dest: '{{ ansible_env.HOME }}/.bashrc'
@@ -149,21 +150,30 @@
     - name: setup .bashrc
       shell:
         cmd: source ~/.bashrc
+      args:
+        executable: /bin/bash
+      become: yes
 
     - name: nvm install 16.13.2
       shell:
-        cmd: source {{ user_home }}/.nvm/nvm.sh && nvm install 16.13.2
-      become: yes
+        cmd: 'source $HOME/.nvm/nvm.sh && nvm install 16.13.2'
+      args:
+        executable: /bin/bash
 
     - name: 16.19.1 global setting
       shell:
-        cmd: source {{ user_home }}/.nvm/nvm.sh && nvm use 16.13.2 && nvm alias default 16.13.2
-      become: yes
+        cmd: 'source $HOME/.nvm/nvm.sh && nvm use 16.13.2 && nvm alias default 16.13.2'
+      args:
+        executable: /bin/bash
 
     - name: checked node & npm version
       shell:
-        cmd: node -v && npm -v
+        cmd: 'source $HOME/.nvm/nvm.sh && node -v && npm -v'
+      args:
+        executable: /bin/bash
 
     - name: set up installed pm2
       shell:
-        cmd: npm install pm2 -g
+        cmd: 'source $HOME/.nvm/nvm.sh && npm install pm2 -g'
+      args:
+        executable: /bin/bash
