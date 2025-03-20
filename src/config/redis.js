@@ -24,6 +24,7 @@ const redisConnect = () => {
         port: redisPort,
         password: process.env.REDIS_PASSWORD,
         showFriendlyErrorStack: true,
+        // default db : 0
       });
     } else {
       redis = new Redis({
@@ -31,6 +32,7 @@ const redisConnect = () => {
         port: redisPort,
         password: process.env.REDIS_DEV_PASSWORD,
         showFriendlyErrorStack: true,
+        db: 1,
       });
     }
     logger.info(`redis ${nodeEnv} connect success!`);
