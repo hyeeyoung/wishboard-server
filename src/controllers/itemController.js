@@ -26,6 +26,13 @@ module.exports = {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.itemNameMiss);
       }
+      if (
+        !req.file &&
+        req.query.type &&
+        req.query.type === ItemAddType.MANUAL
+      ) {
+        throw new BadRequest(ErrorMessage.itemInsertImageMiss);
+      }
       await Items.insertItem(req).then((itemId) => {
         if (
           req.body.item_notification_date &&
