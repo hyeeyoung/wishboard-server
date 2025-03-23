@@ -54,12 +54,18 @@ module.exports = {
             return res.status(StatusCode.CREATED).json({
               success: true,
               message: SuccessMessage.itemAndNotiInsert,
+              data: {
+                id: itemId,
+              },
             });
           });
         } else {
           return res.status(StatusCode.CREATED).json({
             success: true,
             message: SuccessMessage.itemInsert,
+            data: {
+              id: itemId,
+            },
           });
         }
       });
