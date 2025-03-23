@@ -8,7 +8,7 @@ const {
   ErrorMessage,
 } = require('../utils/response');
 const { Strings, ItemAddType } = require('../utils/strings');
-const { isValidDateFormat } = require('../utils/util');
+const { isDateInFuture } = require('../utils/util');
 
 const existEmptyData = (obj) => {
   if (obj.constructor !== Object) {
@@ -44,7 +44,7 @@ module.exports = {
           const minute = Number(
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
-          if (!isValidDateFormat(date)) {
+          if (!isDateInFuture(date)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
           if (!(minute === 0 || minute === 30)) {
@@ -112,7 +112,7 @@ module.exports = {
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
 
-          if (!isValidDateFormat(date)) {
+          if (!isDateInFuture(date)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
           if (!(minute === 0 || minute === 30)) {
