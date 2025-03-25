@@ -77,6 +77,7 @@ const ErrorMessage = {
   itemNotFound: '아이템 정보 없음',
   itemLatestNotFound: '최근 추가한 아이템 정보 없음',
   itemUpdateToFolderNotFound: '수정된 아이템 폴더명 없음',
+  itemSiteUrlNotFound: '요청하신 URL은 유효한 링크가 아닙니다.',
 
   /* 장바구니*/
   cartNotFound: '장바구니 정보 없음',

@@ -20,6 +20,15 @@ const existEmptyData = (obj) => {
   return true;
 };
 
+const isValidUrl = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 module.exports = {
   insertItemInfo: async function (req, res, next) {
     try {
@@ -197,6 +206,9 @@ module.exports = {
     try {
       if (!req.query.site) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      if (!isValidUrl(req.query.site)) {
+        throw new BadRequest(ErrorMessage.itemSiteUrlNotFound);
       }
       await onBindParsingType(req.query.site)
         .then((data) => {
