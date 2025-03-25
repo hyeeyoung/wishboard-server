@@ -8,7 +8,7 @@ const {
   ErrorMessage,
 } = require('../utils/response');
 const { Strings, ItemAddType } = require('../utils/strings');
-const { isValidDateFormat } = require('../utils/util');
+const { isDateInFuture } = require('../utils/util');
 
 const existEmptyData = (obj) => {
   if (obj.constructor !== Object) {
@@ -20,11 +20,27 @@ const existEmptyData = (obj) => {
   return true;
 };
 
+const isValidUrl = (url) => {
+  try {
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 module.exports = {
   insertItemInfo: async function (req, res, next) {
     try {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.itemNameMiss);
+      }
+      if (
+        !req.file &&
+        req.query.type &&
+        req.query.type === ItemAddType.MANUAL
+      ) {
+        throw new BadRequest(ErrorMessage.itemInsertImageMiss);
       }
       await Items.insertItem(req).then((itemId) => {
         if (
@@ -37,7 +53,7 @@ module.exports = {
           const minute = Number(
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
-          if (!isValidDateFormat(date)) {
+          if (!isDateInFuture(date)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
           if (!(minute === 0 || minute === 30)) {
@@ -47,12 +63,18 @@ module.exports = {
             return res.status(StatusCode.CREATED).json({
               success: true,
               message: SuccessMessage.itemAndNotiInsert,
+              data: {
+                id: itemId,
+              },
             });
           });
         } else {
           return res.status(StatusCode.CREATED).json({
             success: true,
             message: SuccessMessage.itemInsert,
+            data: {
+              id: itemId,
+            },
           });
         }
       });
@@ -105,7 +127,7 @@ module.exports = {
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
 
-          if (!isValidDateFormat(date)) {
+          if (!isDateInFuture(date)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
           if (!(minute === 0 || minute === 30)) {
@@ -184,6 +206,9 @@ module.exports = {
     try {
       if (!req.query.site) {
         throw new BadRequest(ErrorMessage.BadRequestMeg);
+      }
+      if (!isValidUrl(req.query.site)) {
+        throw new BadRequest(ErrorMessage.itemSiteUrlNotFound);
       }
       await onBindParsingType(req.query.site)
         .then((data) => {
