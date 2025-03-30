@@ -49,11 +49,10 @@ module.exports = {
         ) {
           // TODO request DTO 분리하기
           const itemNotiDate = req.body.item_notification_date;
-          const date = itemNotiDate.slice(0, 10);
           const minute = Number(
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
-          if (!isDateInFuture(date)) {
+          if (!isDateInFuture(itemNotiDate)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
           if (!(minute === 0 || minute === 30)) {
@@ -114,7 +113,6 @@ module.exports = {
       if (!req.body.item_name) {
         throw new BadRequest(ErrorMessage.itemNameMiss);
       }
-
       await Items.updateItem(req).then(() => {
         if (
           req.body.item_notification_date &&
@@ -122,12 +120,11 @@ module.exports = {
         ) {
           // TODO request DTO 분리하기
           const itemNotiDate = req.body.item_notification_date;
-          const date = itemNotiDate.slice(0, 10);
           const minute = Number(
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
 
-          if (!isDateInFuture(date)) {
+          if (!isDateInFuture(itemNotiDate)) {
             throw new BadRequest(ErrorMessage.notiDateBadRequest);
           }
           if (!(minute === 0 || minute === 30)) {

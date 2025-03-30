@@ -4,10 +4,37 @@ const trimToString = (str) => {
   }
 };
 
+// const isDateInFuture = (str) => {
+//   console.log(str);
+//   const currentDate = new Date();
+//   const inputDate = new Date(str);
+
+//   console.log(currentDate);
+//   console.log(inputDate);
+//   console.log(currentDate <= inputDate);
+
+//   return currentDate <= inputDate;
+// };
+
 const isDateInFuture = (str) => {
   const currentDate = new Date();
   const inputDate = new Date(str);
-  return currentDate <= inputDate;
+
+  const formatter = new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const currentKST = formatter.format(currentDate);
+  const inputKST = formatter.format(inputDate);
+
+  return currentKST <= inputKST;
 };
 
 module.exports = { trimToString, isDateInFuture };
