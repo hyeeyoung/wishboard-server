@@ -4,18 +4,6 @@ const trimToString = (str) => {
   }
 };
 
-// const isDateInFuture = (str) => {
-//   console.log(str);
-//   const currentDate = new Date();
-//   const inputDate = new Date(str);
-
-//   console.log(currentDate);
-//   console.log(inputDate);
-//   console.log(currentDate <= inputDate);
-
-//   return currentDate <= inputDate;
-// };
-
 const isDateInFuture = (str) => {
   const currentDate = new Date();
   const inputDate = new Date(str);
@@ -33,7 +21,6 @@ const isDateInFuture = (str) => {
 
   const currentKST = formatter.format(currentDate);
   const inputKST = formatter.format(inputDate);
-
   return currentKST <= inputKST;
 };
 
