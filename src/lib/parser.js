@@ -74,12 +74,15 @@ const parsingForGeneral = async (url) => {
               break;
           }
         }
+        if (!itemName) {
+          const text = $('title').text();
+          if (text) {
+            itemName = text;
+          }
+        }
       });
     }
   });
-  if (!itemName) {
-    itemName = $('title').text();
-  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -114,12 +117,15 @@ const parsingForMusinsa = async (url) => {
             }
           }
         }
+        if (!itemName) {
+          const text = $('title').text();
+          if (text) {
+            itemName = text;
+          }
+        }
       });
     }
   });
-  if (!itemName) {
-    itemName = $('title').text();
-  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -145,6 +151,12 @@ const parsingForWconcept = async (url) => {
               break;
           }
         }
+        if (!itemName) {
+          const text = $('title').text();
+          if (text) {
+            itemName = text;
+          }
+        }
       });
       if (!itemPrice) {
         // TODO 개선 필요
@@ -154,9 +166,6 @@ const parsingForWconcept = async (url) => {
       }
     }
   });
-  if (!itemName) {
-    itemName = $('title').text();
-  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -184,6 +193,12 @@ const parsingForNaver = async (url) => {
               }
               break;
           }
+          if (!itemName) {
+            const text = $('title').text();
+            if (text) {
+              itemName = text;
+            }
+          }
         }
       });
       //* 앞 smartStore, 뒤 toptop
@@ -200,9 +215,6 @@ const parsingForNaver = async (url) => {
       }
     }
   });
-  if (!itemName) {
-    itemName = $('title').text();
-  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -220,9 +232,6 @@ const parsingForCos = async (url) => {
       itemPrice = $('.m-product-price').children('#priceValue').text();
     }
   });
-  if (!itemName) {
-    itemName = $('title').text();
-  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -256,6 +265,12 @@ const parsingForGmarket = async (url) => {
               break;
           }
         }
+        if (!itemName) {
+          const text = $('title').text();
+          if (text) {
+            itemName = text;
+          }
+        }
       });
       /* Gmarket Web */
       if (!String(url).includes('mitem')) {
@@ -263,9 +278,6 @@ const parsingForGmarket = async (url) => {
       }
     }
   });
-  if (!itemName) {
-    itemName = $('title').text();
-  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
@@ -294,12 +306,15 @@ const parsingForSeoulStore = async (url) => {
               break;
           }
         }
+        if (!itemName) {
+          const text = $('title').text();
+          if (text) {
+            itemName = text;
+          }
+        }
       });
     }
   });
-  if (!itemName) {
-    itemName = $('title').text();
-  }
   itemPrice = itemPrice ? getPriceWithoutString(itemPrice) : undefined;
   return { item_img: itemImg, item_name: itemName, item_price: itemPrice };
 };
