@@ -124,9 +124,7 @@ module.exports = {
             itemNotiDate.slice(-5, itemNotiDate.length - 3),
           );
 
-          if (!isDateInFuture(itemNotiDate)) {
-            throw new BadRequest(ErrorMessage.notiDateBadRequest);
-          }
+          // 아이템 수정 시에는 과거 날짜도 가능 (이전에 알림이 온 아이템을 수정할 수도 있으므로)
           if (!(minute === 0 || minute === 30)) {
             throw new BadRequest(ErrorMessage.notiDateMinuteBadRequest);
           }
