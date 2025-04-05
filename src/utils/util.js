@@ -16,11 +16,15 @@ const isDateInFuture = (str) => {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    hour12: false,
+    hourCycle: 'h23',
   });
 
   const currentKST = formatter.format(currentDate);
   const inputKST = formatter.format(inputDate);
+  console.log(currentDate);
+  console.log(inputDate);
+  console.log(currentKST);
+  console.log(inputKST);
   return currentKST <= inputKST;
 };
 
