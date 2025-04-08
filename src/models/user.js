@@ -66,7 +66,7 @@ module.exports = {
 
     if (
       selectFcmToken.length >= 1 &&
-      selectFcmToken.user_id !== selectRows.user_id
+      selectFcmToken[0].user_id !== selectRows[0].user_id
     ) {
       const sqlUpdate = 'UPDATE users SET fcm_token = null WHERE user_id = ?';
       const [updateRows] = await db.queryWithTransaction(sqlUpdate, [
