@@ -4,26 +4,28 @@ const trimToString = (str) => {
   }
 };
 
-const isValidDateFormat = (str) => {
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-  if (datePattern.test(str)) {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // 월은 0부터 시작
-    const currentDay = currentDate.getDate();
+const isDateInFuture = (str) => {
+  const currentDate = new Date();
+  const inputDate = new Date(str);
 
-    const inputDate = new Date(str);
-    const inputYear = inputDate.getFullYear();
-    const inputMonth = inputDate.getMonth() + 1; // 월은 0부터 시작
-    const inputDay = inputDate.getDate();
+  const formatter = new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  });
 
-    return (
-      inputYear >= currentYear &&
-      inputMonth >= currentMonth &&
-      inputDay >= currentDay
-    );
-  }
-  return false;
+  const currentKST = formatter.format(currentDate);
+  const inputKST = formatter.format(inputDate);
+  console.log(currentDate);
+  console.log(inputDate);
+  console.log(currentKST);
+  console.log(inputKST);
+  return currentKST <= inputKST;
 };
 
-module.exports = { trimToString, isValidDateFormat };
+module.exports = { trimToString, isDateInFuture };

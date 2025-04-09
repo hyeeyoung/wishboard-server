@@ -30,7 +30,9 @@ const getOsType = (req, res, next) => {
   const osTypeToUpperCase = String(osType).toUpperCase();
 
   if (!Object.keys(OsType).includes(osTypeToUpperCase)) {
-    throw new BadRequest(ErrorMessage.userAgentInOsInfoNotFound);
+    log.error(ErrorMessage.userAgentInOsInfoNotFound);
+    req.osType = '';
+    return next();
   }
   req.osType = String(osType).toUpperCase();
   return next();

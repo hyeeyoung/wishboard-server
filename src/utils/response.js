@@ -70,12 +70,14 @@ const ErrorMessage = {
   itemParseFail: '아이템 파싱 실패',
   itemNameMiss: '아이템 이름 누락',
   itemInsertTypeMiss: '자동(PARSING)/수동(MANUAL) 타입 누락',
+  itemInsertImageMiss: '수동 등록의 경우 아이템 이미지 필수',
   itemUpdate: '수정된 아이템 없음',
   itemInsert: '추가된 아이템 없음',
   itemDelete: '삭제된 아이템 없음',
   itemNotFound: '아이템 정보 없음',
   itemLatestNotFound: '최근 추가한 아이템 정보 없음',
   itemUpdateToFolderNotFound: '수정된 아이템 폴더명 없음',
+  itemSiteUrlNotFound: '요청하신 URL은 유효한 링크가 아닙니다.',
 
   /* 장바구니*/
   cartNotFound: '장바구니 정보 없음',

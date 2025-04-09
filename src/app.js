@@ -19,11 +19,7 @@ const { redisConnect } = require('./config/redis');
 // 서버 환경에 따라 다르게 설정 (배포/개발)
 app.use(helmet());
 app.use(hpp());
-if (nodeEnv === 'production') {
-  morganFormat = 'combined'; // Apache 표준
-} else {
-  morganFormat = 'dev';
-}
+morganFormat = 'combined'; // Apache 표준
 app.use(morgan(morganFormat, { stream: logger.stream }));
 
 let isDisableKeepAlive = false;

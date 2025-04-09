@@ -14,6 +14,8 @@ module.exports = {
         cb(null, `${Date.now()}_${file.originalname}`);
       },
     }),
+    // 파일 허용 사이즈 (5 MB)
+    limits: { fileSize: 5 * 1024 * 1024 },
   }),
   s3Delete: async function (key) {
     s3.deleteObject(

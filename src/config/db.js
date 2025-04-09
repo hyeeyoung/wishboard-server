@@ -80,11 +80,9 @@ module.exports = {
       rows = await connection.query(query);
     } else {
       let sqlQuery = '';
-      await Promise.all(
-        args.map(async (parameter) => {
-          sqlQuery += mysql.format(query, parameter);
-        }),
-      );
+      args.forEach((parameter) => {
+        sqlQuery += mysql.format(query, parameter);
+      });
       rows = await connection.query(sqlQuery);
     }
     connection.release();
@@ -95,25 +93,22 @@ module.exports = {
     let rows;
     const connection = await this.connection(async (conn) => conn);
 
-    await connection.beginTransaction();
-    if (!args) {
-      rows = await connection
-        .query(query)
-        .then(await connection.commit())
-        .catch(await connection.rollback());
-    } else {
-      let sqlQuery = '';
-      await Promise.all(
-        args.map(async (parameter) => {
+    try {
+      if (!args || args.length === 0) {
+        rows = await connection.query(query);
+      } else {
+        let sqlQuery = '';
+        args.forEach((parameter) => {
           sqlQuery += mysql.format(query, parameter);
-        }),
-      );
-      rows = await connection
-        .query(sqlQuery)
-        .then(await connection.commit())
-        .catch(await connection.rollback());
+        });
+        rows = await connection.query(sqlQuery);
+      }
+      await connection.commit();
+      return rows;
+    } catch (err) {
+      await connection.rollback();
+    } finally {
+      connection.release();
     }
-    connection.release();
-    return rows;
   },
 };

@@ -66,7 +66,7 @@ module.exports = {
 
     if (
       selectFcmToken.length >= 1 &&
-      selectFcmToken.user_id !== selectRows.user_id
+      selectFcmToken[0].user_id !== selectRows[0].user_id
     ) {
       const sqlUpdate = 'UPDATE users SET fcm_token = null WHERE user_id = ?';
       const [updateRows] = await db.queryWithTransaction(sqlUpdate, [
@@ -120,6 +120,7 @@ module.exports = {
       throw new NotFound(ErrorMessage.unValidateUser);
     }
 
+    // 현재 유저로 fcm 토큰 갱신
     if (rows[0].fcm_token !== fcmToken) {
       const sqlUpdate = 'UPDATE users SET fcm_token = ? WHERE user_id = ?';
       const params = [fcmToken, rows[0].user_id];
