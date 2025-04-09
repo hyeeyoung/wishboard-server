@@ -17,6 +17,7 @@ const { redisConnect } = require('./config/redis');
 
 /** 기본 설정 */
 // 서버 환경에 따라 다르게 설정 (배포/개발)
+app.set('trust proxy', true);
 app.use(helmet());
 app.use(hpp());
 morganFormat = 'combined'; // Apache 표준
