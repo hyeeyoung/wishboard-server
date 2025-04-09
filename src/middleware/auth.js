@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const { ErrorMessage } = require('../utils/response');
 const { Unauthorized, BadRequest } = require('../utils/errors');
 const { OsType } = require('../utils/strings');
+const logger = require('../config/winston');
 require('dotenv').config({ path: '../.env' });
 
 const jwtSecret = process.env.JWT_SECRET_KEY;
@@ -30,7 +31,7 @@ const getOsType = (req, res, next) => {
   const osTypeToUpperCase = String(osType).toUpperCase();
 
   if (!Object.keys(OsType).includes(osTypeToUpperCase)) {
-    log.error(ErrorMessage.userAgentInOsInfoNotFound);
+    logger.error(ErrorMessage.userAgentInOsInfoNotFound);
     req.osType = '';
     return next();
   }

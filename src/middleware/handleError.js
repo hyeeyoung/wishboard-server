@@ -6,11 +6,7 @@ const multer = require('multer');
 const { ErrorMessage } = require('../utils/response');
 
 const handleErrors = (err, req, res, next) => {
-  if (process.env.NODE_ENV === 'production') {
-    logger.error(err.stack);
-  } else {
-    logger.error(err.stack);
-  }
+  logger.error(err.stack);
 
   //* multer 에러 확인용 log
   if (err instanceof multer.MulterError) {
