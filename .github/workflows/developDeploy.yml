@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16.13.2] # 개발환경과 동일하게 맞춤
+        node-version: [18.20.7] # 개발환경과 동일하게 맞춤
 
     steps:
       # 브랜치에 checkout해 코드를 가져온다

@@ -3,7 +3,7 @@ const router = new express.Router();
 const logger = require('../config/winston');
 
 router.use((req, res, next) => {
-  const cloneBody = req.body;
+  const cloneBody = structuredClone(req.body);
   if (cloneBody.password) {
     cloneBody.password = 'None record data. - wishbaord server';
   }
