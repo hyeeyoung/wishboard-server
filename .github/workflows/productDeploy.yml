@@ -4,6 +4,22 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy (default: main)'
+        required: false
+        default: 'main'
+      AWS_BUILD_BUCKET:
+        description: 'Override S3 Bucket Name (optional)'
+        required: false
+      AWS_ACCESS_KEY_ID:
+        description: 'Override AWS_ACCESS_KEY_ID (optional)'
+        required: false
+      AWS_SECRET_ACCESS_KEY:
+        description: 'Override AWS_SECRET_ACCESS_KEY (optional)'
+        required: false
+
 jobs:
   prod_CICD:
     runs-on: ubuntu-latest
@@ -68,13 +84,22 @@ jobs:
         run: |
           cp ./ecosystem.config.js ./dist
 
-        # S3에 빌드 파일 저장
-      - name: Build file and PM2 script upload to S3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ github.event.inputs.AWS_ACCESS_KEY_ID != '' && github.event.inputs.AWS_ACCESS_KEY_ID || secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ github.event.inputs.AWS_SECRET_ACCESS_KEY != '' && github.event.inputs.AWS_SECRET_ACCESS_KEY || secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      
+      - name: Set AWS_BUILD_BUCKET
         run: |
+          echo "AWS_BUILD_BUCKET=${{ github.event.inputs.AWS_BUILD_BUCKET != '' && github.event.inputs.AWS_BUILD_BUCKET || secrets.AWS_BUILD_BUCKET }}" >> $GITHUB_ENV
+          
+        # S3에 빌드 파일 저장
+      - name: Build file upload to S3 and PM2 script
+        run: |
+          AWS_BUILD_BUCKET=${{ github.event.inputs.AWS_BUILD_BUCKET != '' && github.event.inputs.AWS_BUILD_BUCKET || secrets.AWS_BUILD_BUCKET }}
           aws s3 cp \
             --recursive \
             --region ap-northeast-2 \
-            dist s3://wishboard-prod2-build
+            dist s3://$AWS_BUILD_BUCKET
