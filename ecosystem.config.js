@@ -10,7 +10,7 @@ module.exports = {
       namespace: 'API-server',
       instance_var: 'INSTANCE_ID',
       version: '1.0.0',
-      instances: 4,
+      instances: 2,
       exec_mode: 'cluster',
       wait_ready: true, // 마스터 프로세스에게 ready 이벤트 대기
       listen_timeout: 50000, // ms ... ready 이벤트를 기다릴 시간값
